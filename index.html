@@ -4,6 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SBTÜ Hazırlık Not & Devamsızlık Sistemi</title>
+    <!-- PWA & Mobil Uygulama Meta Etiketleri -->
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#1e1b4b">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="SBTÜ Hazırlık">
+    
+    <!-- iOS Safari Desteği -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="SBTÜ Hazırlık">
+    <link rel="apple-touch-icon" href="https://ydyo.sivas.edu.tr/app/themes/edu/ico/sbtu.png">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -54,6 +66,14 @@
                     <h1 class="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight">Hazırlık Not & Devamsızlık</h1>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
+                    <!-- PWA Uygulama Yükleme Butonu (Sadece destekleyen tarayıcılarda görünür) -->
+                    <button id="pwa-install-btn" onclick="triggerPWAInstall()" class="hidden bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-100 text-xs px-2.5 sm:px-3 py-2 rounded-xl border border-emerald-400/30 transition flex items-center gap-1.5 shadow-sm active:scale-95 backdrop-blur-sm" title="Uygulamayı Telefona Yükle">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                        <span class="hidden sm:inline font-bold">Uygulamayı İndir</span>
+                    </button>
+
                     <!-- Tema Değiştirme Butonu -->
                     <button id="theme-toggle-btn" onclick="toggleTheme()" class="relative p-2 sm:p-2.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 backdrop-blur-md transition-all duration-300 shadow-sm group" title="Temayı Değiştir" aria-label="Temayı Değiştir">
                         <svg id="theme-icon-sun" class="w-4 h-4 sm:w-5 sm:h-5 hidden text-amber-300 transition-transform duration-500 group-hover:rotate-90 drop-shadow-[0_0_8px_rgba(252,211,77,0.6)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -2866,6 +2886,63 @@
         }
 
         window.onload = initApp;
+
+        // ====================== PWA YÜKLEME & SERVICE WORKER ENTEGRASYONU ======================
+        let deferredPrompt = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Tarayıcının varsayılan banner'ını durdur ve özel butonumuzu göster
+            e.preventDefault();
+            deferredPrompt = e;
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) {
+                installBtn.classList.remove('hidden');
+            }
+        });
+
+        async function triggerPWAInstall() {
+            if (!deferredPrompt) {
+                // Eğer iOS Safari kullanılıyorsa kullanıcıya nasıl ana ekrana ekleyeceğini söyleyen rehber aç
+                showFeedback(true, "Telefona Yükleme (iOS Safari)", "Safari alt menüsündeki 'Paylaş' (ortadaki yukarı oklu kare) butonuna dokunup 'Ana Ekrana Ekle' seçeneğine basarak doğrudan uygulama gibi yükleyebilirsiniz.");
+                return;
+            }
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') {
+                const installBtn = document.getElementById('pwa-install-btn');
+                if (installBtn) installBtn.classList.add('hidden');
+            }
+            deferredPrompt = null;
+        }
+
+        window.addEventListener('appinstalled', () => {
+            const installBtn = document.getElementById('pwa-install-btn');
+            if (installBtn) installBtn.classList.add('hidden');
+            showFeedback(true, "Uygulama Yüklendi!", "SBTÜ Hazırlık Sistemi telefonunuzun ana ekranına başarıyla eklendi.");
+        });
+
+        // Çevrimdışı önbellekleme için gömülü Service Worker kaydı
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'sbtu-pwa-v1';
+                    self.addEventListener('install', (e) => {
+                        self.skipWaiting();
+                    });
+                    self.addEventListener('activate', (e) => {
+                        e.waitUntil(clients.claim());
+                    });
+                    self.addEventListener('fetch', (e) => {
+                        e.respondWith(
+                            fetch(e.request).catch(() => caches.match(e.request))
+                        );
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'application/javascript' });
+                const swUrl = URL.createObjectURL(blob);
+                navigator.serviceWorker.register(swUrl).catch(() => {});
+            });
+        }
     </script>
 </body>
 </html>
