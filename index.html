@@ -1000,7 +1000,7 @@
         let activeKurId = 'kur1';
         let selectedDateId = '2026-11-02';
 
-        // Bugünün Tarihine Göre Aktif Kuru Otomatik Tespit Etme
+        // Bugünün Tarihine Göre Aktif Kuru Akıllı ve Dinamik Tespit Etme
         function detectCurrentKurId() {
             const now = new Date();
             const y = now.getFullYear();
@@ -1008,24 +1008,58 @@
             const d = String(now.getDate()).padStart(2, '0');
             const todayStr = `${y}-${m}-${d}`;
 
-            // Akademik Takvim aralıklarını kontrol et
+            // 1. Doğrudan kur tarihleri içinde miyiz?
             for (let kId in KURS_DATA) {
                 const k = KURS_DATA[kId];
                 if (todayStr >= k.startDate && todayStr <= k.endDate) {
                     return kId;
                 }
             }
-            return 'kur1'; // Varsayılan Güz 1. Kur
+
+            // 2. Kurlar arası tatilde veya sınav haftasındaysak en yakın gelecek kuru seç
+            if (todayStr < KURS_DATA.kur1.startDate) return 'kur1';
+            if (todayStr > KURS_DATA.kur1.endDate && todayStr < KURS_DATA.kur2.startDate) return 'kur2';
+            if (todayStr > KURS_DATA.kur2.endDate && todayStr < KURS_DATA.kur3.startDate) return 'kur3';
+            if (todayStr > KURS_DATA.kur3.endDate && todayStr < KURS_DATA.kur4.startDate) return 'kur4';
+            if (todayStr > KURS_DATA.kur4.endDate && todayStr < KURS_DATA.yaz.startDate) return 'yaz';
+
+            return 'kur1'; // Varsayılan
         }
 
         function setKur(kId) {
-            if (!KURS_DATA[kId]) return;
-            activeKurId = kId;
-            SafeStorage.set(ACTIVE_KUR_PREF_KEY, activeKurId);
+            if (kId === 'auto') {
+                SafeStorage.remove(ACTIVE_KUR_PREF_KEY);
+                activeKurId = detectCurrentKurId();
+            } else {
+                if (!KURS_DATA[kId]) return;
+                activeKurId = kId;
+                SafeStorage.set(ACTIVE_KUR_PREF_KEY, activeKurId);
+            }
 
             // Seçili günü bu kurun ilk geçerli gününe ayarla
-            const firstDay = KURS_DATA[kId].weeks[0].days[0].id;
-            selectedDateId = firstDay;
+            const curKur = KURS_DATA[activeKurId];
+            if (curKur && curKur.weeks[0]) {
+                // Eğer bugün bu kurun içindeyse bugünü, değilse ilk günü seç
+                const now = new Date();
+                const y = now.getFullYear();
+                const m = String(now.getMonth() + 1).padStart(2, '0');
+                const d = String(now.getDate()).padStart(2, '0');
+                const todayStr = `${y}-${m}-${d}`;
+
+                let foundToday = false;
+                curKur.weeks.forEach(w => {
+                    w.days.forEach(day => {
+                        if (day.id === todayStr) {
+                            selectedDateId = day.id;
+                            foundToday = true;
+                        }
+                    });
+                });
+
+                if (!foundToday) {
+                    selectedDateId = curKur.weeks[0].days[0].id;
+                }
+            }
 
             renderKurSelector();
             calculateAttendance();
@@ -1037,13 +1071,36 @@
             const container = document.getElementById('kur-selector-buttons');
             container.innerHTML = '';
 
+            const isAuto = !SafeStorage.get(ACTIVE_KUR_PREF_KEY);
             const activeKur = KURS_DATA[activeKurId];
             document.getElementById('calendar-header-title').innerText = activeKur.title;
             document.getElementById('calendar-header-subtitle').innerText = activeKur.subtitle;
 
+            // Güncel Tarih Etiketi
+            const now = new Date();
+            const dateOptions = { day: '2-digit', month: 'long', year: 'numeric' };
+            const formattedDate = now.toLocaleDateString('tr-TR', dateOptions);
+            const dateInfoEl = document.getElementById('current-date-info');
+            if (dateInfoEl) dateInfoEl.innerText = `Bugün: ${formattedDate}`;
+
+            // Otomatik Takip Butonu
+            const autoBtn = document.createElement('button');
+            autoBtn.type = 'button';
+            autoBtn.onclick = () => setKur('auto');
+            autoBtn.className = `py-1.5 px-2 rounded-xl border text-xs text-center transition-all active:scale-95 flex flex-col items-center justify-center ${
+                isAuto 
+                ? 'bg-emerald-600 text-white font-extrabold shadow-md border-emerald-600' 
+                : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold'
+            }`;
+            autoBtn.innerHTML = `
+                <span class="truncate w-full flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full ${isAuto ? 'bg-white animate-pulse' : 'bg-emerald-500'}"></span>Otomatik</span>
+                <span class="text-[9px] ${isAuto ? 'text-emerald-100' : 'text-slate-400'} font-normal">Takvimle Senkron</span>
+            `;
+            container.appendChild(autoBtn);
+
             for (let kId in KURS_DATA) {
                 const k = KURS_DATA[kId];
-                const isActive = kId === activeKurId;
+                const isActive = !isAuto && kId === activeKurId;
 
                 const btn = document.createElement('button');
                 btn.type = 'button';
