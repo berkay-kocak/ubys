@@ -488,9 +488,9 @@
             
             <div class="flex items-center gap-2">
                 <!-- Gizli dosya seçici input -->
-                <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="handleFileImport(event)">
+                <input type="file" id="import-file-input" accept=".json" class="hidden" onchange="handleFileSelect(event)">
                 
-                <button onclick="exportUserData()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 active:scale-95 text-slate-700 dark:text-slate-300 font-bold text-[11px] rounded-xl border border-slate-200 dark:border-slate-700 transition flex items-center gap-1 shadow-sm">
+                <button onclick="openExportModal()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/80 dark:hover:bg-slate-700/80 active:scale-95 text-slate-700 dark:text-slate-300 font-bold text-[11px] rounded-xl border border-slate-200 dark:border-slate-700 transition flex items-center gap-1 shadow-sm">
                     <svg class="w-3.5 h-3.5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
                     <span>Dışa Aktar (.json)</span>
                 </button>
@@ -503,6 +503,143 @@
         </div>
 
     </main>
+
+    <!-- Dışa Aktarma Ön İzleme Modalı -->
+    <div id="export-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm transition-opacity duration-300">
+        <div class="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh] animate-modal">
+            
+            <div class="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    </span>
+                    <h3 class="font-bold text-sm sm:text-base text-slate-800 dark:text-slate-100">Yedekleme Ön İzlemesi</h3>
+                </div>
+                <button onclick="closeExportModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Kapat">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-3.5 text-xs">
+                <p class="text-slate-500 dark:text-slate-400 leading-relaxed text-[11px] sm:text-xs">
+                    Aşağıdaki özet veriler ve tüm takvim kayıtlarınız şifrelenmemiş standart bir <strong>.json</strong> yedek dosyasında toplanmıştır.
+                </p>
+
+                <!-- Yedek Özeti Kartı -->
+                <div class="p-3.5 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 space-y-2">
+                    <div class="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                        <span class="font-medium text-slate-500 dark:text-slate-400">Öğrenci:</span>
+                        <span id="export-preview-name" class="font-bold text-indigo-950 dark:text-indigo-200">Belirtilmedi</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                        <span class="font-medium text-slate-500 dark:text-slate-400">Dönem Notu / Durum:</span>
+                        <span id="export-preview-grade" class="font-extrabold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                        <span class="font-medium text-slate-500 dark:text-slate-400">Girilmiş Not Sayısı:</span>
+                        <span id="export-preview-gradecount" class="font-bold text-slate-800 dark:text-slate-200">0 Not</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-slate-300">
+                        <span class="font-medium text-slate-500 dark:text-slate-400">Toplam Devamsızlık Kaydı:</span>
+                        <span id="export-preview-attcount" class="font-bold text-slate-800 dark:text-slate-200">0 Günlük Kayıt</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-slate-300 pt-1 border-t border-indigo-200/50 dark:border-indigo-900/30 text-[10px]">
+                        <span class="text-slate-400">Yedekleme Zamanı:</span>
+                        <span id="export-preview-time" class="text-indigo-600 dark:text-indigo-400 font-semibold">-</span>
+                    </div>
+                </div>
+
+                <!-- JSON Verisi Kod Kutusu -->
+                <div>
+                    <span class="block text-[11px] font-bold text-slate-600 dark:text-slate-300 mb-1">Dosya İçeriği (JSON)</span>
+                    <pre id="export-json-preview" class="p-2.5 rounded-xl bg-slate-900 text-indigo-300 text-[10px] font-mono max-h-32 overflow-x-auto overflow-y-auto border border-slate-800 select-all"></pre>
+                </div>
+            </div>
+
+            <div class="p-3.5 sm:p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 flex items-center justify-end gap-2 shrink-0">
+                <button onclick="closeExportModal()" class="px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition">
+                    Vazgeç
+                </button>
+                <button onclick="downloadExportedFile()" class="flex-1 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span>Yedek Dosyasını İndir (.json)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- İçe Aktarma Ön İzleme ve Onay Modalı -->
+    <div id="import-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm transition-opacity duration-300">
+        <div class="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden flex flex-col max-h-[92vh] animate-modal">
+            
+            <div class="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </span>
+                    <h3 class="font-bold text-sm sm:text-base text-slate-800 dark:text-slate-100">Yedek Yükleme Onayı</h3>
+                </div>
+                <button onclick="closeImportModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Kapat">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-3.5 text-xs">
+                <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-amber-900 dark:text-amber-300 leading-relaxed text-[11px]">
+                    <strong>Dikkat:</strong> Bu yedek dosyasını içeri aktardığınızda tarayıcınızda kayıtlı mevcut notlar ve devamsızlıklar silinip bu yedekteki verilerle değiştirilecektir.
+                </div>
+
+                <!-- Yüklenecek Veri Özeti -->
+                <div class="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-slate-400">Öğrenci:</span>
+                        <span id="import-preview-name" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-slate-400">Not Sayısı:</span>
+                        <span id="import-preview-grades" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-slate-400">Devamsızlık Kayıtları:</span>
+                        <span id="import-preview-att" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-slate-400">Yedek Tarihi:</span>
+                        <span id="import-preview-date" class="font-semibold text-indigo-600 dark:text-indigo-400 text-[10px]">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3.5 sm:p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 flex items-center justify-end gap-2 shrink-0">
+                <button onclick="closeImportModal()" class="px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-slate-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition">
+                    İptal
+                </button>
+                <button onclick="confirmImport()" class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Onayla ve Verileri Yükle</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- İşlem Sonuç Modalı (Başarı veya Hata Ekranı) -->
+    <div id="status-feedback-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm transition-opacity duration-300">
+        <div class="relative w-full max-w-xs sm:max-w-sm bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 p-5 text-center space-y-3.5 animate-modal">
+            
+            <div id="feedback-icon-container" class="w-12 h-12 mx-auto rounded-full flex items-center justify-center bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400">
+                <!-- JS dinamik ikon basar -->
+            </div>
+
+            <div>
+                <h3 id="feedback-title" class="font-extrabold text-base text-slate-900 dark:text-slate-100">İşlem Tamamlandı</h3>
+                <p id="feedback-desc" class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">Verileriniz başarıyla yüklendi.</p>
+            </div>
+
+            <button onclick="closeFeedbackModal()" class="w-full py-2 bg-slate-900 dark:bg-slate-100 text-white dark:text-slate-900 font-bold text-xs rounded-xl shadow transition active:scale-95">
+                Tamam
+            </button>
+        </div>
+    </div>
 
     <!-- Paylaşım & Kart Önizleme Modalı -->
     <div id="share-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm transition-opacity duration-300">
@@ -2512,9 +2649,12 @@
             link.click();
         }
 
-        // ====================== VERİ DIŞA / İÇE AKTARMA (YEDEKLEME) ======================
+        // ====================== VERİ DIŞA / İÇE AKTARMA (ÖN İZLEMELİ VE ONAYLI) ======================
 
-        function exportUserData() {
+        let pendingImportData = null;
+        let generatedBackupJson = '';
+
+        function openExportModal() {
             const rawGrades = SafeStorage.get(STORAGE_CACHE_KEY);
             let parsedGrades = null;
             if (rawGrades) {
@@ -2522,6 +2662,7 @@
             }
 
             const backupData = {
+                app: "SBTU_HAZIRLIK_NOT_SISTEMI",
                 version: 1,
                 exportDate: new Date().toISOString(),
                 grades: parsedGrades || {},
@@ -2529,66 +2670,199 @@
                 activeKur: activeKurId
             };
 
-            const jsonStr = JSON.stringify(backupData, null, 2);
-            const blob = new Blob([jsonStr], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
+            generatedBackupJson = JSON.stringify(backupData, null, 2);
 
+            // Ön izleme alanlarını doldur
+            const sName = parsedGrades?.studentName || document.getElementById('student-name-input')?.value || 'İsimsiz';
+            document.getElementById('export-preview-name').innerText = sName;
+            
+            const overallScore = document.getElementById('overall-score')?.innerText || '0';
+            const statusText = document.getElementById('status-text')?.innerText || 'Belirsiz';
+            document.getElementById('export-preview-grade').innerText = `${overallScore} Puan (${statusText})`;
+
+            let gradeCount = 0;
+            if (parsedGrades) {
+                if (parsedGrades.vize) gradeCount += Object.keys(parsedGrades.vize).length;
+                if (parsedGrades.final) gradeCount += Object.keys(parsedGrades.final).length;
+            }
+            document.getElementById('export-preview-gradecount').innerText = `${gradeCount} Sınav Notu`;
+
+            let attCount = 0;
+            Object.values(multiKurAttendance).forEach(kData => {
+                if (kData && typeof kData === 'object') {
+                    attCount += Object.keys(kData).length;
+                }
+            });
+            document.getElementById('export-preview-attcount').innerText = `${attCount} Günlük Yoklama Kaydı`;
+
+            const now = new Date();
+            document.getElementById('export-preview-time').innerText = now.toLocaleString('tr-TR');
+            document.getElementById('export-json-preview').innerText = generatedBackupJson;
+
+            const modal = document.getElementById('export-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeExportModal() {
+            const modal = document.getElementById('export-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function downloadExportedFile() {
+            if (!generatedBackupJson) return;
+            const blob = new Blob([generatedBackupJson], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             const todayStr = new Date().toISOString().slice(0, 10);
             a.download = `sbtu-hazirlik-yedek-${todayStr}.json`;
             a.href = url;
             a.click();
             URL.revokeObjectURL(url);
+            closeExportModal();
+
+            showFeedback(true, "Yedek İndirildi", "Yedek dosyanız cihazınıza başarıyla indirildi. İstediğiniz zaman geri yükleyebilirsiniz.");
         }
 
-        function handleFileImport(event) {
+        function handleFileSelect(event) {
             const file = event.target.files && event.target.files[0];
             if (!file) return;
 
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    const data = JSON.parse(e.target.result);
-                    if (!data || typeof data !== 'object') {
-                        throw new Error("Geçersiz yedek dosyası");
+                    const parsed = JSON.parse(e.target.result);
+                    if (!parsed || typeof parsed !== 'object') {
+                        throw new Error("Dosya içeriği geçerli bir JSON değil.");
                     }
 
-                    // Notları geri yükle
-                    if (data.grades) {
-                        SafeStorage.set(STORAGE_CACHE_KEY, JSON.stringify(data.grades));
-                        loadAllInputsFromStorage();
-                        calculateGrades();
+                    if (!parsed.grades && !parsed.attendance) {
+                        throw new Error("Yüklenen dosya SBTÜ Hazırlık yedek formatına uygun değil.");
                     }
 
-                    // Devamsızlık kayıtlarını geri yükle
-                    if (data.attendance && typeof data.attendance === 'object') {
-                        multiKurAttendance = data.attendance;
-                        SafeStorage.set(ATTENDANCE_ALL_KURS_KEY, JSON.stringify(multiKurAttendance));
+                    pendingImportData = parsed;
+
+                    // Ön izleme alanlarını doldur
+                    const sName = parsed.grades?.studentName || 'Belirtilmedi';
+                    document.getElementById('import-preview-name').innerText = sName;
+
+                    let gCount = 0;
+                    if (parsed.grades) {
+                        if (parsed.grades.vize) gCount += Object.keys(parsed.grades.vize).length;
+                        if (parsed.grades.final) gCount += Object.keys(parsed.grades.final).length;
                     }
+                    document.getElementById('import-preview-grades').innerText = `${gCount} Sınav Notu Mevcut`;
 
-                    if (data.activeKur && KURS_DATA[data.activeKur]) {
-                        activeKurId = data.activeKur;
-                        SafeStorage.set(ACTIVE_KUR_PREF_KEY, activeKurId);
+                    let aCount = 0;
+                    if (parsed.attendance && typeof parsed.attendance === 'object') {
+                        Object.values(parsed.attendance).forEach(kData => {
+                            if (kData && typeof kData === 'object') aCount += Object.keys(kData).length;
+                        });
                     }
+                    document.getElementById('import-preview-att').innerText = `${aCount} Günlük Kayıt`;
 
-                    renderKurSelector();
-                    calculateAttendance();
-                    renderCalendar();
-                    renderDayEditor();
+                    const dateFormatted = parsed.exportDate ? new Date(parsed.exportDate).toLocaleString('tr-TR') : 'Bilinmiyor';
+                    document.getElementById('import-preview-date').innerText = dateFormatted;
 
-                    // Kullanıcıya şık görsel geri bildirim ver
-                    const topBar = document.getElementById('top-summary-bar');
-                    if (topBar) {
-                        topBar.scrollIntoView({ behavior: 'smooth' });
+                    // İçe aktarma onay modalını aç
+                    const modal = document.getElementById('import-modal');
+                    if (modal) {
+                        modal.classList.remove('hidden');
+                        document.body.style.overflow = 'hidden';
                     }
                 } catch (err) {
-                    console.error("Yedek yükleme hatası:", err);
+                    showFeedback(false, "Yedek Yüklenemedi", err.message || "Seçilen dosya okunamadı veya formatı bozuk.");
                 } finally {
-                    // Aynı dosya tekrar seçilebilsin diye inputu sıfırla
                     event.target.value = '';
                 }
             };
+
+            reader.onerror = function() {
+                showFeedback(false, "Dosya Hatası", "Dosya okunurken bir hata oluştu.");
+                event.target.value = '';
+            };
+
             reader.readAsText(file);
+        }
+
+        function closeImportModal() {
+            pendingImportData = null;
+            const modal = document.getElementById('import-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        function confirmImport() {
+            if (!pendingImportData) return;
+
+            try {
+                // Notları geri yükle
+                if (pendingImportData.grades) {
+                    SafeStorage.set(STORAGE_CACHE_KEY, JSON.stringify(pendingImportData.grades));
+                    loadAllInputsFromStorage();
+                    calculateGrades();
+                }
+
+                // Devamsızlık kayıtlarını geri yükle
+                if (pendingImportData.attendance && typeof pendingImportData.attendance === 'object') {
+                    multiKurAttendance = pendingImportData.attendance;
+                    SafeStorage.set(ATTENDANCE_ALL_KURS_KEY, JSON.stringify(multiKurAttendance));
+                }
+
+                if (pendingImportData.activeKur && KURS_DATA[pendingImportData.activeKur]) {
+                    activeKurId = pendingImportData.activeKur;
+                    SafeStorage.set(ACTIVE_KUR_PREF_KEY, activeKurId);
+                }
+
+                renderKurSelector();
+                calculateAttendance();
+                renderCalendar();
+                renderDayEditor();
+
+                closeImportModal();
+                showFeedback(true, "Yedek Geri Yüklendi!", "Tüm notlarınız, strateji verileriniz ve devamsızlık kayıtlarınız başarıyla aktarıldı.");
+            } catch (err) {
+                closeImportModal();
+                showFeedback(false, "Aktarım Hatası", "Veriler uygulanırken beklenmeyen bir hata meydana geldi.");
+            }
+        }
+
+        function showFeedback(isSuccess, title, desc) {
+            const modal = document.getElementById('status-feedback-modal');
+            const iconContainer = document.getElementById('feedback-icon-container');
+            const titleEl = document.getElementById('feedback-title');
+            const descEl = document.getElementById('feedback-desc');
+
+            if (!modal) return;
+
+            if (isSuccess) {
+                iconContainer.className = "w-12 h-12 mx-auto rounded-full flex items-center justify-center bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400";
+                iconContainer.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>';
+            } else {
+                iconContainer.className = "w-12 h-12 mx-auto rounded-full flex items-center justify-center bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400";
+                iconContainer.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>';
+            }
+
+            titleEl.innerText = title;
+            descEl.innerText = desc;
+
+            modal.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeFeedbackModal() {
+            const modal = document.getElementById('status-feedback-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
         }
 
         window.onload = initApp;
