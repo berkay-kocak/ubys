@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SBTÜ Hazırlık Not Hesaplayıcı</title>
+    <title>SBTÜ Hazırlık Not & Devamsızlık Sistemi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -49,12 +49,12 @@
             <div class="flex items-center justify-between gap-3">
                 <div>
                     <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-blue-500/30 text-blue-100 border border-blue-400/30 backdrop-blur-sm mb-1">
-                        SBTÜ UBYS
+                        SBTÜ UBYS & YDYO
                     </span>
-                    <h1 class="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight">Hazırlık Not Hesaplayıcı</h1>
+                    <h1 class="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight">Hazırlık Not & Devamsızlık</h1>
                 </div>
                 <div class="flex items-center gap-2 shrink-0">
-                    <!-- Tema Değiştirme Butonu (Premium Simge) -->
+                    <!-- Tema Değiştirme Butonu -->
                     <button id="theme-toggle-btn" onclick="toggleTheme()" class="relative p-2 sm:p-2.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 backdrop-blur-md transition-all duration-300 shadow-sm group" title="Temayı Değiştir" aria-label="Temayı Değiştir">
                         <svg id="theme-icon-sun" class="w-4 h-4 sm:w-5 sm:h-5 hidden text-amber-300 transition-transform duration-500 group-hover:rotate-90 drop-shadow-[0_0_8px_rgba(252,211,77,0.6)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <circle cx="12" cy="12" r="4" stroke-width="2" fill="currentColor" fill-opacity="0.25"/>
@@ -66,213 +66,417 @@
                     </button>
 
                     <!-- Temizle Butonu -->
-                    <button id="reset-btn" onclick="resetForm()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-100 text-xs px-2.5 sm:px-3.5 py-2 rounded-xl border border-rose-400/30 transition flex items-center gap-1.5 shadow-sm active:scale-95 backdrop-blur-sm">
+                    <button id="reset-btn" onclick="resetActiveTab()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-100 text-xs px-2.5 sm:px-3.5 py-2 rounded-xl border border-rose-400/30 transition flex items-center gap-1.5 shadow-sm active:scale-95 backdrop-blur-sm">
                         <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
                         <span class="hidden sm:inline">Temizle</span>
                     </button>
                 </div>
+            </div>
+
+            <!-- Ana Sekme / Tab Seçici -->
+            <div class="mt-4 flex bg-white/10 p-1 rounded-2xl border border-white/15 backdrop-blur-md">
+                <button id="tab-btn-grades" onclick="switchTab('grades')" class="flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-white text-indigo-950 shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    <span>Not Hesapla</span>
+                </button>
+                <button id="tab-btn-attendance" onclick="switchTab('attendance')" class="flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-white/80 hover:text-white hover:bg-white/5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    <span>Devamsızlık Takibi</span>
+                    <span id="tab-attendance-pill" class="text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/30 border border-emerald-400/40 text-emerald-200 font-extrabold hidden">35/35</span>
+                </button>
             </div>
         </div>
     </header>
 
     <main class="max-w-3xl mx-auto px-3 sm:px-4 space-y-4 sm:space-y-6">
 
-        <!-- Top Summary Bar -->
-        <div id="top-summary-bar" class="scroll-mt-4">
-            <div id="summary-card" class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-5 transition-all duration-300">
+        <!-- ======================= BÖLÜM 1: NOT HESAPLAYICI ======================= -->
+        <div id="section-grades" class="space-y-4 sm:space-y-6">
+            
+            <!-- Devamsızlık Uyarı Afişi (Eğer Not sekmesindeyken devamsızlıktan kalınmışsa belirir) -->
+            <div id="attendance-alert-banner" class="hidden p-3.5 sm:p-4 rounded-2xl bg-rose-500/10 border-2 border-rose-500/40 text-rose-700 dark:text-rose-300 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2.5 text-xs sm:text-sm font-bold">
+                    <svg class="w-5 h-5 text-rose-600 dark:text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                    <span>DİKKAT: 35 saatlik devamsızlık sınırı aşıldığı için kurdan başarısız sayılırsınız.</span>
+                </div>
+                <button onclick="switchTab('attendance')" class="shrink-0 text-xs px-2.5 py-1 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-lg transition">İncele</button>
+            </div>
+
+            <!-- Top Summary Bar -->
+            <div id="top-summary-bar" class="scroll-mt-4">
+                <div id="summary-card" class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-5 transition-all duration-300">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 text-center">
+                        
+                        <!-- Vize Score -->
+                        <div class="bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/40 rounded-xl p-2.5 sm:p-3.5">
+                            <div class="text-[10px] sm:text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Vize Katkısı</div>
+                            <div class="text-xl sm:text-2xl font-extrabold text-indigo-950 dark:text-indigo-100 mt-0.5 sm:mt-1" id="vize-total-score">0.00</div>
+                            <div class="text-[10px] sm:text-xs text-indigo-500 dark:text-indigo-400 font-medium" id="vize-subtext">Vize: 0 / 100</div>
+                        </div>
+
+                        <!-- Final Score -->
+                        <div class="bg-purple-50/60 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/40 rounded-xl p-2.5 sm:p-3.5">
+                            <div class="text-[10px] sm:text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Final Katkısı</div>
+                            <div class="text-xl sm:text-2xl font-extrabold text-purple-950 dark:text-purple-100 mt-0.5 sm:mt-1" id="final-total-score">0.00</div>
+                            <div class="text-[10px] sm:text-xs text-purple-500 dark:text-purple-400 font-medium" id="final-subtext">Final: 0 / 100</div>
+                        </div>
+
+                        <!-- Overall Score -->
+                        <div class="bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/40 rounded-xl p-2.5 sm:p-3.5">
+                            <div class="text-[10px] sm:text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Genel Ortalama</div>
+                            <div class="text-2xl sm:text-3xl font-extrabold text-blue-950 dark:text-blue-100 mt-0.5" id="overall-score">0</div>
+                            <div class="text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 font-medium" id="overall-subtext">Ham: 0.00</div>
+                        </div>
+
+                        <!-- Status -->
+                        <div id="status-card" class="bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center transition-colors duration-300">
+                            <div class="text-[10px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Durum</div>
+                            <div class="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200 mt-0.5 flex items-center gap-1" id="status-text">Not Bekleniyor</div>
+                            <span id="status-badge" class="mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold truncate max-w-full">Sınır: 60</span>
+                        </div>
+                    </div>
+
+                    <!-- Visual Progress Bar -->
+                    <div class="mt-3.5 sm:mt-5 pt-3 sm:pt-4 border-t border-slate-100 dark:border-slate-800">
+                        <div class="flex justify-between items-center text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                            <span>Başarı Çubuğu</span>
+                            <span class="text-indigo-600 dark:text-indigo-400 font-bold">Geçme Sınırı: 60 Puan</span>
+                        </div>
+                        <div class="relative h-2.5 sm:h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/80 dark:border-slate-700 p-0.5">
+                            <div id="overall-progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                            <div class="absolute top-0 bottom-0 left-[60%] w-0.5 bg-slate-800/60 dark:bg-slate-300/60 z-10" title="Geçme Sınırı: 60"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sonuç Paylaşım Şeridi -->
+                    <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                        <span class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                            Mobil Not Kartı
+                        </span>
+                        <button onclick="openShareModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                            <span>Sonucu Paylaş</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vize Section -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden">
+                <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">VİZE</span>
+                        <h2 class="font-semibold text-xs sm:text-base">Vize Bileşenleri (%40 Etki)</h2>
+                    </div>
+                    <span id="vize-percent-badge" class="text-[11px] sm:text-xs bg-indigo-900/50 border border-indigo-400/30 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-indigo-100 font-medium">0 / 8 Giriş</span>
+                </div>
+
+                <div class="p-3 sm:p-5 space-y-1.5 sm:space-y-2">
+                    <!-- Vize Genel Satırı -->
+                    <div class="grid grid-cols-12 items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40">
+                        <label for="bulk-vize-input" class="col-span-6 sm:col-span-7 text-xs sm:text-sm font-semibold text-indigo-900 dark:text-indigo-200 cursor-pointer select-none truncate">
+                            Vize Genel
+                        </label>
+                        <div class="col-span-3 sm:col-span-2 text-center text-[10px] sm:text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                            Toplu Giriş
+                        </div>
+                        <div class="col-span-3 text-right">
+                            <input 
+                                type="number" 
+                                inputmode="decimal"
+                                id="bulk-vize-input"
+                                min="0" 
+                                max="100" 
+                                placeholder="-"
+                                oninput="applyBulkScore('vize', this)"
+                                class="w-full text-right bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs sm:text-sm font-bold text-indigo-950 dark:text-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition placeholder-slate-400"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-1.5 px-1 sm:px-2 pt-1">
+                        <div class="col-span-6 sm:col-span-7">Sınav Adı</div>
+                        <div class="col-span-3 sm:col-span-2 text-center">Ağırlık</div>
+                        <div class="col-span-3 text-right">Notunuz</div>
+                    </div>
+
+                    <div id="vize-items" class="space-y-1 sm:space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- Final Section -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden">
+                <div class="bg-gradient-to-r from-purple-700 to-purple-800 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">FİNAL</span>
+                        <div>
+                            <h2 class="font-semibold text-xs sm:text-base leading-tight">Final Bileşenleri (%60 Etki)</h2>
+                            <p class="text-[10px] sm:text-[11px] text-purple-200">Her sınav en az 50 olmalı</p>
+                        </div>
+                    </div>
+                    <span id="final-percent-badge" class="text-[11px] sm:text-xs bg-purple-950/50 border border-purple-400/30 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-purple-100 font-medium">0 / 3 Giriş</span>
+                </div>
+
+                <div class="p-3 sm:p-5 space-y-1.5 sm:space-y-2">
+                    <!-- Final Genel Satırı (Düzeltildi) -->
+                    <div class="grid grid-cols-12 items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-xl bg-purple-50/50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/40">
+                        <label for="bulk-final-input" class="col-span-6 sm:col-span-7 text-xs sm:text-sm font-semibold text-purple-900 dark:text-purple-200 cursor-pointer select-none truncate">
+                            Final Genel
+                        </label>
+                        <div class="col-span-3 sm:col-span-2 text-center text-[10px] sm:text-xs font-medium text-purple-600 dark:text-purple-400">
+                            Toplu Giriş
+                        </div>
+                        <div class="col-span-3 text-right">
+                            <input 
+                                type="number" 
+                                inputmode="decimal"
+                                id="bulk-final-input"
+                                min="0" 
+                                max="100" 
+                                placeholder="-"
+                                oninput="applyBulkScore('final', this)"
+                                class="w-full text-right bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs sm:text-sm font-bold text-purple-950 dark:text-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition placeholder-slate-400"
+                            />
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-12 text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-1.5 px-1 sm:px-2 pt-1">
+                        <div class="col-span-6 sm:col-span-7">Sınav Adı</div>
+                        <div class="col-span-3 sm:col-span-2 text-center">Ağırlık</div>
+                        <div class="col-span-3 text-right">Notunuz</div>
+                    </div>
+
+                    <div id="final-items" class="space-y-1 sm:space-y-2"></div>
+                </div>
+            </div>
+
+            <!-- Butonlar -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <button id="see-result-btn" onclick="scrollToResult()" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 active:scale-98 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 border border-indigo-400/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                    <span>Sonucu Gör</span>
+                </button>
+                <button id="share-card-btn" onclick="openShareModal()" class="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 active:scale-98 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 border border-emerald-400/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                    <span>Sonucu Paylaş</span>
+                </button>
+            </div>
+
+            <!-- Strateji Paneli -->
+            <div id="strategy-panel-card" class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden transition-all duration-300">
+                <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <span class="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                        </span>
+                        <div>
+                            <h2 class="font-semibold text-xs sm:text-base leading-tight">Final Başarı Strateji Paneli</h2>
+                            <p class="text-[10px] sm:text-[11px] text-slate-300">Vize puanınıza göre kişiselleştirilmiş geçme planı</p>
+                        </div>
+                    </div>
+                    <span id="strategy-status-badge" class="text-[11px] sm:text-xs bg-slate-800 border border-slate-700 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-slate-300 font-medium">Kilitli</span>
+                </div>
+
+                <div id="strategy-content" class="p-4 sm:p-5"></div>
+            </div>
+
+            <!-- UBYS Notlandırma Kuralları -->
+            <div class="bg-blue-50/60 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/40 p-4 text-xs text-blue-900 dark:text-blue-200 space-y-1.5">
+                <div class="font-bold text-blue-950 dark:text-blue-100 flex items-center gap-1.5 text-xs sm:text-sm">
+                    <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    SBTÜ UBYS Notlandırma Kuralları
+                </div>
+                <p class="leading-relaxed text-[11px] sm:text-xs text-slate-600 dark:text-slate-300">
+                    • <strong>Vize Katkısı: %40</strong>, <strong>Final Katkısı: %60</strong><br>
+                    • <strong>Geçme Notu: 60</strong> (UBYS standardında yuvarlanır)<br>
+                    • Final sınavlarının her birinde (L&R, Writing, Speaking) <strong>50 barajı</strong> bulunmaktadır.
+                </p>
+            </div>
+
+        </div>
+
+        <!-- ======================= BÖLÜM 2: DEVAMSIZLIK TAKİBİ ======================= -->
+        <div id="section-attendance" class="space-y-4 sm:space-y-6 hidden">
+            
+            <!-- Kur Seçici Bar (Otomatik Takip & Manuel Geçiş) -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-3 sm:p-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-2.5">
+                    <div class="flex items-center gap-2">
+                        <span class="p-1 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                        </span>
+                        <span class="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100">Aktif Dönem / Kur Seçimi</span>
+                    </div>
+                    <span id="auto-detected-kur-badge" class="text-[10px] sm:text-xs text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span id="current-date-info">Bugün: 02 Kasım 2026</span>
+                    </span>
+                </div>
+
+                <!-- 5 Kur Seçim Butonları -->
+                <div class="grid grid-cols-3 sm:grid-cols-5 gap-1.5" id="kur-selector-buttons">
+                    <!-- JS ile dinamik render edilir -->
+                </div>
+            </div>
+
+            <!-- Devamsızlık Özet Kartı -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-5">
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 text-center">
                     
-                    <!-- Vize Score -->
-                    <div class="bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/40 rounded-xl p-2.5 sm:p-3.5">
-                        <div class="text-[10px] sm:text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Vize Katkısı</div>
-                        <div class="text-xl sm:text-2xl font-extrabold text-indigo-950 dark:text-indigo-100 mt-0.5 sm:mt-1" id="vize-total-score">0.00</div>
-                        <div class="text-[10px] sm:text-xs text-indigo-500 dark:text-indigo-400 font-medium" id="vize-subtext">Vize: 0 / 100</div>
+                    <!-- Kalan Özürsüz Hak -->
+                    <div id="att-card-remaining" class="bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 rounded-xl p-2.5 sm:p-3.5">
+                        <div class="text-[10px] sm:text-xs font-semibold text-emerald-700 dark:text-emerald-400 uppercase tracking-wider">Kalan Hak</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-emerald-950 dark:text-emerald-100 mt-0.5" id="att-remaining-hours">35.0</div>
+                        <div class="text-[10px] sm:text-xs text-emerald-600 dark:text-emerald-400 font-medium" id="att-limit-sub">Toplam Sınır: 35 Saat</div>
                     </div>
 
-                    <!-- Final Score -->
-                    <div class="bg-purple-50/60 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/40 rounded-xl p-2.5 sm:p-3.5">
-                        <div class="text-[10px] sm:text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Final Katkısı</div>
-                        <div class="text-xl sm:text-2xl font-extrabold text-purple-950 dark:text-purple-100 mt-0.5 sm:mt-1" id="final-total-score">0.00</div>
-                        <div class="text-[10px] sm:text-xs text-purple-500 dark:text-purple-400 font-medium" id="final-subtext">Final: 0 / 100</div>
+                    <!-- Harcanan Özürsüz -->
+                    <div class="bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 rounded-xl p-2.5 sm:p-3.5">
+                        <div class="text-[10px] sm:text-xs font-semibold text-rose-700 dark:text-rose-400 uppercase tracking-wider">Özürsüz Yok</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-rose-950 dark:text-rose-100 mt-0.5" id="att-unexcused-hours">0</div>
+                        <div class="text-[10px] sm:text-xs text-rose-600 dark:text-rose-400 font-medium" id="att-unexcused-sub">35 Saatte Kalır</div>
                     </div>
 
-                    <!-- Overall Score (Rounded & Raw) -->
-                    <div class="bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/40 rounded-xl p-2.5 sm:p-3.5">
-                        <div class="text-[10px] sm:text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Genel Ortalama</div>
-                        <div class="text-2xl sm:text-3xl font-extrabold text-blue-950 dark:text-blue-100 mt-0.5" id="overall-score">0</div>
-                        <div class="text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 font-medium" id="overall-subtext">Ham: 0.00</div>
+                    <!-- Raporlu Saat & Kota -->
+                    <div class="bg-sky-50/70 dark:bg-sky-950/40 border border-sky-200 dark:border-sky-900/40 rounded-xl p-2.5 sm:p-3.5">
+                        <div class="text-[10px] sm:text-xs font-semibold text-sky-700 dark:text-sky-400 uppercase tracking-wider">Raporlu Saat</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-sky-950 dark:text-sky-100 mt-0.5" id="att-medical-hours">0</div>
+                        <div class="text-[10px] sm:text-xs text-sky-600 dark:text-sky-400 font-medium" id="att-medical-quota">Kota: 0 / 17.5 Saat</div>
                     </div>
 
-                    <!-- Status -->
-                    <div id="status-card" class="bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center transition-colors duration-300">
-                        <div class="text-[10px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Durum</div>
-                        <div class="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200 mt-0.5 flex items-center gap-1" id="status-text">Not Bekleniyor</div>
-                        <span id="status-badge" class="mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold truncate max-w-full">Sınır: 60</span>
+                    <!-- Devamsızlık Durumu -->
+                    <div id="att-status-card" class="bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center">
+                        <div class="text-[10px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Kur Durumu</div>
+                        <div class="text-base sm:text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5" id="att-status-text">Güvenli Bölge</div>
+                        <span id="att-status-badge" class="mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold">%100 Devam</span>
                     </div>
+
                 </div>
 
-                <!-- Visual Progress Bar -->
+                <!-- Devamsızlık Tüketim Barı -->
                 <div class="mt-3.5 sm:mt-5 pt-3 sm:pt-4 border-t border-slate-100 dark:border-slate-800">
                     <div class="flex justify-between items-center text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
-                        <span>Başarı Çubuğu</span>
-                        <span class="text-indigo-600 dark:text-indigo-400 font-bold">Geçme Sınırı: 60 Puan</span>
+                        <span id="att-bar-title">Devamsızlık Tüketimi (35 Saat Sınırı)</span>
+                        <span id="att-percent-label" class="font-bold text-slate-700 dark:text-slate-300">0 / 35 Saat (%0)</span>
                     </div>
                     <div class="relative h-2.5 sm:h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/80 dark:border-slate-700 p-0.5">
-                        <div id="overall-progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
-                        <div class="absolute top-0 bottom-0 left-[60%] w-0.5 bg-slate-800/60 dark:bg-slate-300/60 z-10" title="Geçme Sınırı: 60"></div>
+                        <div id="att-progress-bar" class="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
                     </div>
                 </div>
-
-                <!-- Sonuç Paylaşım Şeridi -->
-                <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
-                    <span class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
-                        Mobil Not Kartı
-                    </span>
-                    <button onclick="openShareModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                        <span>Sonucu Paylaş</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Vize Section -->
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden">
-            <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">VİZE</span>
-                    <h2 class="font-semibold text-xs sm:text-base">Vize Bileşenleri (%40 Etki)</h2>
-                </div>
-                <span id="vize-percent-badge" class="text-[11px] sm:text-xs bg-indigo-900/50 border border-indigo-400/30 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-indigo-100 font-medium">0 / 8 Giriş</span>
             </div>
 
-            <div class="p-3 sm:p-5 space-y-1.5 sm:space-y-2">
-                <!-- Vize Vize Genel Satırı -->
-                <div class="grid grid-cols-12 items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40">
-                    <label for="bulk-vize-input" class="col-span-6 sm:col-span-7 text-xs sm:text-sm font-semibold text-indigo-900 dark:text-indigo-200 cursor-pointer select-none truncate">
-                        Vize Genel
-                    </label>
-                    <div class="col-span-3 sm:col-span-2 text-center text-[10px] sm:text-xs font-medium text-indigo-600 dark:text-indigo-400">
-                        Toplu Giriş
+            <!-- Kur Takvimi (Haftalık Hızlı Saat Girişi + Günlük Matris) -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden">
+                <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center">
+                    <div class="flex items-center gap-2">
+                        <span class="p-1.5 rounded-lg bg-blue-500/20 text-blue-300 border border-blue-400/30">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        </span>
+                        <div>
+                            <h2 class="font-semibold text-xs sm:text-base leading-tight" id="calendar-header-title">1. Kur Akademik Takvimi</h2>
+                            <p class="text-[10px] sm:text-[11px] text-slate-300" id="calendar-header-subtitle">21 Eylül - 6 Kasım 2026 (7 Hafta / 35 Gün)</p>
+                        </div>
                     </div>
-                    <div class="col-span-3 text-right">
-                        <input 
-                            type="number" 
-                            inputmode="decimal"
-                            id="bulk-vize-input"
-                            min="0" 
-                            max="100" 
-                            placeholder="-"
-                            oninput="applyBulkScore('vize', this)"
-                            class="w-full text-right bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs sm:text-sm font-bold text-indigo-950 dark:text-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition placeholder-slate-400"
-                        />
+                    <span class="text-[10px] sm:text-xs bg-slate-800 border border-slate-700 px-2 py-0.5 rounded-full text-slate-300">5 Ders/Gün</span>
+                </div>
+
+                <div class="p-3 sm:p-5 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between text-xs text-slate-500 dark:text-slate-400 gap-1 pb-1 border-b border-slate-100 dark:border-slate-800">
+                        <span>Hafta sağındaki kutudan <strong>toplu haftalık saat</strong> girebilir veya günlere tıklayıp tek tek seçebilirsiniz.</span>
+                        <span class="text-[11px] text-indigo-500 font-semibold shrink-0">Haftalık Tavan: 25 Saat</span>
+                    </div>
+
+                    <!-- Takvim Haftaları Konteyneri -->
+                    <div id="calendar-weeks-container" class="space-y-2.5">
+                        <!-- JS Dynamic Insertion -->
                     </div>
                 </div>
-
-                <div class="grid grid-cols-12 text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-1.5 px-1 sm:px-2 pt-1">
-                    <div class="col-span-6 sm:col-span-7">Sınav Adı</div>
-                    <div class="col-span-3 sm:col-span-2 text-center">Ağırlık</div>
-                    <div class="col-span-3 text-right">Notunuz</div>
-                </div>
-
-                <div id="vize-items" class="space-y-1 sm:space-y-2">
-                    <!-- JS Dynamic Insertion -->
-                </div>
             </div>
-        </div>
 
-        <!-- Final Section -->
-        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden">
-            <div class="bg-gradient-to-r from-purple-700 to-purple-800 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">FİNAL</span>
+            <!-- Günlük Devamsızlık Düzenleme Kartı (Tıklanan Güne Özel) -->
+            <div id="day-editor-card" class="bg-white dark:bg-slate-900 rounded-2xl shadow-md border-2 border-indigo-500/40 p-4 sm:p-5 space-y-4">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                     <div>
-                        <h2 class="font-semibold text-xs sm:text-base leading-tight">Final Bileşenleri (%60 Etki)</h2>
-                        <p class="text-[10px] sm:text-[11px] text-purple-200">Her sınav en az 50 olmalı</p>
+                        <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Seçili Gün Yoklaması</span>
+                        <h3 class="text-sm sm:text-base font-extrabold text-slate-900 dark:text-slate-100" id="editor-date-title">21 Eylül 2026 - Pazartesi</h3>
                     </div>
-                </div>
-                <span id="final-percent-badge" class="text-[11px] sm:text-xs bg-purple-950/50 border border-purple-400/30 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-purple-100 font-medium">0 / 3 Giriş</span>
-            </div>
-
-            <div class="p-3 sm:p-5 space-y-1.5 sm:space-y-2">
-                <!-- Final Vize Genel Satırı -->
-                <div class="grid grid-cols-12 items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-xl bg-purple-50/50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/40">
-                    <label for="bulk-final-input" class="col-span-6 sm:col-span-7 text-xs sm:text-sm font-semibold text-purple-900 dark:text-purple-200 cursor-pointer select-none truncate">
-                        Vize Genel
-                    </label>
-                    <div class="col-span-3 sm:col-span-2 text-center text-[10px] sm:text-xs font-medium text-purple-600 dark:text-purple-400">
-                        Toplu Giriş
-                    </div>
-                    <div class="col-span-3 text-right">
-                        <input 
-                            type="number" 
-                            inputmode="decimal"
-                            id="bulk-final-input"
-                            min="0" 
-                            max="100" 
-                            placeholder="-"
-                            oninput="applyBulkScore('final', this)"
-                            class="w-full text-right bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs sm:text-sm font-bold text-purple-950 dark:text-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition placeholder-slate-400"
-                        />
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-12 text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-1.5 px-1 sm:px-2 pt-1">
-                    <div class="col-span-6 sm:col-span-7">Sınav Adı</div>
-                    <div class="col-span-3 sm:col-span-2 text-center">Ağırlık</div>
-                    <div class="col-span-3 text-right">Notunuz</div>
-                </div>
-
-                <div id="final-items" class="space-y-1 sm:space-y-2">
-                    <!-- JS Dynamic Insertion -->
-                </div>
-            </div>
-        </div>
-
-        <!-- Sonucu Gör & Sonucu Paylaş Butonları -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <button id="see-result-btn" onclick="scrollToResult()" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 active:scale-98 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 border border-indigo-400/20">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
-                <span>Sonucu Gör</span>
-            </button>
-            <button id="share-card-btn" onclick="openShareModal()" class="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 active:scale-98 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 border border-emerald-400/20">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
-                <span>Sonucu Paylaş</span>
-            </button>
-        </div>
-
-        <!-- Final Strateji ve Başarı Analiz Paneli -->
-        <div id="strategy-panel-card" class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden transition-all duration-300">
-            <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center">
-                <div class="flex items-center gap-2">
-                    <span class="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    <span id="editor-day-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                        0 / 5 Saat Yok
                     </span>
-                    <div>
-                        <h2 class="font-semibold text-xs sm:text-base leading-tight">Final Başarı Strateji Paneli</h2>
-                        <p class="text-[10px] sm:text-[11px] text-slate-300">Vize puanınıza göre kişiselleştirilmiş geçme planı</p>
+                </div>
+
+                <!-- 1. YÖNTEM: İnteraktif 5 Ders Slotu -->
+                <div class="space-y-2">
+                    <div class="flex items-center justify-between text-xs font-semibold text-slate-700 dark:text-slate-200">
+                        <span>1. Yöntem: Ders Slotuna Dokun (Durumu Değiştir)</span>
+                        <span class="text-[10px] text-slate-400">Gri: Dersteydim | Kırmızı: Raporsuz | Mavi: Raporlu</span>
+                    </div>
+
+                    <div class="grid grid-cols-5 gap-1.5 sm:gap-2" id="lesson-slots-grid">
+                        <!-- 5 Ders Slotu JS ile basılır -->
                     </div>
                 </div>
-                <span id="strategy-status-badge" class="text-[11px] sm:text-xs bg-slate-800 border border-slate-700 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-slate-300 font-medium">Kilitli</span>
+
+                <!-- 2. YÖNTEM: Hızlı Saat Seçimi ve Türü -->
+                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
+                    <span class="text-xs font-semibold text-slate-700 dark:text-slate-200 block">2. Yöntem: Hızlı Saat Seçimi</span>
+                    
+                    <div class="flex flex-wrap items-center gap-2">
+                        <span class="text-xs text-slate-500 dark:text-slate-400">Kaç saat yoktun?</span>
+                        <div class="flex items-center gap-1">
+                            <button onclick="setFastDayHours(0)" class="px-2 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-bold rounded-lg transition">0 (Temizle)</button>
+                            <button onclick="setFastDayHours(1)" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-bold rounded-lg transition">1</button>
+                            <button onclick="setFastDayHours(2)" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-bold rounded-lg transition">2</button>
+                            <button onclick="setFastDayHours(3)" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-bold rounded-lg transition">3</button>
+                            <button onclick="setFastDayHours(4)" class="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-xs font-bold rounded-lg transition">4</button>
+                            <button onclick="setFastDayHours(5)" class="px-2.5 py-1 bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 text-xs font-bold rounded-lg transition">5 (Tam Gün)</button>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-4 text-xs pt-1">
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-700 dark:text-slate-300">
+                            <input type="radio" name="fast-type" id="fast-type-unexcused" checked onchange="toggleFastType('unexcused')" class="accent-rose-600">
+                            <span>Özürsüz / Raporsuz</span>
+                        </label>
+                        <label class="flex items-center gap-1.5 cursor-pointer font-medium text-slate-700 dark:text-slate-300">
+                            <input type="radio" name="fast-type" id="fast-type-medical" onchange="toggleFastType('medical')" class="accent-sky-600">
+                            <span>Sağlık Raporlu (17.5 Saat Kotası)</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-between pt-2">
+                    <span class="text-[11px] text-slate-400">Değişiklikler anında cihaz hafızasına kaydedilir.</span>
+                    <button onclick="clearSelectedDay()" class="text-xs text-rose-500 hover:text-rose-600 font-semibold transition">Bu Günü Sıfırla</button>
+                </div>
             </div>
 
-            <div id="strategy-content" class="p-4 sm:p-5">
-                <!-- JS Dynamic Insertion -->
+            <!-- Kayıt Günlüğü (Log Listesi) -->
+            <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-4 sm:p-5">
+                <div class="flex items-center justify-between mb-3 border-b border-slate-100 dark:border-slate-800 pb-2">
+                    <h3 class="font-bold text-xs sm:text-sm text-slate-800 dark:text-slate-200">Girilmeyen Ders Kayıt Günlüğü</h3>
+                    <span id="att-log-count-badge" class="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 font-bold">0 Kayıt</span>
+                </div>
+                
+                <div id="attendance-log-list" class="space-y-1.5 text-xs max-h-56 overflow-y-auto">
+                    <div class="text-center py-4 text-slate-400">Henüz kaydedilmiş bir devamsızlık yok.</div>
+                </div>
             </div>
-        </div>
 
-        <!-- SBTU UBYS Bilgilendirme Kutusu -->
-        <div class="bg-blue-50/60 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/40 p-4 text-xs text-blue-900 dark:text-blue-200 space-y-1.5">
-            <div class="font-bold text-blue-950 dark:text-blue-100 flex items-center gap-1.5 text-xs sm:text-sm">
-                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                SBTÜ UBYS Notlandırma Kuralları
+            <!-- Mevzuat Maddesi Bilgilendirmesi -->
+            <div class="bg-blue-50/60 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/40 p-4 text-xs text-blue-900 dark:text-blue-200 space-y-1.5">
+                <div class="font-bold text-blue-950 dark:text-blue-100 flex items-center gap-1.5 text-xs sm:text-sm">
+                    <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    SBTÜ YDYO Yönergesi Devamsızlık Hükümleri (Madde 17)
+                </div>
+                <p class="leading-relaxed text-[11px] sm:text-xs text-slate-600 dark:text-slate-300">
+                    • <strong>%80 Devam Zorunluluğu:</strong> Kur içi toplam 175 ders saatinin %20'sinden (35 saatten) fazlasına katılmayan öğrenci kurdan doğrudan başarısız sayılır ve kuru tekrar eder.<br>
+                    • <strong>Sağlık Raporu Kotası (%10):</strong> Alınan sıhhi izinler en fazla 17.5 saat düşürülebilir. 17.5 saati aşan raporlu günler devamsızlık sayılır.<br>
+                    • <strong>Resmi İlan:</strong> Devamsızlık sınırını aşan öğrenci listesi 7. hafta içinde ilan edilir.
+                </p>
             </div>
-            <p class="leading-relaxed text-[11px] sm:text-xs text-slate-600 dark:text-slate-300">
-                • <strong>Vize Katkısı: %40</strong>, <strong>Final Katkısı: %60</strong><br>
-                • <strong>Geçme Notu: 60</strong> <br>
-                • Final sınavlarının her birinde (L&R, Writing, Speaking) <strong>50 barajı</strong> bulunmaktadır.
-            </p>
+
         </div>
 
     </main>
@@ -311,7 +515,6 @@
                 <div class="w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md bg-slate-950 flex items-center justify-center p-1">
                     <img id="share-preview-img" class="w-auto max-h-[52vh] sm:max-h-[58vh] rounded-xl object-contain block select-none shadow-sm" alt="Mobil Not Kartı" />
                 </div>
-               
             </div>
 
             <div class="p-3.5 sm:p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 flex items-center justify-end gap-2 shrink-0">
@@ -327,7 +530,7 @@
         </div>
     </div>
 
-    <!-- Görsel Oluşturma İçin Gizli HTML5 Canvas (Dikey Mobil: 720 x 1150) -->
+    <!-- Görsel Oluşturma İçin Gizli HTML5 Canvas -->
     <canvas id="shareCanvas" class="hidden" width="720" height="1150"></canvas>
 
     <script>
@@ -335,8 +538,13 @@
         const FINAL_MIN_GRADE = 50;
         const THEME_KEY = 'sbtu_theme_preference';
         const STORAGE_CACHE_KEY = 'sbtu_grades_cache';
+        const ATTENDANCE_ALL_KURS_KEY = 'sbtu_attendance_multikur_cache';
+        const ACTIVE_KUR_PREF_KEY = 'sbtu_active_kur_preference';
 
-        // Google Sites İframe Uyumlu Zırhlı Güvenli Depolama Motoru
+        let currentActiveTab = 'grades';
+        let preRenderedShareFile = null;
+
+        // Tarayıcı / LocalStorage Güvenli Depolama Motoru
         const SafeStorage = {
             isSupported: null,
             check() {
@@ -373,32 +581,7 @@
             }
         };
 
-        let preRenderedShareFile = null;
-
-        const userSkills = {
-            lr: 3,
-            wr: 3,
-            sp: 3
-        };
-
-        const examStructure = {
-            vize: [
-                { id: 'w11', name: 'Writing 1.1', weight: 13.13 },
-                { id: 'w12', name: 'Writing 1.2', weight: 5.63 },
-                { id: 'w21', name: 'Writing 2.1', weight: 13.13 },
-                { id: 'w22', name: 'Writing 2.2', weight: 5.63 },
-                { id: 'q1',  name: 'Quiz 1',       weight: 19.68 },
-                { id: 'q2',  name: 'Quiz 2',       weight: 19.68 },
-                { id: 'spk', name: 'Speaking Task',weight: 13.12 },
-                { id: 'hw',  name: 'Online Homework', weight: 10.00 }
-            ],
-            final: [
-                { id: 'f_lr', name: 'Final (Listening & Reading)', weight: 50.00 },
-                { id: 'f_wr', name: 'Final (Writing)', weight: 25.00 },
-                { id: 'f_sp', name: 'Final (Speaking)', weight: 25.00 }
-            ]
-        };
-
+        // Tema Yönetimi
         function initTheme() {
             const savedTheme = SafeStorage.get(THEME_KEY);
             const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -432,7 +615,878 @@
             }
         }
 
-        // Girilen Tüm Notları Otomatik Hafızaya Alma
+        // Sekmeler Arası Geçiş (Not Hesapla / Devamsızlık Takibi)
+        function switchTab(tab) {
+            currentActiveTab = tab;
+            const gradesSec = document.getElementById('section-grades');
+            const attSec = document.getElementById('section-attendance');
+            const tabBtnGrades = document.getElementById('tab-btn-grades');
+            const tabBtnAtt = document.getElementById('tab-btn-attendance');
+
+            if (tab === 'grades') {
+                gradesSec.classList.remove('hidden');
+                attSec.classList.add('hidden');
+                tabBtnGrades.className = "flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-white text-indigo-950 shadow-sm";
+                tabBtnAtt.className = "flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-white/80 hover:text-white hover:bg-white/5";
+            } else {
+                gradesSec.classList.add('hidden');
+                attSec.classList.remove('hidden');
+                tabBtnAtt.className = "flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 bg-white text-indigo-950 shadow-sm";
+                tabBtnGrades.className = "flex-1 py-2 sm:py-2.5 text-xs sm:text-sm font-bold rounded-xl transition-all duration-200 flex items-center justify-center gap-2 text-white/80 hover:text-white hover:bg-white/5";
+                renderCalendar();
+                renderDayEditor();
+            }
+        }
+
+        const userSkills = {
+            lr: 3,
+            wr: 3,
+            sp: 3
+        };
+
+        const examStructure = {
+            vize: [
+                { id: 'w11', name: 'Writing 1.1', weight: 13.13 },
+                { id: 'w12', name: 'Writing 1.2', weight: 5.63 },
+                { id: 'w21', name: 'Writing 2.1', weight: 13.13 },
+                { id: 'w22', name: 'Writing 2.2', weight: 5.63 },
+                { id: 'q1',  name: 'Quiz 1',       weight: 19.68 },
+                { id: 'q2',  name: 'Quiz 2',       weight: 19.68 },
+                { id: 'spk', name: 'Speaking Task',weight: 13.12 },
+                { id: 'hw',  name: 'Online Homework', weight: 10.00 }
+            ],
+            final: [
+                { id: 'f_lr', name: 'Final (Listening & Reading)', weight: 50.00 },
+                { id: 'f_wr', name: 'Final (Writing)', weight: 25.00 },
+                { id: 'f_sp', name: 'Final (Speaking)', weight: 25.00 }
+            ]
+        };
+
+        // SBTÜ Resmi Akademik Takviminde Belirtilen 5 Kurun Tanımı
+        const KURS_DATA = {
+            kur1: {
+                id: 'kur1',
+                name: '1. Kur (Güz 1)',
+                title: '1. Kur Akademik Takvimi',
+                subtitle: '21 Eylül - 06 Kasım 2026 (7 Hafta / 35 Gün)',
+                startDate: '2026-09-21',
+                endDate: '2026-11-06',
+                totalWeeks: 7,
+                totalHours: 175,
+                maxUnexcused: 35.0,
+                maxMedical: 17.5,
+                weeks: [
+                    { week: 1, range: '21 - 25 Eylül', days: [
+                        { id: '2026-09-21', name: 'Pzt', date: '21 Eyl' },
+                        { id: '2026-09-22', name: 'Sal', date: '22 Eyl' },
+                        { id: '2026-09-23', name: 'Çar', date: '23 Eyl' },
+                        { id: '2026-09-24', name: 'Per', date: '24 Eyl' },
+                        { id: '2026-09-25', name: 'Cum', date: '25 Eyl' }
+                    ]},
+                    { week: 2, range: '28 Eylül - 02 Ekim', days: [
+                        { id: '2026-09-28', name: 'Pzt', date: '28 Eyl' },
+                        { id: '2026-09-29', name: 'Sal', date: '29 Eyl' },
+                        { id: '2026-09-30', name: 'Çar', date: '30 Eyl' },
+                        { id: '2026-10-01', name: 'Per', date: '01 Eki' },
+                        { id: '2026-10-02', name: 'Cum', date: '02 Eki' }
+                    ]},
+                    { week: 3, range: '05 - 09 Ekim', days: [
+                        { id: '2026-10-05', name: 'Pzt', date: '05 Eki' },
+                        { id: '2026-10-06', name: 'Sal', date: '06 Eki' },
+                        { id: '2026-10-07', name: 'Çar', date: '07 Eki' },
+                        { id: '2026-10-08', name: 'Per', date: '08 Eki' },
+                        { id: '2026-10-09', name: 'Cum', date: '09 Eki' }
+                    ]},
+                    { week: 4, range: '12 - 16 Ekim', days: [
+                        { id: '2026-10-12', name: 'Pzt', date: '12 Eki' },
+                        { id: '2026-10-13', name: 'Sal', date: '13 Eki' },
+                        { id: '2026-10-14', name: 'Çar', date: '14 Eki' },
+                        { id: '2026-10-15', name: 'Per', date: '15 Eki' },
+                        { id: '2026-10-16', name: 'Cum', date: '16 Eki' }
+                    ]},
+                    { week: 5, range: '19 - 23 Ekim', days: [
+                        { id: '2026-10-19', name: 'Pzt', date: '19 Eki' },
+                        { id: '2026-10-20', name: 'Sal', date: '20 Eki' },
+                        { id: '2026-10-21', name: 'Çar', date: '21 Eki' },
+                        { id: '2026-10-22', name: 'Per', date: '22 Eki' },
+                        { id: '2026-10-23', name: 'Cum', date: '23 Eki' }
+                    ]},
+                    { week: 6, range: '26 - 30 Ekim', days: [
+                        { id: '2026-10-26', name: 'Pzt', date: '26 Eki' },
+                        { id: '2026-10-27', name: 'Sal', date: '27 Eki' },
+                        { id: '2026-10-28', name: 'Çar', date: '28 Eki' },
+                        { id: '2026-10-29', name: 'Per', date: '29 Eki', isHoliday: true, holidayName: 'Cumhuriyet Bayramı' },
+                        { id: '2026-10-30', name: 'Cum', date: '30 Eki' }
+                    ]},
+                    { week: 7, range: '02 - 06 Kasım', days: [
+                        { id: '2026-11-02', name: 'Pzt', date: '02 Kas' },
+                        { id: '2026-11-03', name: 'Sal', date: '03 Kas' },
+                        { id: '2026-11-04', name: 'Çar', date: '04 Kas' },
+                        { id: '2026-11-05', name: 'Per', date: '05 Kas' },
+                        { id: '2026-11-06', name: 'Cum', date: '06 Kas' }
+                    ]}
+                ]
+            },
+            kur2: {
+                id: 'kur2',
+                name: '2. Kur (Güz 2)',
+                title: '2. Kur Akademik Takvimi',
+                subtitle: '23 Kasım 2026 - 08 Ocak 2027 (7 Hafta / 35 Gün)',
+                startDate: '2026-11-23',
+                endDate: '2027-01-08',
+                totalWeeks: 7,
+                totalHours: 175,
+                maxUnexcused: 35.0,
+                maxMedical: 17.5,
+                weeks: [
+                    { week: 1, range: '23 - 27 Kasım', days: [
+                        { id: '2026-11-23', name: 'Pzt', date: '23 Kas' },
+                        { id: '2026-11-24', name: 'Sal', date: '24 Kas' },
+                        { id: '2026-11-25', name: 'Çar', date: '25 Kas' },
+                        { id: '2026-11-26', name: 'Per', date: '26 Kas' },
+                        { id: '2026-11-27', name: 'Cum', date: '27 Kas' }
+                    ]},
+                    { week: 2, range: '30 Kasım - 04 Aralık', days: [
+                        { id: '2026-11-30', name: 'Pzt', date: '30 Kas' },
+                        { id: '2026-12-01', name: 'Sal', date: '01 Ara' },
+                        { id: '2026-12-02', name: 'Çar', date: '02 Ara' },
+                        { id: '2026-12-03', name: 'Per', date: '03 Ara' },
+                        { id: '2026-12-04', name: 'Cum', date: '04 Ara' }
+                    ]},
+                    { week: 3, range: '07 - 11 Aralık', days: [
+                        { id: '2026-12-07', name: 'Pzt', date: '07 Ara' },
+                        { id: '2026-12-08', name: 'Sal', date: '08 Ara' },
+                        { id: '2026-12-09', name: 'Çar', date: '09 Ara' },
+                        { id: '2026-12-10', name: 'Per', date: '10 Ara' },
+                        { id: '2026-12-11', name: 'Cum', date: '11 Ara' }
+                    ]},
+                    { week: 4, range: '14 - 18 Aralık', days: [
+                        { id: '2026-12-14', name: 'Pzt', date: '14 Ara' },
+                        { id: '2026-12-15', name: 'Sal', date: '15 Ara' },
+                        { id: '2026-12-16', name: 'Çar', date: '16 Ara' },
+                        { id: '2026-12-17', name: 'Per', date: '17 Ara' },
+                        { id: '2026-12-18', name: 'Cum', date: '18 Ara' }
+                    ]},
+                    { week: 5, range: '21 - 25 Aralık', days: [
+                        { id: '2026-12-21', name: 'Pzt', date: '21 Ara' },
+                        { id: '2026-12-22', name: 'Sal', date: '22 Ara' },
+                        { id: '2026-12-23', name: 'Çar', date: '23 Ara' },
+                        { id: '2026-12-24', name: 'Per', date: '24 Ara' },
+                        { id: '2026-12-25', name: 'Cum', date: '25 Ara' }
+                    ]},
+                    { week: 6, range: '28 Aralık - 01 Ocak', days: [
+                        { id: '2026-12-28', name: 'Pzt', date: '28 Ara' },
+                        { id: '2026-12-29', name: 'Sal', date: '29 Ara' },
+                        { id: '2026-12-30', name: 'Çar', date: '30 Ara' },
+                        { id: '2026-12-31', name: 'Per', date: '31 Ara' },
+                        { id: '2027-01-01', name: 'Cum', date: '01 Oca', isHoliday: true, holidayName: 'Yılbaşı' }
+                    ]},
+                    { week: 7, range: '04 - 08 Ocak', days: [
+                        { id: '2027-01-04', name: 'Pzt', date: '04 Oca' },
+                        { id: '2027-01-05', name: 'Sal', date: '05 Oca' },
+                        { id: '2027-01-06', name: 'Çar', date: '06 Oca' },
+                        { id: '2027-01-07', name: 'Per', date: '07 Oca' },
+                        { id: '2027-01-08', name: 'Cum', date: '08 Oca' }
+                    ]}
+                ]
+            },
+            kur3: {
+                id: 'kur3',
+                name: '3. Kur (Bahar 1)',
+                title: '3. Kur Akademik Takvimi',
+                subtitle: '01 Şubat - 26 Mart 2027 (8 Hafta)',
+                startDate: '2027-02-01',
+                endDate: '2027-03-26',
+                totalWeeks: 8,
+                totalHours: 175,
+                maxUnexcused: 35.0,
+                maxMedical: 17.5,
+                weeks: [
+                    { week: 1, range: '01 - 05 Şubat', days: [
+                        { id: '2027-02-01', name: 'Pzt', date: '01 Şub' },
+                        { id: '2027-02-02', name: 'Sal', date: '02 Şub' },
+                        { id: '2027-02-03', name: 'Çar', date: '03 Şub' },
+                        { id: '2027-02-04', name: 'Per', date: '04 Şub' },
+                        { id: '2027-02-05', name: 'Cum', date: '05 Şub' }
+                    ]},
+                    { week: 2, range: '08 - 12 Şubat', days: [
+                        { id: '2027-02-08', name: 'Pzt', date: '08 Şub' },
+                        { id: '2027-02-09', name: 'Sal', date: '09 Şub' },
+                        { id: '2027-02-10', name: 'Çar', date: '10 Şub' },
+                        { id: '2027-02-11', name: 'Per', date: '11 Şub' },
+                        { id: '2027-02-12', name: 'Cum', date: '12 Şub' }
+                    ]},
+                    { week: 3, range: '15 - 19 Şubat', days: [
+                        { id: '2027-02-15', name: 'Pzt', date: '15 Şub' },
+                        { id: '2027-02-16', name: 'Sal', date: '16 Şub' },
+                        { id: '2027-02-17', name: 'Çar', date: '17 Şub' },
+                        { id: '2027-02-18', name: 'Per', date: '18 Şub' },
+                        { id: '2027-02-19', name: 'Cum', date: '19 Şub' }
+                    ]},
+                    { week: 4, range: '22 - 26 Şubat', days: [
+                        { id: '2027-02-22', name: 'Pzt', date: '22 Şub' },
+                        { id: '2027-02-23', name: 'Sal', date: '23 Şub' },
+                        { id: '2027-02-24', name: 'Çar', date: '24 Şub' },
+                        { id: '2027-02-25', name: 'Per', date: '25 Şub' },
+                        { id: '2027-02-26', name: 'Cum', date: '26 Şub' }
+                    ]},
+                    { week: 5, range: '01 - 05 Mart', days: [
+                        { id: '2027-03-01', name: 'Pzt', date: '01 Mar' },
+                        { id: '2027-03-02', name: 'Sal', date: '02 Mar' },
+                        { id: '2027-03-03', name: 'Çar', date: '03 Mar' },
+                        { id: '2027-03-04', name: 'Per', date: '04 Mar' },
+                        { id: '2027-03-05', name: 'Cum', date: '05 Mar' }
+                    ]},
+                    { week: 6, range: '08 - 12 Mart', days: [
+                        { id: '2027-03-08', name: 'Pzt', date: '08 Mar' },
+                        { id: '2027-03-09', name: 'Sal', date: '09 Mar', isHoliday: true, holidayName: 'Ramazan Bayramı' },
+                        { id: '2027-03-10', name: 'Çar', date: '10 Mar', isHoliday: true, holidayName: 'Ramazan Bayramı' },
+                        { id: '2027-03-11', name: 'Per', date: '11 Mar', isHoliday: true, holidayName: 'Ramazan Bayramı' },
+                        { id: '2027-03-12', name: 'Cum', date: '12 Mar' }
+                    ]},
+                    { week: 7, range: '15 - 19 Mart', days: [
+                        { id: '2027-03-15', name: 'Pzt', date: '15 Mar' },
+                        { id: '2027-03-16', name: 'Sal', date: '16 Mar' },
+                        { id: '2027-03-17', name: 'Çar', date: '17 Mar' },
+                        { id: '2027-03-18', name: 'Per', date: '18 Mar' },
+                        { id: '2027-03-19', name: 'Cum', date: '19 Mar' }
+                    ]},
+                    { week: 8, range: '22 - 26 Mart', days: [
+                        { id: '2027-03-22', name: 'Pzt', date: '22 Mar' },
+                        { id: '2027-03-23', name: 'Sal', date: '23 Mar' },
+                        { id: '2027-03-24', name: 'Çar', date: '24 Mar' },
+                        { id: '2027-03-25', name: 'Per', date: '25 Mar' },
+                        { id: '2027-03-26', name: 'Cum', date: '26 Mar' }
+                    ]}
+                ]
+            },
+            kur4: {
+                id: 'kur4',
+                name: '4. Kur (Bahar 2)',
+                title: '4. Kur Akademik Takvimi',
+                subtitle: '12 Nisan - 04 Haziran 2027 (8 Hafta)',
+                startDate: '2027-04-12',
+                endDate: '2027-06-04',
+                totalWeeks: 8,
+                totalHours: 175,
+                maxUnexcused: 35.0,
+                maxMedical: 17.5,
+                weeks: [
+                    { week: 1, range: '12 - 16 Nisan', days: [
+                        { id: '2027-04-12', name: 'Pzt', date: '12 Nis' },
+                        { id: '2027-04-13', name: 'Sal', date: '13 Nis' },
+                        { id: '2027-04-14', name: 'Çar', date: '14 Nis' },
+                        { id: '2027-04-15', name: 'Per', date: '15 Nis' },
+                        { id: '2027-04-16', name: 'Cum', date: '16 Nis' }
+                    ]},
+                    { week: 2, range: '19 - 23 Nisan', days: [
+                        { id: '2027-04-19', name: 'Pzt', date: '19 Nis' },
+                        { id: '2027-04-20', name: 'Sal', date: '20 Nis' },
+                        { id: '2027-04-21', name: 'Çar', date: '21 Nis' },
+                        { id: '2027-04-22', name: 'Per', date: '22 Nis' },
+                        { id: '2027-04-23', name: 'Cum', date: '23 Nis', isHoliday: true, holidayName: '23 Nisan Bayramı' }
+                    ]},
+                    { week: 3, range: '26 - 30 Nisan', days: [
+                        { id: '2027-04-26', name: 'Pzt', date: '26 Nis' },
+                        { id: '2027-04-27', name: 'Sal', date: '27 Nis' },
+                        { id: '2027-04-28', name: 'Çar', date: '28 Nis' },
+                        { id: '2027-04-29', name: 'Per', date: '29 Nis' },
+                        { id: '2027-04-30', name: 'Cum', date: '30 Nis' }
+                    ]},
+                    { week: 4, range: '03 - 07 Mayıs', days: [
+                        { id: '2027-05-03', name: 'Pzt', date: '03 May' },
+                        { id: '2027-05-04', name: 'Sal', date: '04 May' },
+                        { id: '2027-05-05', name: 'Çar', date: '05 May' },
+                        { id: '2027-05-06', name: 'Per', date: '06 May' },
+                        { id: '2027-05-07', name: 'Cum', date: '07 May' }
+                    ]},
+                    { week: 5, range: '10 - 14 Mayıs', days: [
+                        { id: '2027-05-10', name: 'Pzt', date: '10 May' },
+                        { id: '2027-05-11', name: 'Sal', date: '11 May' },
+                        { id: '2027-05-12', name: 'Çar', date: '12 May' },
+                        { id: '2027-05-13', name: 'Per', date: '13 May' },
+                        { id: '2027-05-14', name: 'Cum', date: '14 May' }
+                    ]},
+                    { week: 6, range: '17 - 21 Mayıs', days: [
+                        { id: '2027-05-17', name: 'Pzt', date: '17 May', isHoliday: true, holidayName: 'Kurban Bayramı' },
+                        { id: '2027-05-18', name: 'Sal', date: '18 May', isHoliday: true, holidayName: 'Kurban Bayramı' },
+                        { id: '2027-05-19', name: 'Çar', date: '19 May', isHoliday: true, holidayName: '19 Mayıs Bayramı' },
+                        { id: '2027-05-20', name: 'Per', date: '20 May' },
+                        { id: '2027-05-21', name: 'Cum', date: '21 May' }
+                    ]},
+                    { week: 7, range: '24 - 28 Mayıs', days: [
+                        { id: '2027-05-24', name: 'Pzt', date: '24 May' },
+                        { id: '2027-05-25', name: 'Sal', date: '25 May' },
+                        { id: '2027-05-26', name: 'Çar', date: '26 May' },
+                        { id: '2027-05-27', name: 'Per', date: '27 May' },
+                        { id: '2027-05-28', name: 'Cum', date: '28 May' }
+                    ]},
+                    { week: 8, range: '31 Mayıs - 04 Haziran', days: [
+                        { id: '2027-05-31', name: 'Pzt', date: '31 May' },
+                        { id: '2027-06-01', name: 'Sal', date: '01 Haz' },
+                        { id: '2027-06-02', name: 'Çar', date: '02 Haz' },
+                        { id: '2027-06-03', name: 'Per', date: '03 Haz' },
+                        { id: '2027-06-04', name: 'Cum', date: '04 Haz' }
+                    ]}
+                ]
+            },
+            yaz: {
+                id: 'yaz',
+                name: '5. Kur (Yaz Okulu)',
+                title: 'Yaz Okulu Akademik Takvimi',
+                subtitle: '05 Temmuz - 13 Ağustos 2027 (6 Hafta / 30 Gün)',
+                startDate: '2027-07-05',
+                endDate: '2027-08-13',
+                totalWeeks: 6,
+                totalHours: 150,
+                maxUnexcused: 30.0, // 150 * 0.20
+                maxMedical: 15.0,   // 150 * 0.10
+                weeks: [
+                    { week: 1, range: '05 - 09 Temmuz', days: [
+                        { id: '2027-07-05', name: 'Pzt', date: '05 Tem' },
+                        { id: '2027-07-06', name: 'Sal', date: '06 Tem' },
+                        { id: '2027-07-07', name: 'Çar', date: '07 Tem' },
+                        { id: '2027-07-08', name: 'Per', date: '08 Tem' },
+                        { id: '2027-07-09', name: 'Cum', date: '09 Tem' }
+                    ]},
+                    { week: 2, range: '12 - 16 Temmuz', days: [
+                        { id: '2027-07-12', name: 'Pzt', date: '12 Tem' },
+                        { id: '2027-07-13', name: 'Sal', date: '13 Tem' },
+                        { id: '2027-07-14', name: 'Çar', date: '14 Tem' },
+                        { id: '2027-07-15', name: 'Per', date: '15 Tem', isHoliday: true, holidayName: '15 Temmuz Demokrasi Günü' },
+                        { id: '2027-07-16', name: 'Cum', date: '16 Tem' }
+                    ]},
+                    { week: 3, range: '19 - 23 Temmuz', days: [
+                        { id: '2027-07-19', name: 'Pzt', date: '19 Tem' },
+                        { id: '2027-07-20', name: 'Sal', date: '20 Tem' },
+                        { id: '2027-07-21', name: 'Çar', date: '21 Tem' },
+                        { id: '2027-07-22', name: 'Per', date: '22 Tem' },
+                        { id: '2027-07-23', name: 'Cum', date: '23 Tem' }
+                    ]},
+                    { week: 4, range: '26 - 30 Temmuz', days: [
+                        { id: '2027-07-26', name: 'Pzt', date: '26 Tem' },
+                        { id: '2027-07-27', name: 'Sal', date: '27 Tem' },
+                        { id: '2027-07-28', name: 'Çar', date: '28 Tem' },
+                        { id: '2027-07-29', name: 'Per', date: '29 Tem' },
+                        { id: '2027-07-30', name: 'Cum', date: '30 Tem' }
+                    ]},
+                    { week: 5, range: '02 - 06 Ağustos', days: [
+                        { id: '2027-08-02', name: 'Pzt', date: '02 Ağu' },
+                        { id: '2027-08-03', name: 'Sal', date: '03 Ağu' },
+                        { id: '2027-08-04', name: 'Çar', date: '04 Ağu' },
+                        { id: '2027-08-05', name: 'Per', date: '05 Ağu' },
+                        { id: '2027-08-06', name: 'Cum', date: '06 Ağu' }
+                    ]},
+                    { week: 6, range: '09 - 13 Ağustos', days: [
+                        { id: '2027-08-09', name: 'Pzt', date: '09 Ağu' },
+                        { id: '2027-08-10', name: 'Sal', date: '10 Ağu' },
+                        { id: '2027-08-11', name: 'Çar', date: '11 Ağu' },
+                        { id: '2027-08-12', name: 'Per', date: '12 Ağu' },
+                        { id: '2027-08-13', name: 'Cum', date: '13 Ağu' }
+                    ]}
+                ]
+            }
+        };
+
+        // Çoklu Kur Devamsızlık Deposu: { kur1: { dateId: [...] }, kur2: {...} }
+        let multiKurAttendance = {
+            kur1: {},
+            kur2: {},
+            kur3: {},
+            kur4: {},
+            yaz: {}
+        };
+
+        let activeKurId = 'kur1';
+        let selectedDateId = '2026-11-02';
+
+        // Bugünün Tarihine Göre Aktif Kuru Otomatik Tespit Etme
+        function detectCurrentKurId() {
+            const now = new Date();
+            const y = now.getFullYear();
+            const m = String(now.getMonth() + 1).padStart(2, '0');
+            const d = String(now.getDate()).padStart(2, '0');
+            const todayStr = `${y}-${m}-${d}`;
+
+            // Akademik Takvim aralıklarını kontrol et
+            for (let kId in KURS_DATA) {
+                const k = KURS_DATA[kId];
+                if (todayStr >= k.startDate && todayStr <= k.endDate) {
+                    return kId;
+                }
+            }
+            return 'kur1'; // Varsayılan Güz 1. Kur
+        }
+
+        function setKur(kId) {
+            if (!KURS_DATA[kId]) return;
+            activeKurId = kId;
+            SafeStorage.set(ACTIVE_KUR_PREF_KEY, activeKurId);
+
+            // Seçili günü bu kurun ilk geçerli gününe ayarla
+            const firstDay = KURS_DATA[kId].weeks[0].days[0].id;
+            selectedDateId = firstDay;
+
+            renderKurSelector();
+            calculateAttendance();
+            renderCalendar();
+            renderDayEditor();
+        }
+
+        function renderKurSelector() {
+            const container = document.getElementById('kur-selector-buttons');
+            container.innerHTML = '';
+
+            const activeKur = KURS_DATA[activeKurId];
+            document.getElementById('calendar-header-title').innerText = activeKur.title;
+            document.getElementById('calendar-header-subtitle').innerText = activeKur.subtitle;
+
+            for (let kId in KURS_DATA) {
+                const k = KURS_DATA[kId];
+                const isActive = kId === activeKurId;
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => setKur(kId);
+
+                let btnClass = isActive 
+                    ? 'bg-indigo-600 text-white font-extrabold shadow-md border-indigo-600' 
+                    : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold';
+
+                btn.className = `py-1.5 px-2 rounded-xl border text-xs text-center transition-all active:scale-95 flex flex-col items-center justify-center ${btnClass}`;
+                btn.innerHTML = `
+                    <span class="truncate w-full">${k.name}</span>
+                    <span class="text-[9px] ${isActive ? 'text-indigo-200' : 'text-slate-400'} font-normal">${k.totalWeeks} Hafta (${k.maxUnexcused}s)</span>
+                `;
+                container.appendChild(btn);
+            }
+        }
+
+        // ====================== DEVAMSIZLIK YÖNETİMİ ======================
+
+        function loadAttendanceFromStorage() {
+            const rawMulti = SafeStorage.get(ATTENDANCE_ALL_KURS_KEY);
+            if (rawMulti) {
+                try {
+                    multiKurAttendance = JSON.parse(rawMulti);
+                } catch (e) {
+                    multiKurAttendance = { kur1: {}, kur2: {}, kur3: {}, kur4: {}, yaz: {} };
+                }
+            } else {
+                // Eski tekli cache varsa kur1'e taşı
+                const legacy = SafeStorage.get('sbtu_attendance_cache');
+                if (legacy) {
+                    try {
+                        multiKurAttendance.kur1 = JSON.parse(legacy);
+                    } catch (e) {}
+                }
+            }
+
+            const savedKur = SafeStorage.get(ACTIVE_KUR_PREF_KEY);
+            activeKurId = (savedKur && KURS_DATA[savedKur]) ? savedKur : detectCurrentKurId();
+
+            const curKur = KURS_DATA[activeKurId];
+            if (curKur && curKur.weeks[0]) {
+                selectedDateId = curKur.weeks[0].days[0].id;
+            }
+
+            renderKurSelector();
+            calculateAttendance();
+        }
+
+        function saveAttendanceToStorage() {
+            SafeStorage.set(ATTENDANCE_ALL_KURS_KEY, JSON.stringify(multiKurAttendance));
+            calculateAttendance();
+        }
+
+        function calculateAttendance() {
+            const curKur = KURS_DATA[activeKurId];
+            const kurData = multiKurAttendance[activeKurId] || {};
+
+            let totalUnexcused = 0;
+            let totalMedical = 0;
+
+            Object.entries(kurData).forEach(([dateStr, slots]) => {
+                if (Array.isArray(slots)) {
+                    slots.forEach(slot => {
+                        if (slot === 'unexcused') totalUnexcused += 1;
+                        else if (slot === 'medical') totalMedical += 1;
+                    });
+                }
+            });
+
+            const maxUnexcused = curKur.maxUnexcused;
+            const maxMedical = curKur.maxMedical;
+
+            // SBTÜ Yönergesi Madde 17/5: Sağlık izinleri toplamı kur ders saatinin %10'unu aşamaz.
+            // Aşan kısım devam zorunluluğundan (özürsüz havuzundan) düşülür.
+            const validMedicalDeduction = Math.min(maxMedical, totalMedical);
+            const excessMedical = Math.max(0, totalMedical - maxMedical);
+            const netAttendanceLoss = totalUnexcused + excessMedical;
+            const remainingHours = Math.max(0, maxUnexcused - netAttendanceLoss);
+            const isFailedAttendance = netAttendanceLoss > maxUnexcused;
+
+            // UI Güncellemeleri
+            document.getElementById('att-remaining-hours').innerText = remainingHours.toFixed(1);
+            document.getElementById('att-unexcused-hours').innerText = totalUnexcused;
+            document.getElementById('att-medical-hours').innerText = totalMedical;
+            document.getElementById('att-medical-quota').innerText = `Kota: ${validMedicalDeduction.toFixed(1)} / ${maxMedical} Saat`;
+            document.getElementById('att-limit-sub').innerText = `Toplam Sınır: ${maxUnexcused} Saat`;
+            document.getElementById('att-unexcused-sub').innerText = `${maxUnexcused} Saatte Kalır`;
+            document.getElementById('att-bar-title').innerText = `Devamsızlık Tüketimi (${maxUnexcused} Saat Sınırı)`;
+
+            const percentConsumed = Math.min(100, (netAttendanceLoss / maxUnexcused) * 100);
+            document.getElementById('att-percent-label').innerText = `${netAttendanceLoss.toFixed(1)} / ${maxUnexcused} Saat (%${Math.round(percentConsumed)})`;
+
+            const pBar = document.getElementById('att-progress-bar');
+            pBar.style.width = `${percentConsumed}%`;
+
+            const statusText = document.getElementById('att-status-text');
+            const statusBadge = document.getElementById('att-status-badge');
+            const remCard = document.getElementById('att-card-remaining');
+            const notTabPill = document.getElementById('tab-attendance-pill');
+            const alertBanner = document.getElementById('attendance-alert-banner');
+
+            notTabPill.classList.remove('hidden');
+            notTabPill.innerText = `${remainingHours.toFixed(0)}/${maxUnexcused}s`;
+
+            if (isFailedAttendance) {
+                pBar.className = "h-full bg-gradient-to-r from-rose-500 to-red-600 rounded-full transition-all duration-500 ease-out";
+                statusText.innerText = "DEVAMSIZLIKTAN KALDI";
+                statusText.className = "text-sm sm:text-base font-extrabold text-rose-600 dark:text-rose-400 mt-0.5";
+                statusBadge.innerText = "Kur Tekrarı";
+                statusBadge.className = "mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-rose-200 dark:bg-rose-900/60 text-rose-800 dark:text-rose-200 font-bold";
+                remCard.className = "bg-rose-50/70 dark:bg-rose-950/40 border-2 border-rose-400 dark:border-rose-900/60 rounded-xl p-2.5 sm:p-3.5";
+                notTabPill.className = "text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500 border border-rose-400 text-white font-extrabold";
+                alertBanner.classList.remove('hidden');
+            } else if (remainingHours <= 5) {
+                pBar.className = "h-full bg-gradient-to-r from-amber-500 to-rose-500 rounded-full transition-all duration-500 ease-out";
+                statusText.innerText = "KRİTİK ALARM";
+                statusText.className = "text-sm sm:text-base font-extrabold text-rose-600 dark:text-rose-400 mt-0.5";
+                statusBadge.innerText = "1 Gün Bile Kaçıramazsın";
+                statusBadge.className = "mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 font-bold";
+                remCard.className = "bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 rounded-xl p-2.5 sm:p-3.5";
+                notTabPill.className = "text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/40 border border-rose-400 text-rose-200 font-extrabold";
+                alertBanner.classList.add('hidden');
+            } else if (remainingHours <= 15) {
+                pBar.className = "h-full bg-gradient-to-r from-emerald-500 to-amber-500 rounded-full transition-all duration-500 ease-out";
+                statusText.innerText = "DİKKAT: SINIR YAKIN";
+                statusText.className = "text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-0.5";
+                statusBadge.innerText = "Kalan Saat Azalıyor";
+                statusBadge.className = "mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 font-semibold";
+                remCard.className = "bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/40 rounded-xl p-2.5 sm:p-3.5";
+                notTabPill.className = "text-[10px] px-1.5 py-0.5 rounded-full bg-amber-500/30 border border-amber-400 text-amber-200 font-extrabold";
+                alertBanner.classList.add('hidden');
+            } else {
+                pBar.className = "h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500 ease-out";
+                statusText.innerText = "Güvenli Bölge";
+                statusText.className = "text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 mt-0.5";
+                statusBadge.innerText = "Devam Oranı İyi";
+                statusBadge.className = "mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 font-semibold";
+                remCard.className = "bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 rounded-xl p-2.5 sm:p-3.5";
+                notTabPill.className = "text-[10px] px-1.5 py-0.5 rounded-full bg-emerald-500/30 border border-emerald-400 text-emerald-200 font-extrabold";
+                alertBanner.classList.add('hidden');
+            }
+
+            renderAttendanceLog();
+            return { isFailedAttendance, remainingHours };
+        }
+
+        // ====================== TAKVİM VE HAFTALIK HIZLI GİRİŞ ======================
+
+        function renderCalendar() {
+            const container = document.getElementById('calendar-weeks-container');
+            container.innerHTML = '';
+
+            const curKur = KURS_DATA[activeKurId];
+            const kurData = multiKurAttendance[activeKurId] || {};
+
+            curKur.weeks.forEach(w => {
+                const weekRow = document.createElement('div');
+                weekRow.className = "p-2 sm:p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 space-y-2";
+                
+                // Bu haftanın mevcut toplam devamsızlık saatini hesapla
+                let currentWeekTotalAbsent = 0;
+                w.days.forEach(d => {
+                    const slots = kurData[d.id] || ['present','present','present','present','present'];
+                    currentWeekTotalAbsent += slots.filter(s => s !== 'present').length;
+                });
+
+                let daysHtml = '';
+                w.days.forEach(d => {
+                    const slots = kurData[d.id] || ['present','present','present','present','present'];
+                    const unexcusedCount = slots.filter(s => s === 'unexcused').length;
+                    const medicalCount = slots.filter(s => s === 'medical').length;
+                    const totalAbsent = unexcusedCount + medicalCount;
+                    const isSelected = selectedDateId === d.id;
+
+                    let bgBadge = "bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700";
+                    let statusDot = "";
+
+                    if (d.isHoliday) {
+                        bgBadge = "bg-slate-200/60 dark:bg-slate-800/80 text-slate-400 border-dashed border-slate-300 dark:border-slate-700 opacity-60 cursor-not-allowed";
+                        statusDot = `<span class="text-[9px] text-amber-500 block truncate" title="${d.holidayName}">Tatil</span>`;
+                    } else if (totalAbsent === 5) {
+                        bgBadge = "bg-rose-50 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-300 dark:border-rose-800 font-bold";
+                        statusDot = `<span class="text-[9px] text-rose-600 block">5s Yok</span>`;
+                    } else if (totalAbsent > 0) {
+                        bgBadge = "bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800 font-bold";
+                        statusDot = `<span class="text-[9px] text-amber-600 block">${totalAbsent}s Yok</span>`;
+                    }
+
+                    const selectedRing = isSelected ? "ring-2 ring-indigo-500 ring-offset-1 dark:ring-offset-slate-900" : "";
+
+                    daysHtml += `
+                        <button onclick="${d.isHoliday ? '' : `selectCalendarDay('${d.id}')`}" 
+                                class="flex-1 p-1.5 sm:p-2 rounded-xl border text-center transition-all ${bgBadge} ${selectedRing}">
+                            <div class="text-[10px] text-slate-400 font-medium">${d.name}</div>
+                            <div class="text-xs sm:text-sm font-extrabold">${d.date}</div>
+                            ${statusDot}
+                        </button>
+                    `;
+                });
+
+                // Hafta Başlığı: Sol tarafta Hafta No & Tarih Aralığı, Sağ tarafta HIZLI HAFTALIK SAAT GİRİŞ KUTUSU
+                weekRow.innerHTML = `
+                    <div class="flex items-center justify-between gap-2 px-1">
+                        <div>
+                            <span class="text-xs sm:text-sm font-extrabold text-slate-700 dark:text-slate-200">${w.week}. Hafta</span>
+                            <span class="text-[10px] sm:text-xs text-slate-400 ml-1">(${w.range})</span>
+                        </div>
+                        
+                        <!-- Hızlı Haftalık Saat Girişi -->
+                        <div class="flex items-center gap-1.5 bg-white dark:bg-slate-900 px-2 py-1 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+                            <label for="week-bulk-input-${w.week}" class="text-[10px] sm:text-[11px] font-semibold text-slate-500 dark:text-slate-400 select-none">
+                                Hafta Toplamı:
+                            </label>
+                            <input 
+                                type="number" 
+                                inputmode="numeric" 
+                                id="week-bulk-input-${w.week}"
+                                min="0" 
+                                max="25" 
+                                value="${currentWeekTotalAbsent > 0 ? currentWeekTotalAbsent : ''}"
+                                placeholder="0" 
+                                oninput="applyWeeklyBulkHours(${w.week}, this)"
+                                class="w-10 sm:w-12 text-center bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg py-0.5 text-xs font-extrabold text-indigo-950 dark:text-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                            />
+                            <span class="text-[10px] text-slate-400">saat</span>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-5 gap-1.5 sm:gap-2">
+                        ${daysHtml}
+                    </div>
+                `;
+                container.appendChild(weekRow);
+            });
+        }
+
+        // Haftanın Yanındaki Kutudan Hızlı Saat Dağıtımı Yapma
+        function applyWeeklyBulkHours(weekNumber, inputEl) {
+            let totalHours = parseInt(inputEl.value, 10);
+            if (isNaN(totalHours) || totalHours < 0) totalHours = 0;
+            if (totalHours > 25) { totalHours = 25; inputEl.value = 25; }
+
+            const curKur = KURS_DATA[activeKurId];
+            const weekObj = curKur.weeks.find(w => w.week === weekNumber);
+            if (!weekObj) return;
+
+            if (!multiKurAttendance[activeKurId]) {
+                multiKurAttendance[activeKurId] = {};
+            }
+
+            // Hafta günlerini sırayla doldur (Tatil olan günleri atla)
+            let remainingToDistribute = totalHours;
+
+            weekObj.days.forEach(d => {
+                if (d.isHoliday) {
+                    delete multiKurAttendance[activeKurId][d.id];
+                    return;
+                }
+
+                if (remainingToDistribute <= 0) {
+                    delete multiKurAttendance[activeKurId][d.id];
+                } else {
+                    const hoursForThisDay = Math.min(5, remainingToDistribute);
+                    const newSlots = ['present','present','present','present','present'];
+                    for (let i = 0; i < hoursForThisDay; i++) {
+                        newSlots[i] = 'unexcused';
+                    }
+                    multiKurAttendance[activeKurId][d.id] = newSlots;
+                    remainingToDistribute -= hoursForThisDay;
+                }
+            });
+
+            saveAttendanceToStorage();
+            calculateAttendance();
+            renderCalendar();
+            renderDayEditor();
+        }
+
+        function selectCalendarDay(dateId) {
+            selectedDateId = dateId;
+            renderCalendar();
+            renderDayEditor();
+            document.getElementById('day-editor-card').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function renderDayEditor() {
+            let dayObj = null;
+            let weekNumber = 1;
+            const curKur = KURS_DATA[activeKurId];
+
+            curKur.weeks.forEach(w => {
+                const found = w.days.find(d => d.id === selectedDateId);
+                if (found) { dayObj = found; weekNumber = w.week; }
+            });
+
+            if (!dayObj) return;
+
+            const kurData = multiKurAttendance[activeKurId] || {};
+            const yearStr = dayObj.id.split('-')[0];
+            document.getElementById('editor-date-title').innerText = `${dayObj.date} ${yearStr} - ${dayObj.name} (${curKur.name} / ${weekNumber}. Hafta)`;
+
+            const slots = kurData[selectedDateId] || ['present','present','present','present','present'];
+            const unexcusedCount = slots.filter(s => s === 'unexcused').length;
+            const medicalCount = slots.filter(s => s === 'medical').length;
+            const totalAbsent = unexcusedCount + medicalCount;
+
+            const badge = document.getElementById('editor-day-badge');
+            badge.innerText = `${totalAbsent} / 5 Saat Yok (${unexcusedCount} Özürsüz, ${medicalCount} Raporlu)`;
+
+            const grid = document.getElementById('lesson-slots-grid');
+            grid.innerHTML = '';
+
+            slots.forEach((status, idx) => {
+                const slotBtn = document.createElement('button');
+                slotBtn.type = 'button';
+                slotBtn.onclick = () => cycleSlotStatus(idx);
+
+                let slotStyle = "bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300";
+                let statusLabel = "Dersteydim";
+                let statusPill = "bg-emerald-500/20 text-emerald-600 dark:text-emerald-400";
+
+                if (status === 'unexcused') {
+                    slotStyle = "bg-rose-50 dark:bg-rose-950/60 border-rose-300 dark:border-rose-800 text-rose-800 dark:text-rose-200";
+                    statusLabel = "Raporsuz";
+                    statusPill = "bg-rose-500 text-white font-bold";
+                } else if (status === 'medical') {
+                    slotStyle = "bg-sky-50 dark:bg-sky-950/60 border-sky-300 dark:border-sky-800 text-sky-800 dark:text-sky-200";
+                    statusLabel = "Raporlu";
+                    statusPill = "bg-sky-500 text-white font-bold";
+                }
+
+                slotBtn.className = `p-2 sm:p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${slotStyle}`;
+                slotBtn.innerHTML = `
+                    <span class="text-[11px] font-bold">${idx + 1}. Ders</span>
+                    <span class="text-[9px] px-1.5 py-0.5 rounded-md ${statusPill}">${statusLabel}</span>
+                `;
+                grid.appendChild(slotBtn);
+            });
+        }
+
+        // Tıklanan slotun durumunu döngüsel değiştirir: present -> unexcused -> medical -> present
+        function cycleSlotStatus(index) {
+            if (!multiKurAttendance[activeKurId]) {
+                multiKurAttendance[activeKurId] = {};
+            }
+            if (!multiKurAttendance[activeKurId][selectedDateId]) {
+                multiKurAttendance[activeKurId][selectedDateId] = ['present','present','present','present','present'];
+            }
+            const current = multiKurAttendance[activeKurId][selectedDateId][index];
+            let next = 'present';
+            if (current === 'present') next = 'unexcused';
+            else if (current === 'unexcused') next = 'medical';
+            else if (current === 'medical') next = 'present';
+
+            multiKurAttendance[activeKurId][selectedDateId][index] = next;
+            saveAttendanceToStorage();
+            renderCalendar();
+            renderDayEditor();
+        }
+
+        // Hızlı Butonlar ile Günlük Saati Belirleme
+        function setFastDayHours(count) {
+            const isMedical = document.getElementById('fast-type-medical').checked;
+            const type = isMedical ? 'medical' : 'unexcused';
+
+            if (!multiKurAttendance[activeKurId]) {
+                multiKurAttendance[activeKurId] = {};
+            }
+
+            const newSlots = ['present','present','present','present','present'];
+            for (let i = 0; i < count; i++) {
+                newSlots[i] = type;
+            }
+
+            multiKurAttendance[activeKurId][selectedDateId] = newSlots;
+            saveAttendanceToStorage();
+            renderCalendar();
+            renderDayEditor();
+        }
+
+        function toggleFastType(type) {
+            const kurData = multiKurAttendance[activeKurId] || {};
+            const slots = kurData[selectedDateId];
+            if (slots) {
+                const count = slots.filter(s => s !== 'present').length;
+                if (count > 0) setFastDayHours(count);
+            }
+        }
+
+        function clearSelectedDay() {
+            if (multiKurAttendance[activeKurId]) {
+                delete multiKurAttendance[activeKurId][selectedDateId];
+                saveAttendanceToStorage();
+                renderCalendar();
+                renderDayEditor();
+            }
+        }
+
+        function renderAttendanceLog() {
+            const container = document.getElementById('attendance-log-list');
+            const badge = document.getElementById('att-log-count-badge');
+            container.innerHTML = '';
+
+            const kurData = multiKurAttendance[activeKurId] || {};
+            const logs = [];
+
+            Object.entries(kurData).forEach(([dateStr, slots]) => {
+                const unexcused = slots.filter(s => s === 'unexcused').length;
+                const medical = slots.filter(s => s === 'medical').length;
+                if (unexcused > 0 || medical > 0) {
+                    logs.push({ dateStr, unexcused, medical, total: unexcused + medical });
+                }
+            });
+
+            logs.sort((a, b) => a.dateStr.localeCompare(b.dateStr));
+            badge.innerText = `${logs.length} Gün`;
+
+            if (logs.length === 0) {
+                container.innerHTML = '<div class="text-center py-4 text-slate-400">Bu kurda henüz kaydedilmiş bir devamsızlık bulunmuyor.</div>';
+                return;
+            }
+
+            logs.forEach(item => {
+                const row = document.createElement('div');
+                row.className = "flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60";
+                row.innerHTML = `
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold text-slate-800 dark:text-slate-200">${item.dateStr}</span>
+                        <span class="text-[10px] text-slate-400">(${item.total} Saat)</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 text-[11px]">
+                        ${item.unexcused > 0 ? `<span class="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold">${item.unexcused}s Özürsüz</span>` : ''}
+                        ${item.medical > 0 ? `<span class="px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold">${item.medical}s Raporlu</span>` : ''}
+                        <button onclick="selectCalendarDay('${item.dateStr}')" class="text-indigo-600 hover:text-indigo-700 font-bold ml-1 text-xs">Düzenle</button>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        // ====================== NOT HESAPLAYICI YÖNETİMİ ======================
+
         function saveAllInputsToStorage() {
             const data = {
                 vize: {},
@@ -453,7 +1507,6 @@
             SafeStorage.set(STORAGE_CACHE_KEY, JSON.stringify(data));
         }
 
-        // Açılışta Hafızadaki Notları Kutulara Yükleme
         function loadAllInputsFromStorage() {
             const raw = SafeStorage.get(STORAGE_CACHE_KEY);
             if (!raw) return;
@@ -464,10 +1517,7 @@
                     examStructure.vize.forEach(item => {
                         if (data.vize[item.id] !== undefined) {
                             const el = document.getElementById(`input-${item.id}`);
-                            if (el) {
-                                el.value = data.vize[item.id];
-                                applyInputStyle(el);
-                            }
+                            if (el) { el.value = data.vize[item.id]; applyInputStyle(el); }
                         }
                     });
                 }
@@ -475,10 +1525,7 @@
                     examStructure.final.forEach(item => {
                         if (data.final[item.id] !== undefined) {
                             const el = document.getElementById(`input-${item.id}`);
-                            if (el) {
-                                el.value = data.final[item.id];
-                                applyInputStyle(el);
-                            }
+                            if (el) { el.value = data.final[item.id]; applyInputStyle(el); }
                         }
                     });
                 }
@@ -494,6 +1541,7 @@
             renderExamInputs('vize-items', examStructure.vize, 'vize');
             renderExamInputs('final-items', examStructure.final, 'final');
             loadAllInputsFromStorage();
+            loadAttendanceFromStorage();
             calculateGrades();
 
             const modal = document.getElementById('share-modal');
@@ -567,7 +1615,6 @@
                 if (val > 100) inputEl.value = 100;
                 if (val < 0) inputEl.value = 0;
             }
-
             applyInputStyle(inputEl);
             calculateGrades();
             saveAllInputsToStorage();
@@ -615,9 +1662,7 @@
                 const card = document.getElementById('summary-card');
                 if (card) {
                     card.classList.add('ring-2', 'ring-indigo-500');
-                    setTimeout(() => {
-                        card.classList.remove('ring-2', 'ring-indigo-500');
-                    }, 1200);
+                    setTimeout(() => card.classList.remove('ring-2', 'ring-indigo-500'), 1200);
                 }
             }
         }
@@ -660,18 +1705,14 @@
             const finalOverallContribution = finalWeightedSum * 0.60;
             const totalOverallGained = vizeOverallContribution + finalOverallContribution;
             const totalWeightEnteredOverall = (vizeEnteredWeight * 0.40) + (finalEnteredWeight * 0.60);
-
             const roundedOverall = Math.round(totalOverallGained);
 
             document.getElementById('vize-total-score').innerText = vizeOverallContribution.toFixed(2);
             document.getElementById('final-total-score').innerText = finalOverallContribution.toFixed(2);
-            
             document.getElementById('overall-score').innerText = roundedOverall;
             document.getElementById('overall-subtext').innerText = `Ham: ${totalOverallGained.toFixed(2)}`;
-
             document.getElementById('vize-subtext').innerText = `Vize: ${vizeWeightedSum.toFixed(1)} / 100`;
             document.getElementById('final-subtext').innerText = `Final: ${finalWeightedSum.toFixed(1)} / 100`;
-
             document.getElementById('vize-percent-badge').innerText = `${vizeEnteredCount} / ${examStructure.vize.length} Giriş`;
             document.getElementById('final-percent-badge').innerText = `${finalEnteredCount} / ${examStructure.final.length} Giriş`;
 
@@ -747,10 +1788,7 @@
 
         function calculateCustomizedPlan(reqFinalAvg, vizeContrib) {
             const extraNeeded = Math.max(0, reqFinalAvg - 50.0);
-            
-            if (extraNeeded <= 0) {
-                return { lr: 50, wr: 50, sp: 50, valid: true, allBarajBlocked: false };
-            }
+            if (extraNeeded <= 0) return { lr: 50, wr: 50, sp: 50, valid: true, allBarajBlocked: false };
 
             const weights = { lr: 0.50, wr: 0.25, sp: 0.25 };
             const softCaps = { lr: 95, wr: 90, sp: 90 };
@@ -758,14 +1796,10 @@
 
             const activeSkills = [];
             ['lr', 'wr', 'sp'].forEach(k => {
-                if (userSkills[k] !== 'baraj') {
-                    activeSkills.push(k);
-                }
+                if (userSkills[k] !== 'baraj') activeSkills.push(k);
             });
 
-            if (activeSkills.length === 0) {
-                return { lr: 50, wr: 50, sp: 50, valid: false, allBarajBlocked: true };
-            }
+            if (activeSkills.length === 0) return { lr: 50, wr: 50, sp: 50, valid: false, allBarajBlocked: true };
 
             let scores = { lr: 50.0, wr: 50.0, sp: 50.0 };
 
@@ -775,21 +1809,14 @@
 
                 while (remaining > 0.0001 && pool.length > 0) {
                     let totalPriorityWeight = 0;
-                    pool.forEach(k => {
-                        totalPriorityWeight += weights[k] * (userSkills[k] || 1);
-                    });
-
-                    if (totalPriorityWeight === 0) {
-                        pool.forEach(k => { totalPriorityWeight += weights[k]; });
-                    }
+                    pool.forEach(k => totalPriorityWeight += weights[k] * (userSkills[k] || 1));
+                    if (totalPriorityWeight === 0) pool.forEach(k => totalPriorityWeight += weights[k]);
 
                     let maxC = remaining / totalPriorityWeight;
                     for (let k of pool) {
                         let headroom = targetCaps[k] - scores[k];
                         let c_limit = headroom / (userSkills[k] || 1);
-                        if (c_limit < maxC) {
-                            maxC = c_limit;
-                        }
+                        if (c_limit < maxC) maxC = c_limit;
                     }
 
                     for (let k of pool) {
@@ -804,10 +1831,7 @@
             }
 
             let rem = distributePoints(extraNeeded, softCaps);
-
-            if (rem > 0.0001) {
-                distributePoints(rem, hardCaps);
-            }
+            if (rem > 0.0001) distributePoints(rem, hardCaps);
 
             let s_lr = userSkills.lr === 'baraj' ? 50 : Math.max(50, Math.ceil(scores.lr));
             let s_wr = userSkills.wr === 'baraj' ? 50 : Math.max(50, Math.ceil(scores.wr));
@@ -828,9 +1852,7 @@
                     if (k === 'sp') return s_sp < 100;
                     return false;
                 });
-
                 if (candidates.length === 0) break;
-
                 candidates.sort((a, b) => userSkills[b] - userSkills[a]);
                 let best = candidates[0];
 
@@ -941,8 +1963,6 @@
 
             container.innerHTML = `
                 <div class="space-y-4">
-
-                    <!-- Beceri Yetkinlik Seçimi -->
                     <div class="p-3.5 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 space-y-3">
                         <div class="flex items-center justify-between">
                             <div>
@@ -1089,7 +2109,6 @@
                             </tbody>
                         </table>
                     </div>
-
                 </div>
             `;
         }
@@ -1115,24 +2134,30 @@
             scrollToResult();
         }
 
-        function resetForm() {
-            [...examStructure.vize, ...examStructure.final].forEach(item => {
-                const input = document.getElementById(`input-${item.id}`);
-                if (input) {
-                    input.value = '';
-                    applyInputStyle(input);
-                }
-            });
-            const bVize = document.getElementById('bulk-vize-input');
-            const bFinal = document.getElementById('bulk-final-input');
-            const sName = document.getElementById('student-name-input');
-            if (bVize) bVize.value = '';
-            if (bFinal) bFinal.value = '';
-            if (sName) sName.value = '';
+        function resetActiveTab() {
+            if (currentActiveTab === 'grades') {
+                [...examStructure.vize, ...examStructure.final].forEach(item => {
+                    const input = document.getElementById(`input-${item.id}`);
+                    if (input) { input.value = ''; applyInputStyle(input); }
+                });
+                const bVize = document.getElementById('bulk-vize-input');
+                const bFinal = document.getElementById('bulk-final-input');
+                const sName = document.getElementById('student-name-input');
+                if (bVize) bVize.value = '';
+                if (bFinal) bFinal.value = '';
+                if (sName) sName.value = '';
 
-            SafeStorage.remove(STORAGE_CACHE_KEY);
-            calculateGrades();
+                SafeStorage.remove(STORAGE_CACHE_KEY);
+                calculateGrades();
+            } else {
+                multiKurAttendance[activeKurId] = {};
+                saveAttendanceToStorage();
+                renderCalendar();
+                renderDayEditor();
+            }
         }
+
+        // ====================== KART ÜRETİMİ (CANVAS) ======================
 
         function generateShareCanvas(studentName = '') {
             const canvas = document.getElementById('shareCanvas');
@@ -1343,9 +2368,7 @@
             const previewImg = document.getElementById('share-preview-img');
             const shareBtn = document.getElementById('modal-native-share-btn');
 
-            if (previewImg) {
-                previewImg.src = canvas.toDataURL('image/png');
-            }
+            if (previewImg) previewImg.src = canvas.toDataURL('image/png');
 
             canvas.toBlob((blob) => {
                 if (!blob) return;
@@ -1364,7 +2387,6 @@
         function openShareModal() {
             calculateGrades();
             updateModalCardPreview();
-
             const modal = document.getElementById('share-modal');
             if (modal) {
                 modal.classList.remove('hidden');
