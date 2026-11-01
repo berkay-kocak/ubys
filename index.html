@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SBTÜ Hazırlık Not Hesaplayıcı</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class'
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .dark ::-webkit-scrollbar-thumb { background: #334155; }
+        .dark ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .animate-modal {
+            animation: modalFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen pb-12 selection:bg-indigo-500 selection:text-white transition-colors duration-200">
+
+    <!-- Header -->
+    <header class="relative bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-lg mb-4 sm:mb-6 overflow-hidden">
+        <div class="absolute -top-24 -left-24 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-24 right-12 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <div class="relative max-w-3xl mx-auto px-4 py-4 sm:py-6">
+            <div class="flex items-center justify-between gap-3">
+                <div>
+                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-blue-500/30 text-blue-100 border border-blue-400/30 backdrop-blur-sm mb-1">
+                        SBTÜ UBYS
+                    </span>
+                    <h1 class="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight">Hazırlık Not Hesaplayıcı</h1>
+                </div>
+                <div class="flex items-center gap-2 shrink-0">
+                    <!-- Tema Değiştirme Butonu (Premium Simge) -->
+                    <button id="theme-toggle-btn" onclick="toggleTheme()" class="relative p-2 sm:p-2.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 backdrop-blur-md transition-all duration-300 shadow-sm group" title="Temayı Değiştir" aria-label="Temayı Değiştir">
+                        <svg id="theme-icon-sun" class="w-4 h-4 sm:w-5 sm:h-5 hidden text-amber-300 transition-transform duration-500 group-hover:rotate-90 drop-shadow-[0_0_8px_rgba(252,211,77,0.6)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="4" stroke-width="2" fill="currentColor" fill-opacity="0.25"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/>
+                        </svg>
+                        <svg id="theme-icon-moon" class="w-4 h-4 sm:w-5 sm:h-5 text-indigo-200 transition-transform duration-500 group-hover:-rotate-12 drop-shadow-[0_0_8px_rgba(199,210,254,0.4)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" fill="currentColor" fill-opacity="0.2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
+                        </svg>
+                    </button>
+
+                    <!-- Temizle Butonu -->
+                    <button id="reset-btn" onclick="resetForm()" class="bg-rose-500/20 hover:bg-rose-500/30 text-rose-100 text-xs px-2.5 sm:px-3.5 py-2 rounded-xl border border-rose-400/30 transition flex items-center gap-1.5 shadow-sm active:scale-95 backdrop-blur-sm">
+                        <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                        <span class="hidden sm:inline">Temizle</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-3xl mx-auto px-3 sm:px-4 space-y-4 sm:space-y-6">
+
+        <!-- Top Summary Bar -->
+        <div id="top-summary-bar" class="scroll-mt-4">
+            <div id="summary-card" class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-3.5 sm:p-5 transition-all duration-300">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-4 text-center">
+                    
+                    <!-- Vize Score -->
+                    <div class="bg-indigo-50/60 dark:bg-indigo-950/40 border border-indigo-100 dark:border-indigo-900/40 rounded-xl p-2.5 sm:p-3.5">
+                        <div class="text-[10px] sm:text-xs font-semibold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Vize Katkısı</div>
+                        <div class="text-xl sm:text-2xl font-extrabold text-indigo-950 dark:text-indigo-100 mt-0.5 sm:mt-1" id="vize-total-score">0.00</div>
+                        <div class="text-[10px] sm:text-xs text-indigo-500 dark:text-indigo-400 font-medium" id="vize-subtext">Vize: 0 / 100</div>
+                    </div>
+
+                    <!-- Final Score -->
+                    <div class="bg-purple-50/60 dark:bg-purple-950/40 border border-purple-100 dark:border-purple-900/40 rounded-xl p-2.5 sm:p-3.5">
+                        <div class="text-[10px] sm:text-xs font-semibold text-purple-600 dark:text-purple-400 uppercase tracking-wider">Final Katkısı</div>
+                        <div class="text-xl sm:text-2xl font-extrabold text-purple-950 dark:text-purple-100 mt-0.5 sm:mt-1" id="final-total-score">0.00</div>
+                        <div class="text-[10px] sm:text-xs text-purple-500 dark:text-purple-400 font-medium" id="final-subtext">Final: 0 / 100</div>
+                    </div>
+
+                    <!-- Overall Score (Rounded & Raw) -->
+                    <div class="bg-blue-50/70 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900/40 rounded-xl p-2.5 sm:p-3.5">
+                        <div class="text-[10px] sm:text-xs font-semibold text-blue-700 dark:text-blue-400 uppercase tracking-wider">Genel Ortalama</div>
+                        <div class="text-2xl sm:text-3xl font-extrabold text-blue-950 dark:text-blue-100 mt-0.5" id="overall-score">0</div>
+                        <div class="text-[10px] sm:text-xs text-blue-600 dark:text-blue-400 font-medium" id="overall-subtext">Ham: 0.00</div>
+                    </div>
+
+                    <!-- Status -->
+                    <div id="status-card" class="bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center transition-colors duration-300">
+                        <div class="text-[10px] sm:text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Durum</div>
+                        <div class="text-base sm:text-lg font-bold text-slate-700 dark:text-slate-200 mt-0.5 flex items-center gap-1" id="status-text">Not Bekleniyor</div>
+                        <span id="status-badge" class="mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold truncate max-w-full">Sınır: 60</span>
+                    </div>
+                </div>
+
+                <!-- Visual Progress Bar -->
+                <div class="mt-3.5 sm:mt-5 pt-3 sm:pt-4 border-t border-slate-100 dark:border-slate-800">
+                    <div class="flex justify-between items-center text-[11px] sm:text-xs font-medium text-slate-500 dark:text-slate-400 mb-1">
+                        <span>Başarı Çubuğu</span>
+                        <span class="text-indigo-600 dark:text-indigo-400 font-bold">Geçme Sınırı: 60 Puan</span>
+                    </div>
+                    <div class="relative h-2.5 sm:h-3 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/80 dark:border-slate-700 p-0.5">
+                        <div id="overall-progress-bar" class="h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500 ease-out" style="width: 0%"></div>
+                        <div class="absolute top-0 bottom-0 left-[60%] w-0.5 bg-slate-800/60 dark:bg-slate-300/60 z-10" title="Geçme Sınırı: 60"></div>
+                    </div>
+                </div>
+
+                <!-- Sonuç Paylaşım Şeridi -->
+                <div class="mt-3 pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2">
+                    <span class="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5 text-indigo-500 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                        Mobil Not Kartı
+                    </span>
+                    <button onclick="openShareModal()" class="px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-sm transition flex items-center gap-1.5">
+                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                        <span>Sonucu Paylaş</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Vize Section -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden">
+            <div class="bg-gradient-to-r from-indigo-600 to-indigo-700 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">VİZE</span>
+                    <h2 class="font-semibold text-xs sm:text-base">Vize Bileşenleri (%40 Etki)</h2>
+                </div>
+                <span id="vize-percent-badge" class="text-[11px] sm:text-xs bg-indigo-900/50 border border-indigo-400/30 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-indigo-100 font-medium">0 / 8 Giriş</span>
+            </div>
+
+            <div class="p-3 sm:p-5 space-y-1.5 sm:space-y-2">
+                <!-- Vize Tümünü Eşitle Satırı -->
+                <div class="grid grid-cols-12 items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-xl bg-indigo-50/50 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40">
+                    <label for="bulk-vize-input" class="col-span-6 sm:col-span-7 text-xs sm:text-sm font-semibold text-indigo-900 dark:text-indigo-200 cursor-pointer select-none truncate">
+                        Tümünü Eşitle
+                    </label>
+                    <div class="col-span-3 sm:col-span-2 text-center text-[10px] sm:text-xs font-medium text-indigo-600 dark:text-indigo-400">
+                        Toplu Giriş
+                    </div>
+                    <div class="col-span-3 text-right">
+                        <input 
+                            type="number" 
+                            inputmode="decimal"
+                            id="bulk-vize-input"
+                            min="0" 
+                            max="100" 
+                            placeholder="-"
+                            oninput="applyBulkScore('vize', this)"
+                            class="w-full text-right bg-white dark:bg-slate-800 border border-indigo-200 dark:border-indigo-800 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs sm:text-sm font-bold text-indigo-950 dark:text-indigo-100 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 transition placeholder-slate-400"
+                        />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-1.5 px-1 sm:px-2 pt-1">
+                    <div class="col-span-6 sm:col-span-7">Sınav Adı</div>
+                    <div class="col-span-3 sm:col-span-2 text-center">Ağırlık</div>
+                    <div class="col-span-3 text-right">Notunuz</div>
+                </div>
+
+                <div id="vize-items" class="space-y-1 sm:space-y-2">
+                    <!-- JS Dynamic Insertion -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Final Section -->
+        <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-700 to-purple-800 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <span class="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-md backdrop-blur-sm">FİNAL</span>
+                    <div>
+                        <h2 class="font-semibold text-xs sm:text-base leading-tight">Final Bileşenleri (%60 Etki)</h2>
+                        <p class="text-[10px] sm:text-[11px] text-purple-200">Her sınav en az 50 olmalı</p>
+                    </div>
+                </div>
+                <span id="final-percent-badge" class="text-[11px] sm:text-xs bg-purple-950/50 border border-purple-400/30 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-purple-100 font-medium">0 / 3 Giriş</span>
+            </div>
+
+            <div class="p-3 sm:p-5 space-y-1.5 sm:space-y-2">
+                <!-- Final Tümünü Eşitle Satırı -->
+                <div class="grid grid-cols-12 items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-xl bg-purple-50/50 dark:bg-purple-950/30 border border-purple-100 dark:border-purple-900/40">
+                    <label for="bulk-final-input" class="col-span-6 sm:col-span-7 text-xs sm:text-sm font-semibold text-purple-900 dark:text-purple-200 cursor-pointer select-none truncate">
+                        Tümünü Eşitle
+                    </label>
+                    <div class="col-span-3 sm:col-span-2 text-center text-[10px] sm:text-xs font-medium text-purple-600 dark:text-purple-400">
+                        Toplu Giriş
+                    </div>
+                    <div class="col-span-3 text-right">
+                        <input 
+                            type="number" 
+                            inputmode="decimal"
+                            id="bulk-final-input"
+                            min="0" 
+                            max="100" 
+                            placeholder="-"
+                            oninput="applyBulkScore('final', this)"
+                            class="w-full text-right bg-white dark:bg-slate-800 border border-purple-200 dark:border-purple-800 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs sm:text-sm font-bold text-purple-950 dark:text-purple-100 focus:outline-none focus:ring-2 focus:ring-purple-500/30 transition placeholder-slate-400"
+                        />
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-12 text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider border-b border-slate-100 dark:border-slate-800 pb-1.5 px-1 sm:px-2 pt-1">
+                    <div class="col-span-6 sm:col-span-7">Sınav Adı</div>
+                    <div class="col-span-3 sm:col-span-2 text-center">Ağırlık</div>
+                    <div class="col-span-3 text-right">Notunuz</div>
+                </div>
+
+                <div id="final-items" class="space-y-1 sm:space-y-2">
+                    <!-- JS Dynamic Insertion -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Sonucu Gör & Sonucu Paylaş Butonları -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            <button id="see-result-btn" onclick="scrollToResult()" class="w-full py-3 px-4 bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 active:scale-98 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg shadow-indigo-600/25 transition-all flex items-center justify-center gap-2 border border-indigo-400/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"></path></svg>
+                <span>Sonucu Gör</span>
+            </button>
+            <button id="share-card-btn" onclick="openShareModal()" class="w-full py-3 px-4 bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 active:scale-98 text-white font-bold text-sm sm:text-base rounded-2xl shadow-lg shadow-emerald-600/25 transition-all flex items-center justify-center gap-2 border border-emerald-400/20">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                <span>Sonucu Paylaş</span>
+            </button>
+        </div>
+
+        <!-- Final Strateji ve Başarı Analiz Paneli -->
+        <div id="strategy-panel-card" class="bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden transition-all duration-300">
+            <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-4 sm:px-5 py-3 sm:py-3.5 flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-400/30">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
+                    </span>
+                    <div>
+                        <h2 class="font-semibold text-xs sm:text-base leading-tight">Final Başarı Strateji Paneli</h2>
+                        <p class="text-[10px] sm:text-[11px] text-slate-300">Vize puanınıza göre kişiselleştirilmiş geçme planı</p>
+                    </div>
+                </div>
+                <span id="strategy-status-badge" class="text-[11px] sm:text-xs bg-slate-800 border border-slate-700 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-slate-300 font-medium">Kilitli</span>
+            </div>
+
+            <div id="strategy-content" class="p-4 sm:p-5">
+                <!-- JS Dynamic Insertion -->
+            </div>
+        </div>
+
+        <!-- SBTU UBYS Bilgilendirme Kutusu -->
+        <div class="bg-blue-50/60 dark:bg-blue-950/30 rounded-2xl border border-blue-100 dark:border-blue-900/40 p-4 text-xs text-blue-900 dark:text-blue-200 space-y-1.5">
+            <div class="font-bold text-blue-950 dark:text-blue-100 flex items-center gap-1.5 text-xs sm:text-sm">
+                <svg class="w-4 h-4 text-blue-600 dark:text-blue-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                SBTÜ UBYS Notlandırma Kuralları
+            </div>
+            <p class="leading-relaxed text-[11px] sm:text-xs text-slate-600 dark:text-slate-300">
+                • <strong>Vize Katkısı: %40</strong>, <strong>Final Katkısı: %60</strong><br>
+                • <strong>Geçme Notu: 60</strong> (Genel not UBYS standardıyla en yakın tam sayıya yuvarlanır; örn. 59.50 → 60, 71.98 → 72)<br>
+                • Final sınavlarının her birinde (L&R, Writing, Speaking) <strong>50 barajı</strong> bulunmaktadır.
+            </p>
+        </div>
+
+    </main>
+
+    <!-- Paylaşım & Kart Önizleme Modalı -->
+    <div id="share-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-slate-950/75 backdrop-blur-sm transition-opacity duration-300">
+        <div class="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-slate-900 rounded-3xl shadow-2xl border border-slate-200/90 dark:border-slate-800 overflow-hidden flex flex-col max-h-[94vh] animate-modal">
+            
+            <div class="flex items-center justify-between px-4 sm:px-5 py-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="p-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+                    </span>
+                    <h3 class="font-bold text-sm sm:text-base text-slate-800 dark:text-slate-100">Mobil Not Kartı</h3>
+                </div>
+                <button onclick="closeShareModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Kapat">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-3.5 sm:p-4 overflow-y-auto space-y-3">
+                <div>
+                    <label for="student-name-input" class="block text-[11px] sm:text-xs font-semibold text-slate-600 dark:text-slate-300 mb-1">
+                        Karta İsim Ekleyin <span class="text-slate-400 font-normal">(İsteğe bağlı)</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="student-name-input" 
+                        maxlength="32" 
+                        placeholder="Örn: Ad Soyad" 
+                        oninput="onStudentNameChange()"
+                        class="w-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-3 py-1.5 sm:py-2 text-xs sm:text-sm font-medium text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-850 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
+                    />
+                </div>
+
+                <div class="w-full rounded-2xl overflow-hidden border border-slate-200 dark:border-slate-800 shadow-md bg-slate-950 flex items-center justify-center p-1">
+                    <img id="share-preview-img" class="w-auto max-h-[52vh] sm:max-h-[58vh] rounded-xl object-contain block select-none shadow-sm" alt="Mobil Not Kartı" />
+                </div>
+                
+                <p class="text-[11px] text-slate-400 text-center leading-tight">
+                    Telefonda görsele basılı tutarak doğrudan WhatsApp'ta paylaşabilir veya galerinize kaydedebilirsiniz.
+                </p>
+            </div>
+
+            <div class="p-3.5 sm:p-4 border-t border-slate-100 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 flex items-center justify-end gap-2 shrink-0">
+                <button onclick="triggerWebShare()" id="modal-native-share-btn" class="flex-1 px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"></path></svg>
+                    <span>Paylaş</span>
+                </button>
+                <button onclick="downloadCardDirectly()" class="flex-1 px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span>Cihaza İndir</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Görsel Oluşturma İçin Gizli HTML5 Canvas (Dikey Mobil: 720 x 1150) -->
+    <canvas id="shareCanvas" class="hidden" width="720" height="1150"></canvas>
+
+    <script>
+        const PASSING_GRADE = 60;
+        const FINAL_MIN_GRADE = 50;
+        const THEME_KEY = 'sbtu_theme_preference';
+        const STORAGE_CACHE_KEY = 'sbtu_grades_cache';
+
+        // Google Sites İframe Uyumlu Zırhlı Güvenli Depolama Motoru
+        const SafeStorage = {
+            isSupported: null,
+            check() {
+                if (this.isSupported !== null) return this.isSupported;
+                try {
+                    const testKey = '__sbtu_sec_test__';
+                    window.localStorage.setItem(testKey, '1');
+                    window.localStorage.removeItem(testKey);
+                    this.isSupported = true;
+                } catch (e) {
+                    this.isSupported = false;
+                }
+                return this.isSupported;
+            },
+            get(key) {
+                if (!this.check()) return null;
+                try {
+                    return window.localStorage.getItem(key);
+                } catch (e) {
+                    return null;
+                }
+            },
+            set(key, val) {
+                if (!this.check()) return;
+                try {
+                    window.localStorage.setItem(key, val);
+                } catch (e) {}
+            },
+            remove(key) {
+                if (!this.check()) return;
+                try {
+                    window.localStorage.removeItem(key);
+                } catch (e) {}
+            }
+        };
+
+        let preRenderedShareFile = null;
+
+        const userSkills = {
+            lr: 3,
+            wr: 3,
+            sp: 3
+        };
+
+        const examStructure = {
+            vize: [
+                { id: 'w11', name: 'Writing 1.1', weight: 13.13 },
+                { id: 'w12', name: 'Writing 1.2', weight: 5.63 },
+                { id: 'w21', name: 'Writing 2.1', weight: 13.13 },
+                { id: 'w22', name: 'Writing 2.2', weight: 5.63 },
+                { id: 'q1',  name: 'Quiz 1',       weight: 19.68 },
+                { id: 'q2',  name: 'Quiz 2',       weight: 19.68 },
+                { id: 'spk', name: 'Speaking Task',weight: 13.12 },
+                { id: 'hw',  name: 'Online Homework', weight: 10.00 }
+            ],
+            final: [
+                { id: 'f_lr', name: 'Final (Listening & Reading)', weight: 50.00 },
+                { id: 'f_wr', name: 'Final (Writing)', weight: 25.00 },
+                { id: 'f_sp', name: 'Final (Speaking)', weight: 25.00 }
+            ]
+        };
+
+        function initTheme() {
+            const savedTheme = SafeStorage.get(THEME_KEY);
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                applyTheme(true);
+            } else {
+                applyTheme(false);
+            }
+        }
+
+        function toggleTheme() {
+            const isCurrentlyDark = document.documentElement.classList.contains('dark');
+            applyTheme(!isCurrentlyDark);
+        }
+
+        function applyTheme(isDark) {
+            const sunIcon = document.getElementById('theme-icon-sun');
+            const moonIcon = document.getElementById('theme-icon-moon');
+
+            if (isDark) {
+                document.documentElement.classList.add('dark');
+                SafeStorage.set(THEME_KEY, 'dark');
+                if (sunIcon) sunIcon.classList.remove('hidden');
+                if (moonIcon) moonIcon.classList.add('hidden');
+            } else {
+                document.documentElement.classList.remove('dark');
+                SafeStorage.set(THEME_KEY, 'light');
+                if (sunIcon) sunIcon.classList.add('hidden');
+                if (moonIcon) moonIcon.classList.remove('hidden');
+            }
+        }
+
+        // Girilen Tüm Notları Otomatik Hafızaya Alma
+        function saveAllInputsToStorage() {
+            const data = {
+                vize: {},
+                final: {},
+                studentName: document.getElementById('student-name-input')?.value || ''
+            };
+
+            examStructure.vize.forEach(item => {
+                const el = document.getElementById(`input-${item.id}`);
+                if (el && el.value !== '') data.vize[item.id] = el.value;
+            });
+
+            examStructure.final.forEach(item => {
+                const el = document.getElementById(`input-${item.id}`);
+                if (el && el.value !== '') data.final[item.id] = el.value;
+            });
+
+            SafeStorage.set(STORAGE_CACHE_KEY, JSON.stringify(data));
+        }
+
+        // Açılışta Hafızadaki Notları Kutulara Yükleme
+        function loadAllInputsFromStorage() {
+            const raw = SafeStorage.get(STORAGE_CACHE_KEY);
+            if (!raw) return;
+
+            try {
+                const data = JSON.parse(raw);
+                if (data.vize) {
+                    examStructure.vize.forEach(item => {
+                        if (data.vize[item.id] !== undefined) {
+                            const el = document.getElementById(`input-${item.id}`);
+                            if (el) {
+                                el.value = data.vize[item.id];
+                                applyInputStyle(el);
+                            }
+                        }
+                    });
+                }
+                if (data.final) {
+                    examStructure.final.forEach(item => {
+                        if (data.final[item.id] !== undefined) {
+                            const el = document.getElementById(`input-${item.id}`);
+                            if (el) {
+                                el.value = data.final[item.id];
+                                applyInputStyle(el);
+                            }
+                        }
+                    });
+                }
+                if (data.studentName) {
+                    const nameInput = document.getElementById('student-name-input');
+                    if (nameInput) nameInput.value = data.studentName;
+                }
+            } catch (e) {}
+        }
+
+        function initApp() {
+            initTheme();
+            renderExamInputs('vize-items', examStructure.vize, 'vize');
+            renderExamInputs('final-items', examStructure.final, 'final');
+            loadAllInputsFromStorage();
+            calculateGrades();
+
+            const modal = document.getElementById('share-modal');
+            if (modal) {
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) closeShareModal();
+                });
+            }
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') closeShareModal();
+            });
+        }
+
+        function renderExamInputs(containerId, items, category) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+
+            const isVize = category === 'vize';
+            const badgeClass = isVize 
+                ? 'bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/50' 
+                : 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-100 dark:border-purple-900/50';
+            const rowFocusClass = isVize
+                ? 'focus-within:bg-indigo-50/40 dark:focus-within:bg-indigo-950/30 focus-within:border-indigo-200 dark:focus-within:border-indigo-800'
+                : 'focus-within:bg-purple-50/40 dark:focus-within:bg-purple-950/30 focus-within:border-purple-200 dark:focus-within:border-purple-800';
+
+            items.forEach((item) => {
+                const row = document.createElement('div');
+                row.className = `grid grid-cols-12 items-center gap-1.5 sm:gap-2 p-1.5 sm:p-2 rounded-xl hover:bg-slate-50/80 dark:hover:bg-slate-800/50 transition-all border border-transparent ${rowFocusClass}`;
+                
+                row.innerHTML = `
+                    <label for="input-${item.id}" class="col-span-6 sm:col-span-7 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-200 cursor-pointer select-none truncate">
+                        ${item.name}
+                    </label>
+                    <div class="col-span-3 sm:col-span-2 text-center text-[11px] sm:text-xs font-semibold py-1 rounded-lg ${badgeClass}">
+                        %${item.weight}
+                    </div>
+                    <div class="col-span-3 text-right">
+                        <input 
+                            type="number" 
+                            inputmode="decimal"
+                            id="input-${item.id}"
+                            data-category="${category}"
+                            data-name="${item.name}"
+                            data-weight="${item.weight}"
+                            min="0" 
+                            max="100" 
+                            placeholder="-"
+                            oninput="onIndividualInput(this)"
+                            class="w-full text-right bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition"
+                        />
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        function applyInputStyle(inputEl) {
+            if (inputEl.dataset.category === 'final' && inputEl.value !== '') {
+                const score = parseFloat(inputEl.value);
+                if (score < FINAL_MIN_GRADE) {
+                    inputEl.className = "w-full text-right bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-400 dark:border-rose-500 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs sm:text-sm font-bold text-rose-700 dark:text-rose-300 focus:outline-none transition";
+                    return;
+                }
+            }
+            inputEl.className = "w-full text-right bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-2 sm:px-2.5 py-1 sm:py-1.5 text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-100 focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition";
+        }
+
+        function validateAndCalculate(inputEl) {
+            if (inputEl.value !== '') {
+                let val = parseFloat(inputEl.value);
+                if (val > 100) inputEl.value = 100;
+                if (val < 0) inputEl.value = 0;
+            }
+
+            applyInputStyle(inputEl);
+            calculateGrades();
+            saveAllInputsToStorage();
+        }
+
+        function onIndividualInput(inputEl) {
+            const category = inputEl.dataset.category;
+            const bulkInput = document.getElementById(`bulk-${category}-input`);
+            if (bulkInput) bulkInput.value = '';
+            validateAndCalculate(inputEl);
+        }
+
+        function applyBulkScore(category, bulkEl) {
+            let val = bulkEl.value;
+            if (val !== '') {
+                let parsed = parseFloat(val);
+                if (parsed > 100) { parsed = 100; bulkEl.value = 100; }
+                if (parsed < 0) { parsed = 0; bulkEl.value = 0; }
+                val = parsed;
+            }
+
+            const items = examStructure[category];
+            items.forEach(item => {
+                const input = document.getElementById(`input-${item.id}`);
+                if (input) {
+                    input.value = val;
+                    applyInputStyle(input);
+                }
+            });
+
+            calculateGrades();
+            saveAllInputsToStorage();
+        }
+
+        function onStudentNameChange() {
+            updateModalCardPreview();
+            saveAllInputsToStorage();
+        }
+
+        function scrollToResult() {
+            calculateGrades();
+            const topBar = document.getElementById('top-summary-bar');
+            if (topBar) {
+                topBar.scrollIntoView({ behavior: 'smooth' });
+                const card = document.getElementById('summary-card');
+                if (card) {
+                    card.classList.add('ring-2', 'ring-indigo-500');
+                    setTimeout(() => {
+                        card.classList.remove('ring-2', 'ring-indigo-500');
+                    }, 1200);
+                }
+            }
+        }
+
+        function calculateGrades() {
+            let vizeWeightedSum = 0;
+            let vizeEnteredCount = 0;
+            let vizeEnteredWeight = 0;
+
+            examStructure.vize.forEach(item => {
+                const input = document.getElementById(`input-${item.id}`);
+                if (input && input.value !== '' && !isNaN(input.value)) {
+                    const score = parseFloat(input.value);
+                    vizeWeightedSum += (score * item.weight) / 100;
+                    vizeEnteredWeight += item.weight;
+                    vizeEnteredCount++;
+                }
+            });
+
+            let finalWeightedSum = 0;
+            let finalEnteredCount = 0;
+            let finalEnteredWeight = 0;
+            let failedFinalComponent = null;
+
+            examStructure.final.forEach(item => {
+                const input = document.getElementById(`input-${item.id}`);
+                if (input && input.value !== '' && !isNaN(input.value)) {
+                    const score = parseFloat(input.value);
+                    finalWeightedSum += (score * item.weight) / 100;
+                    finalEnteredWeight += item.weight;
+                    finalEnteredCount++;
+
+                    if (score < FINAL_MIN_GRADE) {
+                        failedFinalComponent = item.name;
+                    }
+                }
+            });
+
+            const vizeOverallContribution = vizeWeightedSum * 0.40;
+            const finalOverallContribution = finalWeightedSum * 0.60;
+            const totalOverallGained = vizeOverallContribution + finalOverallContribution;
+            const totalWeightEnteredOverall = (vizeEnteredWeight * 0.40) + (finalEnteredWeight * 0.60);
+
+            const roundedOverall = Math.round(totalOverallGained);
+
+            document.getElementById('vize-total-score').innerText = vizeOverallContribution.toFixed(2);
+            document.getElementById('final-total-score').innerText = finalOverallContribution.toFixed(2);
+            
+            document.getElementById('overall-score').innerText = roundedOverall;
+            document.getElementById('overall-subtext').innerText = `Ham: ${totalOverallGained.toFixed(2)}`;
+
+            document.getElementById('vize-subtext').innerText = `Vize: ${vizeWeightedSum.toFixed(1)} / 100`;
+            document.getElementById('final-subtext').innerText = `Final: ${finalWeightedSum.toFixed(1)} / 100`;
+
+            document.getElementById('vize-percent-badge').innerText = `${vizeEnteredCount} / ${examStructure.vize.length} Giriş`;
+            document.getElementById('final-percent-badge').innerText = `${finalEnteredCount} / ${examStructure.final.length} Giriş`;
+
+            const progressBar = document.getElementById('overall-progress-bar');
+            const clampedScore = Math.min(100, Math.max(0, totalOverallGained));
+            progressBar.style.width = `${clampedScore}%`;
+
+            if (failedFinalComponent) {
+                progressBar.className = "h-full bg-gradient-to-r from-rose-500 to-red-600 rounded-full transition-all duration-500 ease-out";
+            } else if (roundedOverall >= PASSING_GRADE) {
+                progressBar.className = "h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500 ease-out";
+            } else {
+                progressBar.className = "h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500 ease-out";
+            }
+
+            updateStatusUI(totalOverallGained, roundedOverall, totalWeightEnteredOverall, failedFinalComponent);
+            updateStrategyPanel(vizeOverallContribution, vizeEnteredCount);
+        }
+
+        function updateStatusUI(gainedPoints, roundedOverall, enteredWeight, failedFinalComponent) {
+            const statusCard = document.getElementById('status-card');
+            const statusText = document.getElementById('status-text');
+            const statusBadge = document.getElementById('status-badge');
+
+            if (failedFinalComponent) {
+                statusText.innerText = "KALDI";
+                statusText.className = "text-base sm:text-xl font-extrabold text-rose-700 dark:text-rose-400 mt-0.5 sm:mt-1";
+                statusCard.className = "bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center transition-colors duration-300";
+                statusBadge.innerText = `${failedFinalComponent} < 50`;
+                statusBadge.className = "mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-rose-200 dark:bg-rose-900/70 text-rose-800 dark:text-rose-200 font-bold truncate max-w-full";
+                return;
+            }
+
+            statusBadge.className = "mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 font-semibold";
+            statusBadge.innerText = `Sınır: ${PASSING_GRADE}`;
+
+            if (enteredWeight === 0) {
+                statusText.innerText = "Not Bekleniyor";
+                statusText.className = "text-sm sm:text-lg font-bold text-slate-700 dark:text-slate-200 mt-0.5 sm:mt-1";
+                statusCard.className = "bg-slate-100 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-800 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center transition-colors duration-300";
+                return;
+            }
+
+            const remainingWeight = 100 - enteredWeight;
+
+            if (enteredWeight >= 99.9) {
+                if (roundedOverall >= PASSING_GRADE) {
+                    statusText.innerText = "GEÇTİ";
+                    statusText.className = "text-base sm:text-xl font-extrabold text-emerald-700 dark:text-emerald-400 mt-0.5 sm:mt-1";
+                    statusCard.className = "bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/60 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center transition-colors duration-300";
+                } else {
+                    statusText.innerText = "KALDI";
+                    statusText.className = "text-base sm:text-xl font-extrabold text-rose-700 dark:text-rose-400 mt-0.5 sm:mt-1";
+                    statusCard.className = "bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center transition-colors duration-300";
+                }
+            } else {
+                if (Math.round(gainedPoints + remainingWeight) < PASSING_GRADE) {
+                    statusText.innerText = "KALDI";
+                    statusText.className = "text-base sm:text-xl font-extrabold text-rose-700 dark:text-rose-400 mt-0.5 sm:mt-1";
+                    statusCard.className = "bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center transition-colors duration-300";
+                } else {
+                    statusText.innerText = "DEVAM EDİYOR";
+                    statusText.className = "text-xs sm:text-base font-bold text-amber-700 dark:text-amber-400 mt-0.5 sm:mt-1";
+                    statusCard.className = "bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/60 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center transition-colors duration-300";
+                }
+            }
+        }
+
+        function setSkillLevel(skillKey, level) {
+            userSkills[skillKey] = level;
+            calculateGrades();
+        }
+
+        function calculateCustomizedPlan(reqFinalAvg, vizeContrib) {
+            const extraNeeded = Math.max(0, reqFinalAvg - 50.0);
+            
+            if (extraNeeded <= 0) {
+                return { lr: 50, wr: 50, sp: 50, valid: true, allBarajBlocked: false };
+            }
+
+            const weights = { lr: 0.50, wr: 0.25, sp: 0.25 };
+            const softCaps = { lr: 95, wr: 90, sp: 90 };
+            const hardCaps = { lr: 100, wr: 100, sp: 100 };
+
+            const activeSkills = [];
+            ['lr', 'wr', 'sp'].forEach(k => {
+                if (userSkills[k] !== 'baraj') {
+                    activeSkills.push(k);
+                }
+            });
+
+            if (activeSkills.length === 0) {
+                return { lr: 50, wr: 50, sp: 50, valid: false, allBarajBlocked: true };
+            }
+
+            let scores = { lr: 50.0, wr: 50.0, sp: 50.0 };
+
+            function distributePoints(needed, targetCaps) {
+                let remaining = needed;
+                let pool = activeSkills.filter(k => scores[k] < targetCaps[k] - 0.0001);
+
+                while (remaining > 0.0001 && pool.length > 0) {
+                    let totalPriorityWeight = 0;
+                    pool.forEach(k => {
+                        totalPriorityWeight += weights[k] * (userSkills[k] || 1);
+                    });
+
+                    if (totalPriorityWeight === 0) {
+                        pool.forEach(k => { totalPriorityWeight += weights[k]; });
+                    }
+
+                    let maxC = remaining / totalPriorityWeight;
+                    for (let k of pool) {
+                        let headroom = targetCaps[k] - scores[k];
+                        let c_limit = headroom / (userSkills[k] || 1);
+                        if (c_limit < maxC) {
+                            maxC = c_limit;
+                        }
+                    }
+
+                    for (let k of pool) {
+                        let delta = maxC * (userSkills[k] || 1);
+                        scores[k] += delta;
+                        remaining -= delta * weights[k];
+                    }
+
+                    pool = activeSkills.filter(k => scores[k] < targetCaps[k] - 0.0001);
+                }
+                return Math.max(0, remaining);
+            }
+
+            let rem = distributePoints(extraNeeded, softCaps);
+
+            if (rem > 0.0001) {
+                distributePoints(rem, hardCaps);
+            }
+
+            let s_lr = userSkills.lr === 'baraj' ? 50 : Math.max(50, Math.ceil(scores.lr));
+            let s_wr = userSkills.wr === 'baraj' ? 50 : Math.max(50, Math.ceil(scores.wr));
+            let s_sp = userSkills.sp === 'baraj' ? 50 : Math.max(50, Math.ceil(scores.sp));
+
+            s_lr = Math.min(100, s_lr);
+            s_wr = Math.min(100, s_wr);
+            s_sp = Math.min(100, s_sp);
+
+            let finalCont = (s_lr * 0.50 + s_wr * 0.25 + s_sp * 0.25) * 0.60;
+            let currentOverall = vizeContrib + finalCont;
+
+            let safetyGuard = 0;
+            while (Math.round(currentOverall) < PASSING_GRADE && safetyGuard < 15) {
+                let candidates = activeSkills.filter(k => {
+                    if (k === 'lr') return s_lr < 100;
+                    if (k === 'wr') return s_wr < 100;
+                    if (k === 'sp') return s_sp < 100;
+                    return false;
+                });
+
+                if (candidates.length === 0) break;
+
+                candidates.sort((a, b) => userSkills[b] - userSkills[a]);
+                let best = candidates[0];
+
+                if (best === 'lr') s_lr++;
+                else if (best === 'wr') s_wr++;
+                else if (best === 'sp') s_sp++;
+
+                finalCont = (s_lr * 0.50 + s_wr * 0.25 + s_sp * 0.25) * 0.60;
+                currentOverall = vizeContrib + finalCont;
+                safetyGuard++;
+            }
+
+            const isValid = s_lr <= 100 && s_wr <= 100 && s_sp <= 100 && Math.round(currentOverall) >= PASSING_GRADE;
+            return { lr: s_lr, wr: s_wr, sp: s_sp, valid: isValid, allBarajBlocked: false };
+        }
+
+        function updateStrategyPanel(vizeContrib, vizeEnteredCount) {
+            const badge = document.getElementById('strategy-status-badge');
+            const container = document.getElementById('strategy-content');
+
+            if (vizeEnteredCount < examStructure.vize.length) {
+                badge.innerText = `${vizeEnteredCount} / ${examStructure.vize.length} Giriş`;
+                badge.className = "text-[11px] sm:text-xs bg-slate-800 border border-slate-700 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-slate-300 font-medium";
+                container.innerHTML = `
+                    <div class="p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 text-center space-y-2">
+                        <div class="inline-flex p-2 rounded-full bg-slate-200/60 dark:bg-slate-700/60 text-slate-500 dark:text-slate-400">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                        </div>
+                        <h4 class="font-bold text-xs sm:text-sm text-slate-700 dark:text-slate-200">Vize Girişleri Bekleniyor</h4>
+                        <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+                            Resmi final stratejilerinin ve kişiselleştirilmiş geçme planının hesaplanabilmesi için 8 vize notunun da girilmesi gerekmektedir.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            badge.innerText = "Aktif";
+            badge.className = "text-[11px] sm:text-xs bg-emerald-950/70 border border-emerald-500/40 px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full text-emerald-300 font-semibold";
+
+            const targetOverall = 59.50;
+            const baseFinalScore = 50.00;
+            const baseFinalContribution = baseFinalScore * 0.60;
+            const totalWithBase = vizeContrib + baseFinalContribution;
+            const isBaseSufficient = totalWithBase >= targetOverall;
+
+            const neededFinalContrib = Math.max(0, targetOverall - vizeContrib);
+            const theoreticalFinalAvg = neededFinalContrib / 0.60;
+
+            if (isBaseSufficient) {
+                const projectedScore = Math.round(totalWithBase);
+                container.innerHTML = `
+                    <div class="space-y-4">
+                        <div class="p-3.5 sm:p-4 rounded-xl bg-emerald-50/80 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-900/50 space-y-2">
+                            <div class="flex items-center gap-2 text-emerald-800 dark:text-emerald-300 font-bold text-xs sm:text-sm">
+                                <svg class="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Asgari Mevzuat Tabanı (50.00) Yeterlidir
+                            </div>
+                            <p class="text-[11px] sm:text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                                Vize katkınız (%40 etki ile <strong>${vizeContrib.toFixed(2)}</strong> puan) doğrultusunda tüm final bileşenlerinden yalnızca <strong>50.00</strong> almanız geçmeniz için yeterlidir.
+                            </p>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2 border-t border-emerald-200/60 dark:border-emerald-900/40 text-[11px] text-slate-600 dark:text-slate-400">
+                                <div>• <strong>50 Barajı Olmasaydı:</strong> Gereken Teorik Not: <strong>${Math.ceil(theoreticalFinalAvg)}</strong></div>
+                                <div>• <strong>50-50-50 Tahmini Sonuç:</strong> <strong>${projectedScore}</strong> (Ham: ${totalWithBase.toFixed(2)})</div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 gap-3">
+                            <div class="text-xs text-slate-600 dark:text-slate-300">
+                                <span class="font-bold text-slate-800 dark:text-slate-100">Önerilen Taban Giriş:</span> Tüm finallere taban not olan 50 uygulayın.
+                            </div>
+                            <button onclick="applyScenario(50, 50, 50)" class="shrink-0 px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-bold transition shadow-sm active:scale-95">
+                                Tabanı Uygula (50)
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            if (vizeContrib + 60.00 < targetOverall) {
+                container.innerHTML = `
+                    <div class="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/60 text-xs text-rose-800 dark:text-rose-300 space-y-1.5">
+                        <div class="font-bold flex items-center gap-1.5 text-xs sm:text-sm text-rose-900 dark:text-rose-200">
+                            <svg class="w-4 h-4 text-rose-600 dark:text-rose-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                            Matematiksel Olarak Bütünleme Gerekmektedir
+                        </div>
+                        <p class="leading-relaxed">
+                            Mevcut vize puanınız ile finallerin tamamından tam not (100) alınsa dahi dönem sonu başarı puanı en fazla <strong>${Math.round(vizeContrib + 60.00)}</strong> seviyesine ulaşabilmektedir.
+                        </p>
+                    </div>
+                `;
+                return;
+            }
+
+            const reqAvg = theoreticalFinalAvg;
+            const customPlan = calculateCustomizedPlan(reqAvg, vizeContrib);
+
+            let balancedScore = Math.max(50, Math.ceil(reqAvg));
+            while (Math.round(vizeContrib + (balancedScore * 0.60)) < PASSING_GRADE && balancedScore < 100) {
+                balancedScore++;
+            }
+            const balancedValid = balancedScore <= 100;
+
+            const btnClass = (active) => active 
+                ? 'bg-indigo-600 text-white font-bold shadow-sm' 
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700';
+
+            container.innerHTML = `
+                <div class="space-y-4">
+
+                    <!-- Beceri Yetkinlik Seçimi -->
+                    <div class="p-3.5 sm:p-4 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/80 dark:border-slate-700/80 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-xs font-bold text-slate-800 dark:text-slate-100 block">
+                                    Beceri Seviyenizi Belirleyin (Baraj: 50 Taban, 1-5: Öncelik)
+                                </span>
+                                <span class="text-[10px] text-slate-400">L&R: Maks 95, Writing/Speaking: Maks 90 (Tavan aşımında otomatik devredilir)</span>
+                            </div>
+                            <span class="text-[11px] font-bold px-2 py-0.5 rounded-md bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200/60 dark:border-indigo-900/50 shrink-0">
+                                Asgari Final Ort: %${Math.ceil(reqAvg)}
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                            <!-- L&R -->
+                            <div class="p-2 sm:p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                                <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-200 mb-1.5 flex justify-between">
+                                    <span>L & R</span>
+                                    <span class="text-slate-400 font-normal">%50</span>
+                                </div>
+                                <div class="grid grid-cols-6 gap-1 text-[10px]">
+                                    <button onclick="setSkillLevel('lr', 'baraj')" class="py-1 rounded-md transition text-[9px] sm:text-[10px] ${btnClass(userSkills.lr === 'baraj')}">Baraj</button>
+                                    <button onclick="setSkillLevel('lr', 1)" class="py-1 rounded-md transition ${btnClass(userSkills.lr === 1)}">1</button>
+                                    <button onclick="setSkillLevel('lr', 2)" class="py-1 rounded-md transition ${btnClass(userSkills.lr === 2)}">2</button>
+                                    <button onclick="setSkillLevel('lr', 3)" class="py-1 rounded-md transition ${btnClass(userSkills.lr === 3)}">3</button>
+                                    <button onclick="setSkillLevel('lr', 4)" class="py-1 rounded-md transition ${btnClass(userSkills.lr === 4)}">4</button>
+                                    <button onclick="setSkillLevel('lr', 5)" class="py-1 rounded-md transition ${btnClass(userSkills.lr === 5)}">5</button>
+                                </div>
+                            </div>
+
+                            <!-- Writing -->
+                            <div class="p-2 sm:p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                                <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-200 mb-1.5 flex justify-between">
+                                    <span>Writing</span>
+                                    <span class="text-slate-400 font-normal">%25</span>
+                                </div>
+                                <div class="grid grid-cols-6 gap-1 text-[10px]">
+                                    <button onclick="setSkillLevel('wr', 'baraj')" class="py-1 rounded-md transition text-[9px] sm:text-[10px] ${btnClass(userSkills.wr === 'baraj')}">Baraj</button>
+                                    <button onclick="setSkillLevel('wr', 1)" class="py-1 rounded-md transition ${btnClass(userSkills.wr === 1)}">1</button>
+                                    <button onclick="setSkillLevel('wr', 2)" class="py-1 rounded-md transition ${btnClass(userSkills.wr === 2)}">2</button>
+                                    <button onclick="setSkillLevel('wr', 3)" class="py-1 rounded-md transition ${btnClass(userSkills.wr === 3)}">3</button>
+                                    <button onclick="setSkillLevel('wr', 4)" class="py-1 rounded-md transition ${btnClass(userSkills.wr === 4)}">4</button>
+                                    <button onclick="setSkillLevel('wr', 5)" class="py-1 rounded-md transition ${btnClass(userSkills.wr === 5)}">5</button>
+                                </div>
+                            </div>
+
+                            <!-- Speaking -->
+                            <div class="p-2 sm:p-2.5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800">
+                                <div class="text-[11px] font-semibold text-slate-700 dark:text-slate-200 mb-1.5 flex justify-between">
+                                    <span>Speaking</span>
+                                    <span class="text-slate-400 font-normal">%25</span>
+                                </div>
+                                <div class="grid grid-cols-6 gap-1 text-[10px]">
+                                    <button onclick="setSkillLevel('sp', 'baraj')" class="py-1 rounded-md transition text-[9px] sm:text-[10px] ${btnClass(userSkills.sp === 'baraj')}">Baraj</button>
+                                    <button onclick="setSkillLevel('sp', 1)" class="py-1 rounded-md transition ${btnClass(userSkills.sp === 1)}">1</button>
+                                    <button onclick="setSkillLevel('sp', 2)" class="py-1 rounded-md transition ${btnClass(userSkills.sp === 2)}">2</button>
+                                    <button onclick="setSkillLevel('sp', 3)" class="py-1 rounded-md transition ${btnClass(userSkills.sp === 3)}">3</button>
+                                    <button onclick="setSkillLevel('sp', 4)" class="py-1 rounded-md transition ${btnClass(userSkills.sp === 4)}">4</button>
+                                    <button onclick="setSkillLevel('sp', 5)" class="py-1 rounded-md transition ${btnClass(userSkills.sp === 5)}">5</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 1. SIRADA: Kişiselleştirilmiş Hedef Planı -->
+                    <div class="p-4 rounded-xl bg-indigo-50/70 dark:bg-indigo-950/40 border-2 border-indigo-500/30 dark:border-indigo-500/40 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">1. Sıra (Öncelikli Model)</span>
+                                <h3 class="text-xs sm:text-sm font-bold text-slate-900 dark:text-slate-100">Kişiselleştirilmiş Hedef Planınız</h3>
+                            </div>
+                            ${customPlan.valid ? `
+                                <button onclick="applyScenario(${customPlan.lr}, ${customPlan.wr}, ${customPlan.sp})" class="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-xs font-bold transition shadow-sm active:scale-95">
+                                    Plana Göre Doldur
+                                </button>
+                            ` : customPlan.allBarajBlocked ? `
+                                <span class="text-amber-700 dark:text-amber-300 font-bold text-xs bg-amber-100 dark:bg-amber-950/60 px-2.5 py-1 rounded-md border border-amber-200 dark:border-amber-900/50">Tümü Baraj Olamaz</span>
+                            ` : `
+                                <span class="text-rose-500 font-bold text-xs bg-rose-100 dark:bg-rose-950/60 px-2.5 py-1 rounded-md">Mümkün Değil (>100)</span>
+                            `}
+                        </div>
+
+                        ${customPlan.allBarajBlocked ? `
+                            <p class="text-[11px] text-amber-800 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/30 p-2.5 rounded-lg border border-amber-200 dark:border-amber-900/40 leading-relaxed">
+                                Tüm sınavları 'Baraj' (50) olarak seçtiğinizde genel ortalama 60 sınırını geçememektedir. Lütfen en az bir sınavı 1-5 aralığında hedefleyin.
+                            </p>
+                        ` : `
+                            <div class="grid grid-cols-3 gap-2 text-center">
+                                <div class="bg-white/80 dark:bg-slate-900/80 p-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
+                                    <div class="flex items-center justify-center gap-1 mb-0.5">
+                                        <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">L & R (%50)</span>
+                                        ${userSkills.lr === 'baraj' ? '<span class="text-[9px] px-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded font-semibold">Baraj</span>' : ''}
+                                    </div>
+                                    <span class="text-lg sm:text-xl font-extrabold ${customPlan.lr > 100 ? 'text-rose-500' : 'text-indigo-950 dark:text-indigo-100'}">${customPlan.lr}</span>
+                                </div>
+                                <div class="bg-white/80 dark:bg-slate-900/80 p-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
+                                    <div class="flex items-center justify-center gap-1 mb-0.5">
+                                        <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Writing (%25)</span>
+                                        ${userSkills.wr === 'baraj' ? '<span class="text-[9px] px-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded font-semibold">Baraj</span>' : ''}
+                                    </div>
+                                    <span class="text-lg sm:text-xl font-extrabold ${customPlan.wr > 100 ? 'text-rose-500' : 'text-indigo-950 dark:text-indigo-100'}">${customPlan.wr}</span>
+                                </div>
+                                <div class="bg-white/80 dark:bg-slate-900/80 p-2.5 rounded-xl border border-indigo-100 dark:border-indigo-900/50">
+                                    <div class="flex items-center justify-center gap-1 mb-0.5">
+                                        <span class="text-[10px] text-slate-500 dark:text-slate-400 font-medium">Speaking (%25)</span>
+                                        ${userSkills.sp === 'baraj' ? '<span class="text-[9px] px-1 bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300 rounded font-semibold">Baraj</span>' : ''}
+                                    </div>
+                                    <span class="text-lg sm:text-xl font-extrabold ${customPlan.sp > 100 ? 'text-rose-500' : 'text-indigo-950 dark:text-indigo-100'}">${customPlan.sp}</span>
+                                </div>
+                            </div>
+                        `}
+                    </div>
+
+                    <!-- 2. SIRADA: Alternatif Dengeli Model -->
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse text-xs">
+                            <thead>
+                                <tr class="border-b border-slate-200 dark:border-slate-800 text-[10px] sm:text-[11px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wider">
+                                    <th class="py-2 px-2">Alternatif Model</th>
+                                    <th class="py-2 px-2 text-center">L&R</th>
+                                    <th class="py-2 px-2 text-center">Writing</th>
+                                    <th class="py-2 px-2 text-center">Speaking</th>
+                                    <th class="py-2 px-2 text-right">İşlem</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-100 dark:divide-slate-800/80 text-slate-700 dark:text-slate-200">
+                                <tr class="hover:bg-slate-50/60 dark:hover:bg-slate-800/40">
+                                    <td class="py-2.5 px-2 font-semibold">
+                                        Dengeli Dağılım Modeli
+                                        <span class="block text-[10px] font-normal text-slate-400">Tüm sınavlara eşit hedef</span>
+                                    </td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-slate-800 dark:text-slate-100">${balancedScore}</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-slate-800 dark:text-slate-100">${balancedScore}</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-slate-800 dark:text-slate-100">${balancedScore}</td>
+                                    <td class="py-2.5 px-2 text-right">
+                                        ${balancedValid ? `
+                                            <button onclick="applyScenario(${balancedScore}, ${balancedScore}, ${balancedScore})" class="px-2.5 py-1 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-100 rounded-md text-[11px] font-bold transition">
+                                                Uygula
+                                            </button>
+                                        ` : `
+                                            <span class="text-rose-500 font-bold text-[10px]">>100</span>
+                                        `}
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            `;
+        }
+
+        function applyScenario(lr, wr, sp) {
+            const lrInput = document.getElementById('input-f_lr');
+            const wrInput = document.getElementById('input-f_wr');
+            const spInput = document.getElementById('input-f_sp');
+
+            if (lrInput) lrInput.value = lr;
+            if (wrInput) wrInput.value = wr;
+            if (spInput) spInput.value = sp;
+
+            const bulkFinalInput = document.getElementById('bulk-final-input');
+            if (bulkFinalInput) bulkFinalInput.value = '';
+
+            [lrInput, wrInput, spInput].forEach(inp => {
+                if (inp) applyInputStyle(inp);
+            });
+
+            calculateGrades();
+            saveAllInputsToStorage();
+            scrollToResult();
+        }
+
+        function resetForm() {
+            [...examStructure.vize, ...examStructure.final].forEach(item => {
+                const input = document.getElementById(`input-${item.id}`);
+                if (input) {
+                    input.value = '';
+                    applyInputStyle(input);
+                }
+            });
+            const bVize = document.getElementById('bulk-vize-input');
+            const bFinal = document.getElementById('bulk-final-input');
+            const sName = document.getElementById('student-name-input');
+            if (bVize) bVize.value = '';
+            if (bFinal) bFinal.value = '';
+            if (sName) sName.value = '';
+
+            SafeStorage.remove(STORAGE_CACHE_KEY);
+            calculateGrades();
+        }
+
+        function generateShareCanvas(studentName = '') {
+            const canvas = document.getElementById('shareCanvas');
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+
+            const bgGrad = ctx.createLinearGradient(0, 0, 0, height);
+            bgGrad.addColorStop(0, '#0f172a');
+            bgGrad.addColorStop(0.4, '#1e1b4b');
+            bgGrad.addColorStop(1, '#020617');
+            ctx.fillStyle = bgGrad;
+            ctx.fillRect(0, 0, width, height);
+
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.4)';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(20, 20, width - 40, height - 40);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#93c5fd';
+            ctx.font = 'bold 18px Inter, sans-serif';
+            ctx.fillText('SİVAS BİLİM VE TEKNOLOJİ ÜNİVERSİTESİ', width / 2, 72);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 32px Inter, sans-serif';
+            ctx.fillText('İngilizce Hazırlık Not Belgesi', width / 2, 116);
+
+            const cleanName = studentName.trim();
+            let currentY = 152;
+            if (cleanName) {
+                ctx.fillStyle = '#38bdf8';
+                ctx.font = 'bold 20px Inter, sans-serif';
+                ctx.fillText(`Öğrenci: ${cleanName}`, width / 2, currentY);
+                currentY += 34;
+            }
+
+            const today = new Date().toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+            ctx.font = '500 14px Inter, sans-serif';
+            ctx.fillText(`${today} • UBYS Resmi Barem Standardı`, width / 2, currentY);
+
+            const overallScore = document.getElementById('overall-score').innerText;
+            const rawScoreText = document.getElementById('overall-subtext').innerText;
+            const statusText = document.getElementById('status-text').innerText;
+            const statusBadgeText = document.getElementById('status-badge').innerText;
+
+            let statusColor = '#3b82f6';
+            let statusBg = 'rgba(59, 130, 246, 0.18)';
+            if (statusText === 'GEÇTİ') {
+                statusColor = '#10b981';
+                statusBg = 'rgba(16, 185, 129, 0.2)';
+            } else if (statusText === 'KALDI') {
+                statusColor = '#f43f5e';
+                statusBg = 'rgba(244, 63, 94, 0.2)';
+            } else if (statusText === 'DEVAM EDİYOR') {
+                statusColor = '#f59e0b';
+                statusBg = 'rgba(245, 158, 11, 0.2)';
+            }
+
+            const mainCardY = currentY + 28;
+            const mainCardH = 290;
+            const mainCardW = width - 80;
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.85)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
+            ctx.lineWidth = 1.5;
+            roundRect(ctx, 40, mainCardY, mainCardW, mainCardH, 24, true, true);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.9)';
+            ctx.font = '600 16px Inter, sans-serif';
+            ctx.fillText('GENEL DÖNEM NOTU', width / 2, mainCardY + 44);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 86px Inter, sans-serif';
+            ctx.fillText(overallScore, width / 2, mainCardY + 130);
+
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '500 16px Inter, sans-serif';
+            ctx.fillText(rawScoreText, width / 2, mainCardY + 164);
+
+            const badgeW = 320;
+            const badgeH = 56;
+            const badgeX = (width - badgeW) / 2;
+            const badgeY = mainCardY + 185;
+
+            ctx.fillStyle = statusBg;
+            ctx.strokeStyle = statusColor;
+            ctx.lineWidth = 2;
+            roundRect(ctx, badgeX, badgeY, badgeW, badgeH, 16, true, true);
+
+            ctx.fillStyle = statusColor;
+            ctx.font = '800 24px Inter, sans-serif';
+            ctx.fillText(statusText, width / 2, badgeY + 37);
+
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.65)';
+            ctx.font = '600 14px Inter, sans-serif';
+            ctx.fillText(statusBadgeText, width / 2, mainCardY + 270);
+
+            const subY = mainCardY + mainCardH + 24;
+            const subH = 150;
+            const subW = (width - 80 - 20) / 2;
+
+            // Vize Kutusu
+            ctx.fillStyle = 'rgba(30, 27, 75, 0.65)';
+            ctx.strokeStyle = 'rgba(99, 102, 241, 0.35)';
+            roundRect(ctx, 40, subY, subW, subH, 20, true, true);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = '#818cf8';
+            ctx.font = '700 15px Inter, sans-serif';
+            ctx.fillText('VİZE KATKISI (%40)', 40 + (subW / 2), subY + 38);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 36px Inter, sans-serif';
+            ctx.fillText(document.getElementById('vize-total-score').innerText, 40 + (subW / 2), subY + 84);
+
+            ctx.fillStyle = '#a5b4fc';
+            ctx.font = '500 14px Inter, sans-serif';
+            ctx.fillText(document.getElementById('vize-subtext').innerText, 40 + (subW / 2), subY + 118);
+
+            // Final Kutusu
+            const finalX = 40 + subW + 20;
+            ctx.fillStyle = 'rgba(88, 28, 135, 0.5)';
+            ctx.strokeStyle = 'rgba(168, 85, 247, 0.35)';
+            roundRect(ctx, finalX, subY, subW, subH, 20, true, true);
+
+            ctx.fillStyle = '#c084fc';
+            ctx.font = '700 15px Inter, sans-serif';
+            ctx.fillText('FİNAL KATKISI (%60)', finalX + (subW / 2), subY + 38);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 36px Inter, sans-serif';
+            ctx.fillText(document.getElementById('final-total-score').innerText, finalX + (subW / 2), subY + 84);
+
+            ctx.fillStyle = '#d8b4fe';
+            ctx.font = '500 14px Inter, sans-serif';
+            ctx.fillText(document.getElementById('final-subtext').innerText, finalX + (subW / 2), subY + 118);
+
+            // Final Sınavları Detay Paneli
+            const finalDetailY = subY + subH + 24;
+            const finalDetailH = 135;
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+            roundRect(ctx, 40, finalDetailY, width - 80, finalDetailH, 20, true, true);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.85)';
+            ctx.font = '600 13px Inter, sans-serif';
+            ctx.fillText('FİNAL BİLEŞENLERİ (ASGARİ 50 BARAJI)', width / 2, finalDetailY + 30);
+
+            const colW = (width - 80) / 3;
+            const f_lr_val = document.getElementById('input-f_lr')?.value || '-';
+            const f_wr_val = document.getElementById('input-f_wr')?.value || '-';
+            const f_sp_val = document.getElementById('input-f_sp')?.value || '-';
+
+            // L&R
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 28px Inter, sans-serif';
+            ctx.fillText(f_lr_val, 40 + (colW * 0.5), finalDetailY + 75);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '500 13px Inter, sans-serif';
+            ctx.fillText('L&R (%50)', 40 + (colW * 0.5), finalDetailY + 104);
+
+            // Writing
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 28px Inter, sans-serif';
+            ctx.fillText(f_wr_val, 40 + (colW * 1.5), finalDetailY + 75);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '500 13px Inter, sans-serif';
+            ctx.fillText('Writing (%25)', 40 + (colW * 1.5), finalDetailY + 104);
+
+            // Speaking
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '800 28px Inter, sans-serif';
+            ctx.fillText(f_sp_val, 40 + (colW * 2.5), finalDetailY + 75);
+            ctx.fillStyle = '#94a3b8';
+            ctx.font = '500 13px Inter, sans-serif';
+            ctx.fillText('Speaking (%25)', 40 + (colW * 2.5), finalDetailY + 104);
+
+            ctx.textAlign = 'center';
+            ctx.fillStyle = 'rgba(148, 163, 184, 0.7)';
+            ctx.font = '600 14px Inter, sans-serif';
+            ctx.fillText('SBTÜ Hazırlık UBYS Not Hesaplayıcı', width / 2, height - 42);
+
+            return canvas;
+        }
+
+        function roundRect(ctx, x, y, width, height, radius, fill, stroke) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            if (fill) ctx.fill();
+            if (stroke) ctx.stroke();
+        }
+
+        function updateModalCardPreview() {
+            const nameInput = document.getElementById('student-name-input');
+            const studentName = nameInput ? nameInput.value : '';
+            const canvas = generateShareCanvas(studentName);
+            const previewImg = document.getElementById('share-preview-img');
+            const shareBtn = document.getElementById('modal-native-share-btn');
+
+            if (previewImg) {
+                previewImg.src = canvas.toDataURL('image/png');
+            }
+
+            canvas.toBlob((blob) => {
+                if (!blob) return;
+                preRenderedShareFile = new File([blob], 'sbtu-hazirlik-not-durumu.png', { type: 'image/png' });
+
+                if (shareBtn) {
+                    if (navigator.canShare && navigator.canShare({ files: [preRenderedShareFile] })) {
+                        shareBtn.classList.remove('hidden');
+                    } else {
+                        shareBtn.classList.add('hidden');
+                    }
+                }
+            }, 'image/png');
+        }
+
+        function openShareModal() {
+            calculateGrades();
+            updateModalCardPreview();
+
+            const modal = document.getElementById('share-modal');
+            if (modal) {
+                modal.classList.remove('hidden');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeShareModal() {
+            const modal = document.getElementById('share-modal');
+            if (modal) {
+                modal.classList.add('hidden');
+                document.body.style.overflow = '';
+            }
+        }
+
+        async function triggerWebShare() {
+            if (!preRenderedShareFile) {
+                downloadCardDirectly();
+                return;
+            }
+
+            if (navigator.canShare && navigator.canShare({ files: [preRenderedShareFile] })) {
+                try {
+                    await navigator.share({
+                        title: 'SBTÜ Hazırlık Not Durumu',
+                        text: `SBTÜ Hazırlık Not Belgesi - Genel Notum: ${document.getElementById('overall-score').innerText} (${document.getElementById('status-text').innerText})`,
+                        files: [preRenderedShareFile]
+                    });
+                } catch (err) {
+                    if (err.name === 'AbortError') return;
+                    downloadCardDirectly();
+                }
+            } else {
+                downloadCardDirectly();
+            }
+        }
+
+        function downloadCardDirectly() {
+            const canvas = document.getElementById('shareCanvas');
+            const link = document.createElement('a');
+            link.download = 'sbtu-hazirlik-not-durumu.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        window.onload = initApp;
+    </script>
+</body>
+</html>
