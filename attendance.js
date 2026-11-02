@@ -350,6 +350,7 @@ let multiKurAttendance = {
 
 let activeKurId = 'kur1';
 let selectedDateId = '2026-11-02';
+let currentFastType = 'unexcused';
 
 // ====================== DİNAMİK KUR TESPİTİ VE YÖNETİMİ ======================
 
@@ -694,6 +695,10 @@ function renderCalendar() {
             } else if (totalAbsent > 0) {
                 bgBadge = "bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800 font-bold";
                 statusDot = `<span class="text-[9px] text-amber-600 block">${totalAbsent}s Yok</span>`;
+            } else if (ghostSuspiciousCount > 0) {
+                bgBadge = "bg-amber-500/10 text-amber-800 dark:text-amber-300 border-amber-400/50 font-bold";
+            } else if (ghostSuccessCount > 0) {
+                bgBadge = "bg-purple-500/10 text-purple-800 dark:text-purple-300 border-purple-400/50 font-bold";
             }
 
             // Kaçak imza etiketleri (ghost_suspicious -> 1kç?, ghost_success -> 1kç✓)
@@ -833,7 +838,19 @@ function renderDayEditor() {
     const medicalCount = slots.filter(s => s === 'medical').length;
     const ghostSuspiciousCount = slots.filter(s => s === 'ghost_suspicious').length;
     const ghostSuccessCount = slots.filter(s => s === 'ghost_success').length;
-    const totalAbsent = unexcusedCount + medicalCount;
+    const totalRecorded = unexcusedCount + medicalCount + ghostSuspiciousCount + ghostSuccessCount;
+
+    // Günün var olan durumuna göre radyo butonunu senkronize et
+    if (ghostSuspiciousCount > 0) currentFastType = 'ghost_suspicious';
+    else if (ghostSuccessCount > 0) currentFastType = 'ghost_success';
+    else if (medicalCount > 0) currentFastType = 'medical';
+    else if (unexcusedCount > 0) currentFastType = 'unexcused';
+
+    const radioId = currentFastType === 'ghost_suspicious' ? 'fast-type-ghost-suspicious' : 
+                    currentFastType === 'ghost_success' ? 'fast-type-ghost-success' : 
+                    `fast-type-${currentFastType}`;
+    const targetRadio = document.getElementById(radioId);
+    if (targetRadio) targetRadio.checked = true;
 
     const badge = document.getElementById('editor-day-badge');
     if (badge) {
@@ -844,7 +861,7 @@ function renderDayEditor() {
         if (ghostSuccessCount > 0) details.push(`${ghostSuccessCount} Başarılı Kaçak`);
         
         const detailStr = details.length > 0 ? ` (${details.join(', ')})` : '';
-        badge.innerText = `${totalAbsent} / 5 Saat Yok${detailStr}`;
+        badge.innerText = `${totalRecorded} / 5 Saat İşlendi${detailStr}`;
     }
 
     const grid = document.getElementById('lesson-slots-grid');
@@ -905,42 +922,65 @@ function cycleSlotStatus(index) {
     else if (current === 'ghost_success') next = 'present';
 
     multiKurAttendance[activeKurId][selectedDateId][index] = next;
+    
+    // Tüm slotlar dersteydim olduysa boş kaydı temizle
+    const remainingCount = multiKurAttendance[activeKurId][selectedDateId].filter(s => s !== 'present').length;
+    if (remainingCount === 0) {
+        delete multiKurAttendance[activeKurId][selectedDateId];
+    }
+
     saveAttendanceToStorage();
     renderCalendar();
     renderDayEditor();
 }
 
 function setFastDayHours(count) {
-    let type = 'unexcused';
+    let type = currentFastType;
     if (document.getElementById('fast-type-medical')?.checked) {
         type = 'medical';
     } else if (document.getElementById('fast-type-ghost-suspicious')?.checked) {
         type = 'ghost_suspicious';
     } else if (document.getElementById('fast-type-ghost-success')?.checked) {
         type = 'ghost_success';
+    } else if (document.getElementById('fast-type-unexcused')?.checked) {
+        type = 'unexcused';
     }
+    currentFastType = type;
 
     if (!multiKurAttendance[activeKurId]) {
         multiKurAttendance[activeKurId] = {};
     }
 
-    const newSlots = ['present','present','present','present','present'];
-    for (let i = 0; i < count; i++) {
-        newSlots[i] = type;
+    if (count === 0) {
+        delete multiKurAttendance[activeKurId][selectedDateId];
+    } else {
+        const newSlots = ['present','present','present','present','present'];
+        for (let i = 0; i < count; i++) {
+            newSlots[i] = type;
+        }
+        multiKurAttendance[activeKurId][selectedDateId] = newSlots;
     }
 
-    multiKurAttendance[activeKurId][selectedDateId] = newSlots;
     saveAttendanceToStorage();
     renderCalendar();
     renderDayEditor();
 }
 
 function toggleFastType(type) {
+    currentFastType = type;
+    const radioId = type === 'ghost_suspicious' ? 'fast-type-ghost-suspicious' : 
+                    type === 'ghost_success' ? 'fast-type-ghost-success' : 
+                    `fast-type-${type}`;
+    const radioEl = document.getElementById(radioId);
+    if (radioEl) radioEl.checked = true;
+
     const kurData = multiKurAttendance[activeKurId] || {};
     const slots = kurData[selectedDateId];
     if (slots) {
         const count = slots.filter(s => s !== 'present').length;
-        if (count > 0) setFastDayHours(count);
+        if (count > 0) {
+            setFastDayHours(count);
+        }
     }
 }
 
