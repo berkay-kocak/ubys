@@ -1,10 +1,11 @@
 /**
- * SBTÜ Hazırlık Sistemi - Devamsızlık Takibi ve Akademik Takvim Motoru
+ * SBTÜ Hazırlık Sistemi - Devamsızlık Takibi, Kaçak İmza ve Akademik Takvim Motoru
  * - 5 Kurluk Resmi Akademik Takvim (Kur 1, Kur 2, Kur 3, Kur 4, Yaz Okulu)
  * - Resmi tatil ve bayram günleri filtrelemesi
  * - Dinamik ve tarihe duyarlı akıllı kur tespiti
  * - SBTÜ YDYO Yönergesi Madde 17 Devamsızlık Hükümleri
  *   (%80 devam zorunluluğu, 35 saat özürsüz sınır, %10 = 17.5 saat rapor kotası)
+ * - Kaçak İmza Takibi (Şüpheli Risk ve Başarılı Kurtarma)
  * - Haftalık hızlı saat dağıtımı & günlük 5 ders slotu etkileşimi
  * - Devamsızlık kayıt günlüğü (log) listelemesi
  */
@@ -517,12 +518,16 @@ function calculateAttendance() {
 
     let totalUnexcused = 0;
     let totalMedical = 0;
+    let totalGhostSuspicious = 0;
+    let totalGhostSuccess = 0;
 
     Object.entries(kurData).forEach(([dateStr, slots]) => {
         if (Array.isArray(slots)) {
             slots.forEach(slot => {
                 if (slot === 'unexcused') totalUnexcused += 1;
                 else if (slot === 'medical') totalMedical += 1;
+                else if (slot === 'ghost_suspicious') totalGhostSuspicious += 1;
+                else if (slot === 'ghost_success') totalGhostSuccess += 1;
             });
         }
     });
@@ -537,6 +542,11 @@ function calculateAttendance() {
     const netAttendanceLoss = totalUnexcused + excessMedical;
     const remainingHours = Math.max(0, maxUnexcused - netAttendanceLoss);
     const isFailedAttendance = netAttendanceLoss > maxUnexcused;
+
+    // En Kötü Senaryo (Şüpheli Kaçak İmzaların Resmi Devamsızlığa Dönüşmesi Riski)
+    const worstCaseLoss = netAttendanceLoss + totalGhostSuspicious;
+    const riskRemaining = maxUnexcused - worstCaseLoss;
+    const isWorstCaseFailed = worstCaseLoss > maxUnexcused;
 
     // UI Güncellemeleri
     const remHoursEl = document.getElementById('att-remaining-hours');
@@ -558,9 +568,21 @@ function calculateAttendance() {
     if (unexcusedEl) unexcusedEl.innerText = totalUnexcused;
     if (medicalEl) medicalEl.innerText = totalMedical;
     if (medicalQuotaEl) medicalQuotaEl.innerText = `Kota: ${validMedicalDeduction.toFixed(1)} / ${maxMedical} Saat`;
-    if (limitSubEl) limitSubEl.innerText = `Toplam Sınır: ${maxUnexcused} Saat`;
     if (unexcusedSubEl) unexcusedSubEl.innerText = `${maxUnexcused} Saatte Kalır`;
     if (barTitleEl) barTitleEl.innerText = `Devamsızlık Tüketimi (${maxUnexcused} Saat Sınırı)`;
+
+    // Kaçak İmza Risk Uyarısı (Kalan Hak Kartının Altı)
+    if (limitSubEl) {
+        if (totalGhostSuspicious > 0) {
+            let riskWarnHtml = `<div class="text-[10px] text-amber-600 dark:text-amber-400 font-bold mt-1 leading-tight">${totalGhostSuspicious}s Şüpheli İmza (En Kötü Senaryo Kalan: ${Math.max(0, riskRemaining).toFixed(1)}s)</div>`;
+            if (isWorstCaseFailed && !isFailedAttendance) {
+                riskWarnHtml += `<div class="text-[9px] text-rose-500 font-extrabold mt-0.5">⚠️ Şüpheli imzalar fark edilirse kurdan kalırsınız!</div>`;
+            }
+            limitSubEl.innerHTML = `Toplam Sınır: ${maxUnexcused} Saat${riskWarnHtml}`;
+        } else {
+            limitSubEl.innerText = `Toplam Sınır: ${maxUnexcused} Saat`;
+        }
+    }
 
     const percentConsumed = Math.min(100, (netAttendanceLoss / maxUnexcused) * 100);
     if (percentLabelEl) percentLabelEl.innerText = `${netAttendanceLoss.toFixed(1)} / ${maxUnexcused} Saat (%${Math.round(percentConsumed)})`;
@@ -585,14 +607,14 @@ function calculateAttendance() {
         if (remCard) remCard.className = "bg-rose-50/70 dark:bg-rose-950/40 border-2 border-rose-400 dark:border-rose-900/60 rounded-xl p-2.5 sm:p-3.5";
         if (notTabPill) notTabPill.className = "text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500 border border-rose-400 text-white font-extrabold";
         if (alertBanner) alertBanner.classList.remove('hidden');
-    } else if (remainingHours <= 5) {
+    } else if (remainingHours <= 5 || (isWorstCaseFailed && totalGhostSuspicious > 0)) {
         if (pBar) pBar.className = "h-full bg-gradient-to-r from-amber-500 to-rose-500 rounded-full transition-all duration-500 ease-out";
         if (statusText) {
-            statusText.innerText = "KRİTİK ALARM";
+            statusText.innerText = remainingHours <= 5 ? "KRİTİK ALARM" : "RİSKLİ BÖLGE";
             statusText.className = "text-sm sm:text-base font-extrabold text-rose-600 dark:text-rose-400 mt-0.5";
         }
         if (statusBadge) {
-            statusBadge.innerText = "1 Gün Bile Kaçıramazsın";
+            statusBadge.innerText = isWorstCaseFailed ? "Şüpheli İmza Riski!" : "1 Gün Bile Kaçıramazsın";
             statusBadge.className = "mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300 font-bold";
         }
         if (remCard) remCard.className = "bg-rose-50/70 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-900/40 rounded-xl p-2.5 sm:p-3.5";
@@ -605,7 +627,7 @@ function calculateAttendance() {
             statusText.className = "text-sm sm:text-base font-bold text-amber-600 dark:text-amber-400 mt-0.5";
         }
         if (statusBadge) {
-            statusBadge.innerText = "Kalan Saat Azalıyor";
+            statusBadge.innerText = totalGhostSuspicious > 0 ? `${totalGhostSuspicious}s Şüpheli İmza` : "Kalan Saat Azalıyor";
             statusBadge.className = "mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/40 text-amber-800 dark:text-amber-200 font-semibold";
         }
         if (remCard) remCard.className = "bg-amber-50/70 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/40 rounded-xl p-2.5 sm:p-3.5";
@@ -614,11 +636,11 @@ function calculateAttendance() {
     } else {
         if (pBar) pBar.className = "h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500 ease-out";
         if (statusText) {
-            statusText.innerText = "Güvenli Bölge";
+            statusText.innerText = totalGhostSuspicious > 0 ? "Şüpheli İmza Mevcut" : "Güvenli Bölge";
             statusText.className = "text-sm sm:text-base font-bold text-emerald-600 dark:text-emerald-400 mt-0.5";
         }
         if (statusBadge) {
-            statusBadge.innerText = "Devam Oranı İyi";
+            statusBadge.innerText = totalGhostSuspicious > 0 ? `Risk: ${Math.max(0, riskRemaining).toFixed(1)}s Kalan` : "Devam Oranı İyi";
             statusBadge.className = "mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-800 dark:text-emerald-200 font-semibold";
         }
         if (remCard) remCard.className = "bg-emerald-50/70 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-900/40 rounded-xl p-2.5 sm:p-3.5";
@@ -627,7 +649,7 @@ function calculateAttendance() {
     }
 
     renderAttendanceLog();
-    return { isFailedAttendance, remainingHours };
+    return { isFailedAttendance, remainingHours, riskRemaining, totalGhostSuspicious, totalGhostSuccess };
 }
 
 // ====================== TAKVİM ÇİZİMİ VE TOPLU HAFTALIK GİRİŞ ======================
@@ -647,7 +669,7 @@ function renderCalendar() {
         let currentWeekTotalAbsent = 0;
         w.days.forEach(d => {
             const slots = kurData[d.id] || ['present','present','present','present','present'];
-            currentWeekTotalAbsent += slots.filter(s => s !== 'present').length;
+            currentWeekTotalAbsent += slots.filter(s => s === 'unexcused' || s === 'medical').length;
         });
 
         let daysHtml = '';
@@ -655,6 +677,8 @@ function renderCalendar() {
             const slots = kurData[d.id] || ['present','present','present','present','present'];
             const unexcusedCount = slots.filter(s => s === 'unexcused').length;
             const medicalCount = slots.filter(s => s === 'medical').length;
+            const ghostSuspiciousCount = slots.filter(s => s === 'ghost_suspicious').length;
+            const ghostSuccessCount = slots.filter(s => s === 'ghost_success').length;
             const totalAbsent = unexcusedCount + medicalCount;
             const isSelected = selectedDateId === d.id;
 
@@ -670,6 +694,19 @@ function renderCalendar() {
             } else if (totalAbsent > 0) {
                 bgBadge = "bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-300 dark:border-amber-800 font-bold";
                 statusDot = `<span class="text-[9px] text-amber-600 block">${totalAbsent}s Yok</span>`;
+            }
+
+            // Kaçak imza etiketleri (ghost_suspicious -> 1kç?, ghost_success -> 1kç✓)
+            let ghostBadges = "";
+            if (ghostSuspiciousCount > 0) {
+                ghostBadges += `<span class="inline-block text-[9px] px-1 py-0.5 rounded bg-amber-500/20 text-amber-700 dark:text-amber-300 font-extrabold mr-0.5">${ghostSuspiciousCount}kç?</span>`;
+            }
+            if (ghostSuccessCount > 0) {
+                ghostBadges += `<span class="inline-block text-[9px] px-1 py-0.5 rounded bg-purple-500/20 text-purple-700 dark:text-purple-300 font-extrabold">${ghostSuccessCount}kç✓</span>`;
+            }
+
+            if (ghostBadges) {
+                statusDot += `<div class="mt-0.5 flex flex-wrap items-center justify-center gap-0.5">${ghostBadges}</div>`;
             }
 
             const selectedRing = isSelected ? "ring-2 ring-indigo-500 ring-offset-1 dark:ring-offset-slate-900" : "";
@@ -794,11 +831,20 @@ function renderDayEditor() {
     const slots = kurData[selectedDateId] || ['present','present','present','present','present'];
     const unexcusedCount = slots.filter(s => s === 'unexcused').length;
     const medicalCount = slots.filter(s => s === 'medical').length;
+    const ghostSuspiciousCount = slots.filter(s => s === 'ghost_suspicious').length;
+    const ghostSuccessCount = slots.filter(s => s === 'ghost_success').length;
     const totalAbsent = unexcusedCount + medicalCount;
 
     const badge = document.getElementById('editor-day-badge');
     if (badge) {
-        badge.innerText = `${totalAbsent} / 5 Saat Yok (${unexcusedCount} Özürsüz, ${medicalCount} Raporlu)`;
+        let details = [];
+        if (unexcusedCount > 0) details.push(`${unexcusedCount} Özürsüz`);
+        if (medicalCount > 0) details.push(`${medicalCount} Raporlu`);
+        if (ghostSuspiciousCount > 0) details.push(`${ghostSuspiciousCount} Şüpheli Kaçak`);
+        if (ghostSuccessCount > 0) details.push(`${ghostSuccessCount} Başarılı Kaçak`);
+        
+        const detailStr = details.length > 0 ? ` (${details.join(', ')})` : '';
+        badge.innerText = `${totalAbsent} / 5 Saat Yok${detailStr}`;
     }
 
     const grid = document.getElementById('lesson-slots-grid');
@@ -822,6 +868,14 @@ function renderDayEditor() {
             slotStyle = "bg-sky-50 dark:bg-sky-950/60 border-sky-300 dark:border-sky-800 text-sky-800 dark:text-sky-200";
             statusLabel = "Raporlu";
             statusPill = "bg-sky-500 text-white font-bold";
+        } else if (status === 'ghost_suspicious') {
+            slotStyle = "bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-400/40";
+            statusLabel = "Kaçak (Şüpheli)";
+            statusPill = "bg-amber-500 text-white font-bold";
+        } else if (status === 'ghost_success') {
+            slotStyle = "bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-400/40";
+            statusLabel = "Kaçak (Başarılı)";
+            statusPill = "bg-purple-600 text-white font-bold";
         }
 
         slotBtn.className = `p-2 sm:p-2.5 rounded-xl border flex flex-col items-center justify-center gap-1 transition-all active:scale-95 ${slotStyle}`;
@@ -842,9 +896,13 @@ function cycleSlotStatus(index) {
     }
     const current = multiKurAttendance[activeKurId][selectedDateId][index];
     let next = 'present';
+
+    // 5 Aşamalı Slot Döngüsü: present -> unexcused -> medical -> ghost_suspicious -> ghost_success -> present
     if (current === 'present') next = 'unexcused';
     else if (current === 'unexcused') next = 'medical';
-    else if (current === 'medical') next = 'present';
+    else if (current === 'medical') next = 'ghost_suspicious';
+    else if (current === 'ghost_suspicious') next = 'ghost_success';
+    else if (current === 'ghost_success') next = 'present';
 
     multiKurAttendance[activeKurId][selectedDateId][index] = next;
     saveAttendanceToStorage();
@@ -853,9 +911,14 @@ function cycleSlotStatus(index) {
 }
 
 function setFastDayHours(count) {
-    const medicalRadio = document.getElementById('fast-type-medical');
-    const isMedical = medicalRadio ? medicalRadio.checked : false;
-    const type = isMedical ? 'medical' : 'unexcused';
+    let type = 'unexcused';
+    if (document.getElementById('fast-type-medical')?.checked) {
+        type = 'medical';
+    } else if (document.getElementById('fast-type-ghost-suspicious')?.checked) {
+        type = 'ghost_suspicious';
+    } else if (document.getElementById('fast-type-ghost-success')?.checked) {
+        type = 'ghost_success';
+    }
 
     if (!multiKurAttendance[activeKurId]) {
         multiKurAttendance[activeKurId] = {};
@@ -904,8 +967,12 @@ function renderAttendanceLog() {
     Object.entries(kurData).forEach(([dateStr, slots]) => {
         const unexcused = slots.filter(s => s === 'unexcused').length;
         const medical = slots.filter(s => s === 'medical').length;
-        if (unexcused > 0 || medical > 0) {
-            logs.push({ dateStr, unexcused, medical, total: unexcused + medical });
+        const ghostSuspicious = slots.filter(s => s === 'ghost_suspicious').length;
+        const ghostSuccess = slots.filter(s => s === 'ghost_success').length;
+        const total = unexcused + medical + ghostSuspicious + ghostSuccess;
+
+        if (total > 0) {
+            logs.push({ dateStr, unexcused, medical, ghostSuspicious, ghostSuccess, total });
         }
     });
 
@@ -919,15 +986,17 @@ function renderAttendanceLog() {
 
     logs.forEach(item => {
         const row = document.createElement('div');
-        row.className = "flex items-center justify-between p-2 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60";
+        row.className = "flex flex-wrap sm:flex-nowrap items-center justify-between gap-1.5 p-2 rounded-xl bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-700/60";
         row.innerHTML = `
             <div class="flex items-center gap-2">
                 <span class="font-bold text-slate-800 dark:text-slate-200">${item.dateStr}</span>
-                <span class="text-[10px] text-slate-400">(${item.total} Saat)</span>
+                <span class="text-[10px] text-slate-400">(${item.total} Kayıt)</span>
             </div>
-            <div class="flex items-center gap-1.5 text-[11px]">
+            <div class="flex flex-wrap items-center gap-1 text-[10px] sm:text-[11px]">
                 ${item.unexcused > 0 ? `<span class="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold">${item.unexcused}s Özürsüz</span>` : ''}
                 ${item.medical > 0 ? `<span class="px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold">${item.medical}s Raporlu</span>` : ''}
+                ${item.ghostSuspicious > 0 ? `<span class="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold">${item.ghostSuspicious}s Kaçak (?)</span>` : ''}
+                ${item.ghostSuccess > 0 ? `<span class="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold">${item.ghostSuccess}s Kaçak (✓)</span>` : ''}
                 <button onclick="selectCalendarDay('${item.dateStr}')" class="text-indigo-600 hover:text-indigo-700 font-bold ml-1 text-xs">Düzenle</button>
             </div>
         `;
