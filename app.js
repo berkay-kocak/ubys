@@ -194,23 +194,7 @@ window.addEventListener('appinstalled', () => {
 // Çevrimdışı çalışma desteği için Service Worker kaydı
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        const swCode = `
-            const CACHE_NAME = 'sbtu-pwa-v1';
-            self.addEventListener('install', (e) => {
-                self.skipWaiting();
-            });
-            self.addEventListener('activate', (e) => {
-                e.waitUntil(clients.claim());
-            });
-            self.addEventListener('fetch', (e) => {
-                e.respondWith(
-                    fetch(e.request).catch(() => caches.match(e.request))
-                );
-            });
-        `;
-        const blob = new Blob([swCode], { type: 'application/javascript' });
-        const swUrl = URL.createObjectURL(blob);
-        navigator.serviceWorker.register(swUrl).catch(() => {});
+        navigator.serviceWorker.register('./sw.js').catch(() => {});
     });
 }
 

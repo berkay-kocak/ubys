@@ -339,6 +339,42 @@ const KURS_DATA = {
     }
 };
 
+function validateCourseData() {
+    const lessonsPerDay = 5;
+
+    Object.values(KURS_DATA).forEach((course) => {
+        const days = course.weeks.flatMap((week) => week.days);
+        const holidayCount = days.filter((day) => day.isHoliday).length;
+        const listedHours = days.length * lessonsPerDay;
+        const scheduledHours = (days.length - holidayCount) * lessonsPerDay;
+        const expectedWeeks = course.weeks.length;
+
+        if (course.totalWeeks !== expectedWeeks) {
+            console.warn(
+                `[Takvim] ${course.id}: totalWeeks=${course.totalWeeks}, ` +
+                `weeks.length=${expectedWeeks}`
+            );
+        }
+
+        if (course.totalHours !== listedHours && course.totalHours !== scheduledHours) {
+            console.warn(
+                `[Takvim] ${course.id}: totalHours=${course.totalHours}, ` +
+                `listelenen=${listedHours}, tatiller çıkarılmış=${scheduledHours}`
+            );
+        }
+
+        const expectedUnexcused = course.totalHours * 0.20;
+        const expectedMedical = course.totalHours * 0.10;
+        if (course.maxUnexcused !== expectedUnexcused || course.maxMedical !== expectedMedical) {
+            console.warn(
+                `[Takvim] ${course.id}: devamsızlık limitleri totalHours ile uyumsuz.`
+            );
+        }
+    });
+}
+
+validateCourseData();
+
 // Çoklu Kur Devamsızlık Belleği: { kur1: { '2026-09-21': ['present', ...] }, kur2: {...} }
 let multiKurAttendance = {
     kur1: {},
@@ -351,6 +387,29 @@ let multiKurAttendance = {
 let activeKurId = 'kur1';
 let selectedDateId = '2026-11-02';
 let currentFastType = 'unexcused';
+
+function createEmptyAttendanceState() {
+    return Object.fromEntries(Object.keys(KURS_DATA).map((kurId) => [kurId, {}]));
+}
+
+function sanitizeAttendanceState(value) {
+    const cleanState = createEmptyAttendanceState();
+    if (!value || typeof value !== 'object' || Array.isArray(value)) return cleanState;
+
+    const validStatuses = new Set(['present', 'unexcused', 'medical', 'ghost_suspicious', 'ghost_success']);
+    Object.entries(value).forEach(([kurId, dates]) => {
+        if (!cleanState[kurId] || !dates || typeof dates !== 'object' || Array.isArray(dates)) return;
+
+        Object.entries(dates).forEach(([date, slots]) => {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) return;
+            if (!Array.isArray(slots) || slots.length !== 5) return;
+            if (slots.some((slot) => !validStatuses.has(slot))) return;
+            cleanState[kurId][date] = slots.slice();
+        });
+    });
+
+    return cleanState;
+}
 
 // ====================== DİNAMİK KUR TESPİTİ VE YÖNETİMİ ======================
 
@@ -375,6 +434,7 @@ function detectCurrentKurId() {
     if (todayStr > KURS_DATA.kur2.endDate && todayStr < KURS_DATA.kur3.startDate) return 'kur3';
     if (todayStr > KURS_DATA.kur3.endDate && todayStr < KURS_DATA.kur4.startDate) return 'kur4';
     if (todayStr > KURS_DATA.kur4.endDate && todayStr < KURS_DATA.yaz.startDate) return 'yaz';
+    if (todayStr > KURS_DATA.yaz.endDate) return 'yaz';
 
     return 'kur1';
 }
@@ -482,17 +542,15 @@ function loadAttendanceFromStorage() {
     const rawMulti = SafeStorage.get(ATTENDANCE_ALL_KURS_KEY);
     if (rawMulti) {
         try {
-            multiKurAttendance = JSON.parse(rawMulti);
+            multiKurAttendance = sanitizeAttendanceState(JSON.parse(rawMulti));
         } catch (e) {
-            multiKurAttendance = { kur1: {}, kur2: {}, kur3: {}, kur4: {}, yaz: {} };
+            multiKurAttendance = createEmptyAttendanceState();
         }
     } else {
         // Eski tekli cache varsa kur1'e taşı
         const legacy = SafeStorage.get('sbtu_attendance_cache');
         if (legacy) {
-            try {
-                multiKurAttendance.kur1 = JSON.parse(legacy);
-            } catch (e) {}
+            try { multiKurAttendance.kur1 = sanitizeAttendanceState({ kur1: JSON.parse(legacy) }).kur1; } catch (e) {}
         }
     }
 

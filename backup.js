@@ -9,6 +9,77 @@
 let pendingImportData = null;
 let generatedBackupJson = '';
 
+function validateBackupData(data) {
+    const errors = [];
+    const isObject = (value) => value && typeof value === 'object' && !Array.isArray(value);
+    const validSlotTypes = new Set(['present', 'unexcused', 'medical', 'ghost_suspicious', 'ghost_success']);
+
+    if (!isObject(data)) return ['Yedek kök verisi bir nesne olmalıdır.'];
+    if (data.version !== undefined && data.version !== 1) errors.push('Desteklenmeyen yedek sürümü.');
+
+    if (data.grades !== undefined) {
+        if (!isObject(data.grades)) {
+            errors.push('Not verisi geçersiz.');
+        } else {
+            if (data.grades.studentName !== undefined && typeof data.grades.studentName !== 'string') {
+                errors.push('Öğrenci adı geçersiz.');
+            }
+            ['vize', 'final'].forEach((category) => {
+                const scores = data.grades[category];
+                if (scores === undefined) return;
+                if (!isObject(scores)) {
+                    errors.push(`${category} notları geçersiz.`);
+                    return;
+                }
+                Object.entries(scores).forEach(([id, value]) => {
+                    const score = Number(value);
+                    if (!Number.isFinite(score) || score < 0 || score > 100) {
+                        errors.push(`${category}.${id} notu 0-100 arasında olmalıdır.`);
+                    }
+                });
+            });
+        }
+    }
+
+    if (data.attendance !== undefined) {
+        if (!isObject(data.attendance)) {
+            errors.push('Devamsızlık verisi geçersiz.');
+        } else {
+            Object.entries(data.attendance).forEach(([kurId, dates]) => {
+                if (typeof KURS_DATA !== 'undefined' && !KURS_DATA[kurId]) {
+                    errors.push(`Bilinmeyen kur: ${kurId}.`);
+                    return;
+                }
+                if (!isObject(dates)) {
+                    errors.push(`${kurId} kayıtları geçersiz.`);
+                    return;
+                }
+                Object.entries(dates).forEach(([date, slots]) => {
+                    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+                        errors.push(`${kurId} içinde geçersiz tarih: ${date}.`);
+                    }
+                    if (!Array.isArray(slots) || slots.length !== 5 || slots.some((slot) => !validSlotTypes.has(slot))) {
+                        errors.push(`${kurId}.${date} kaydı 5 geçerli ders durumu içermelidir.`);
+                    }
+                });
+            });
+        }
+    }
+
+    if (data.activeKur !== undefined && typeof KURS_DATA !== 'undefined' && !KURS_DATA[data.activeKur]) {
+        errors.push(`Geçersiz aktif kur: ${data.activeKur}.`);
+    }
+
+    return errors;
+}
+
+function getLocalDateString(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
 // ====================== DIŞA AKTARMA (EXPORT) ======================
 
 function openExportModal() {
@@ -85,7 +156,7 @@ function downloadExportedFile() {
     const blob = new Blob([generatedBackupJson], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    const todayStr = new Date().toISOString().slice(0, 10);
+    const todayStr = getLocalDateString();
     a.download = `sbtu-hazirlik-yedek-${todayStr}.json`;
     a.href = url;
     a.click();
@@ -111,6 +182,11 @@ function handleFileSelect(event) {
 
             if (!parsed.grades && !parsed.attendance) {
                 throw new Error("Yüklenen dosya SBTÜ Hazırlık yedek formatına uygun değil.");
+            }
+
+            const validationErrors = validateBackupData(parsed);
+            if (validationErrors.length > 0) {
+                throw new Error(`Yedek doğrulanamadı: ${validationErrors.join(' ')}`);
             }
 
             pendingImportData = parsed;
@@ -204,42 +280,5 @@ function confirmImport() {
     } catch (err) {
         closeImportModal();
         showFeedback(false, "Aktarım Hatası", "Veriler uygulanırken beklenmeyen bir hata meydana geldi.");
-    }
-}
-
-// ====================== İŞLEM GERİ BİLDİRİM MODALI (POPUP) ======================
-
-function showFeedback(isSuccess, title, desc) {
-    const modal = document.getElementById('status-feedback-modal');
-    const iconContainer = document.getElementById('feedback-icon-container');
-    const titleEl = document.getElementById('feedback-title');
-    const descEl = document.getElementById('feedback-desc');
-
-    if (!modal) return;
-
-    if (isSuccess) {
-        if (iconContainer) {
-            iconContainer.className = "w-12 h-12 mx-auto rounded-full flex items-center justify-center bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400";
-            iconContainer.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"></path></svg>';
-        }
-    } else {
-        if (iconContainer) {
-            iconContainer.className = "w-12 h-12 mx-auto rounded-full flex items-center justify-center bg-rose-100 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400";
-            iconContainer.innerHTML = '<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"></path></svg>';
-        }
-    }
-
-    if (titleEl) titleEl.innerText = title;
-    if (descEl) descEl.innerText = desc;
-
-    modal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-}
-
-function closeFeedbackModal() {
-    const modal = document.getElementById('status-feedback-modal');
-    if (modal) {
-        modal.classList.add('hidden');
-        document.body.style.overflow = '';
     }
 }
