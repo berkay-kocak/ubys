@@ -1,6 +1,6 @@
 {
-  "name": "SBTÜ Hazırlık & İŞKUR Sistemi",
-  "short_name": "SBTÜ Hazırlık",
+  "name": "SBTÜ Portal",
+  "short_name": "SBTÜ Portal",
   "id": "./",
   "start_url": "./",
   "display": "standalone",
