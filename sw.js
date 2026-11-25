@@ -1,10 +1,14 @@
 // SBTÜ Hazırlık & İŞKUR PWA Service Worker
-const CACHE_NAME = 'sbtu-hazirlik-v3';
+const CACHE_NAME = 'sbtu-hazirlik-v4';
 const APP_SHELL = [
     './',
     './index.html',
-    './devamsizlik.html',
-    './iskur.html',
+    './not-hesapla/',
+    './not-hesapla/index.html',
+    './devamsizlik/',
+    './devamsizlik/index.html',
+    './iskur/',
+    './iskur/index.html',
     './style.css',
     './app.js',
     './grades.js',

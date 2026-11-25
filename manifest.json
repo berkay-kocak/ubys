@@ -1,8 +1,8 @@
 {
   "name": "SBTÜ Hazırlık & İŞKUR Sistemi",
   "short_name": "SBTÜ Hazırlık",
-  "id": "/",
-  "start_url": "./index.html",
+  "id": "./",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#1e1b4b",
@@ -12,17 +12,17 @@
     {
       "name": "Not Hesaplayıcı",
       "short_name": "Notlar",
-      "url": "./index.html"
+      "url": "./not-hesapla/"
     },
     {
       "name": "Devamsızlık Takibi",
       "short_name": "Devamsızlık",
-      "url": "./devamsizlik.html"
+      "url": "./devamsizlik/"
     },
     {
       "name": "İŞKUR Puantaj",
       "short_name": "Puantaj",
-      "url": "./iskur.html"
+      "url": "./iskur/"
     }
   ],
   "icons": [

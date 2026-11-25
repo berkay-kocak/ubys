@@ -53,7 +53,8 @@
         const path = window.location.pathname.toLowerCase();
         if (path.includes('devamsizlik')) return 'attendance';
         if (path.includes('iskur')) return 'iskur';
-        return 'grades';
+        if (path.includes('not-hesapla')) return 'grades';
+        return 'home';
     }
 
     function readJsonStorage(key, fallback) {
@@ -564,6 +565,11 @@
         isSyncing = true;
         try {
             const page = getPageType();
+            if (page === 'home') {
+                const ubysOk = await loadAndMergeUbysFromCloud(user);
+                const iskurOk = await loadAndMergeIskurFromCloud(user);
+                return ubysOk && iskurOk;
+            }
             if (page === 'iskur') {
                 return await loadAndMergeIskurFromCloud(user);
             }
@@ -661,7 +667,11 @@
                                 </p>
                             </div>
 
-                            <form id="profile-password-form" class="bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 space-y-3">
+                            <button id="profile-toggle-pw-btn" type="button" class="w-full py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200/80 dark:hover:bg-slate-700/80 border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-2">
+                                <span>🔑 Şifreyi Değiştir</span>
+                            </button>
+
+                            <form id="profile-password-form" class="hidden bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/80 rounded-2xl p-4 space-y-3">
                                 <div class="flex items-center justify-between">
                                     <span class="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
                                         Şifre Değiştir / Belirle
@@ -788,6 +798,7 @@
         const authErrorMsg = document.getElementById('auth-error-msg');
         const authInfoMsg = document.getElementById('auth-info-msg');
         const profilePwMsg = document.getElementById('profile-pw-msg');
+        const profilePwForm = document.getElementById('profile-password-form');
         const profileNewPwInput = document.getElementById('profile-new-password');
         const profileConfirmPwInput = document.getElementById('profile-confirm-password');
 
@@ -796,6 +807,14 @@
         if (profilePwMsg) profilePwMsg.classList.add('hidden');
         if (profileNewPwInput) profileNewPwInput.value = '';
         if (profileConfirmPwInput) profileConfirmPwInput.value = '';
+
+        if (profilePwForm) {
+            if (focusPasswordReset && currentUser) {
+                profilePwForm.classList.remove('hidden');
+            } else {
+                profilePwForm.classList.add('hidden');
+            }
+        }
 
         updateAuthUI();
         modal.classList.remove('hidden');
@@ -831,6 +850,7 @@
         const authInfoMsg = document.getElementById('auth-info-msg');
         const authSubmitBtn = document.getElementById('auth-submit-btn');
 
+        const profileTogglePwBtn = document.getElementById('profile-toggle-pw-btn');
         const profilePwForm = document.getElementById('profile-password-form');
         const profileNewPwInput = document.getElementById('profile-new-password');
         const profileConfirmPwInput = document.getElementById('profile-confirm-password');
@@ -926,6 +946,17 @@
             });
         }
 
+        if (profileTogglePwBtn && profilePwForm) {
+            profileTogglePwBtn.addEventListener('click', () => {
+                const willOpen = profilePwForm.classList.contains('hidden');
+                profilePwForm.classList.toggle('hidden');
+                if (profilePwMsg) profilePwMsg.classList.add('hidden');
+                if (willOpen && profileNewPwInput) {
+                    setTimeout(() => profileNewPwInput.focus(), 50);
+                }
+            });
+        }
+
         if (profilePwForm) {
             profilePwForm.addEventListener('submit', async (e) => {
                 e.preventDefault();
@@ -958,9 +989,8 @@
 
                     profileNewPwInput.value = '';
                     profileConfirmPwInput.value = '';
-                    profilePwMsg.textContent = '✅ Şifreniz başarıyla güncellendi!';
-                    profilePwMsg.className = 'text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 rounded-xl px-3 py-2';
-                    profilePwMsg.classList.remove('hidden');
+                    profilePwForm.classList.add('hidden');
+                    profilePwMsg.classList.add('hidden');
                     showToast('Şifreniz başarıyla güncellendi!');
                 } catch (err) {
                     let msg = err.message || 'Şifre güncellenemedi.';
@@ -984,9 +1014,18 @@
                 authSyncNowBtn.textContent = 'Eşitleniyor...';
                 const page = getPageType();
                 const mergedOk = await loadActivePageFromCloud(currentUser);
-                const savedOk = mergedOk
-                    ? (page === 'iskur' ? await syncIskurToCloudNow(false) : await syncUbysToCloudNow(false))
-                    : false;
+                let savedOk = false;
+                if (mergedOk) {
+                    if (page === 'home') {
+                        const uOk = await syncUbysToCloudNow(false);
+                        const iOk = await syncIskurToCloudNow(false);
+                        savedOk = uOk && iOk;
+                    } else if (page === 'iskur') {
+                        savedOk = await syncIskurToCloudNow(false);
+                    } else {
+                        savedOk = await syncUbysToCloudNow(false);
+                    }
+                }
                 authSyncNowBtn.disabled = false;
                 authSyncNowBtn.textContent = 'Şimdi Eşitle';
                 if (savedOk) {
@@ -1003,7 +1042,18 @@
 
                 const page = getPageType();
                 try {
-                    if (page === 'iskur') {
+                    if (page === 'home') {
+                        localStorage.removeItem(ISKUR_WEEKS_KEY);
+                        localStorage.removeItem(ISKUR_BACKUP_KEY);
+                        localStorage.removeItem(ISKUR_MANUAL_KEY);
+                        localStorage.removeItem(ISKUR_DIRTY_KEY);
+                        localStorage.removeItem(ISKUR_LAST_USER_KEY);
+                        localStorage.removeItem(UBYS_GRADES_KEY);
+                        localStorage.removeItem(UBYS_ATT_KEY);
+                        localStorage.removeItem(UBYS_KUR_KEY);
+                        localStorage.removeItem(UBYS_DIRTY_KEY);
+                        localStorage.removeItem(UBYS_LAST_USER_KEY);
+                    } else if (page === 'iskur') {
                         localStorage.removeItem(ISKUR_WEEKS_KEY);
                         localStorage.removeItem(ISKUR_BACKUP_KEY);
                         localStorage.removeItem(ISKUR_MANUAL_KEY);

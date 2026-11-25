@@ -537,7 +537,8 @@ function getCurrentPageKey() {
     const path = window.location.pathname.toLowerCase();
     if (path.includes('devamsizlik')) return 'attendance';
     if (path.includes('iskur')) return 'iskur';
-    return 'grades';
+    if (path.includes('not-hesapla')) return 'grades';
+    return 'home';
 }
 
 function initAppSwitcher() {
@@ -671,7 +672,8 @@ window.addEventListener('appinstalled', () => {
 
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js').catch(() => {});
+        const swPath = getCurrentPageKey() === 'home' ? './sw.js' : '../sw.js';
+        navigator.serviceWorker.register(swPath).catch(() => {});
     });
 }
 
