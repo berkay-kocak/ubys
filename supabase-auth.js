@@ -893,7 +893,7 @@
 
                 try {
                     if (authMode === 'forgot') {
-                        const redirectUrl = window.location.origin + window.location.pathname;
+                        const redirectUrl = 'https://berkay-kocak.github.io/ubys/';
                         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
                             redirectTo: redirectUrl
                         });
@@ -1084,28 +1084,61 @@
     async function initSession() {
         if (!supabaseClient) return;
         try {
-            const { data } = await supabaseClient.auth.getSession();
-            if (data && data.session && data.session.user) {
-                currentUser = data.session.user;
+            const rawHash = window.location.hash || '';
+            const rawSearch = window.location.search || '';
+            const isRecoveryUrl =
+                rawHash.includes('type=recovery') ||
+                rawSearch.includes('type=recovery') ||
+                rawHash.includes('access_token=') ||
+                rawSearch.includes('code=');
+
+            let recoveryHandled = false;
+
+            const cleanRecoveryUrl = () => {
+                try {
+                    if (window.history && typeof window.history.replaceState === 'function') {
+                        window.history.replaceState(null, document.title, window.location.pathname);
+                    }
+                } catch (e) {}
+            };
+
+            const handleRecoverySession = (user) => {
+                if (!user) return;
+                currentUser = user;
                 updateAuthUI();
-                await loadActivePageFromCloud(currentUser);
-            }
+                if (!recoveryHandled) {
+                    recoveryHandled = true;
+                    openAuthModal(true);
+                    showToast('Lütfen profil penceresinden yeni şifrenizi belirleyin.');
+                    cleanRecoveryUrl();
+                }
+            };
 
             supabaseClient.auth.onAuthStateChange(async (event, session) => {
                 if (event === 'PASSWORD_RECOVERY' && session && session.user) {
-                    currentUser = session.user;
-                    updateAuthUI();
-                    openAuthModal(true);
-                    showToast('Lütfen profil penceresinden yeni şifrenizi belirleyin.');
+                    handleRecoverySession(session.user);
                 } else if (event === 'SIGNED_IN' && session && session.user) {
                     currentUser = session.user;
                     updateAuthUI();
+                    if (isRecoveryUrl && !recoveryHandled) {
+                        handleRecoverySession(session.user);
+                    }
                     await loadActivePageFromCloud(currentUser);
                 } else if (event === 'SIGNED_OUT') {
                     currentUser = null;
                     updateAuthUI();
                 }
             });
+
+            const { data } = await supabaseClient.auth.getSession();
+            if (data && data.session && data.session.user) {
+                currentUser = data.session.user;
+                updateAuthUI();
+                if (isRecoveryUrl) {
+                    handleRecoverySession(currentUser);
+                }
+                await loadActivePageFromCloud(currentUser);
+            }
         } catch (e) {
             console.warn('Oturum kontrol hatası:', e);
         }
