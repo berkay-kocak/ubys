@@ -208,12 +208,15 @@ function calculateGrades() {
     document.getElementById('vize-percent-badge').innerText = `${vizeEnteredCount} / ${examStructure.vize.length} Giriş`;
     document.getElementById('final-percent-badge').innerText = `${finalEnteredCount} / ${examStructure.final.length} Giriş`;
 
+    const attSummary = typeof getActiveAttendanceSummary === 'function' ? getActiveAttendanceSummary() : null;
+    updateAttendanceAlertsUI(attSummary);
+
     // İlerleme çubuğunu güncelle
     const progressBar = document.getElementById('overall-progress-bar');
     const clampedScore = Math.min(100, Math.max(0, totalOverallGained));
     progressBar.style.width = `${clampedScore}%`;
 
-    if (failedFinalComponent) {
+    if (attSummary?.isFailedAttendance || failedFinalComponent) {
         progressBar.className = "h-full bg-gradient-to-r from-rose-500 to-red-600 rounded-full transition-all duration-500 ease-out";
     } else if (roundedOverall >= PASSING_GRADE) {
         progressBar.className = "h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500 ease-out";
@@ -221,14 +224,74 @@ function calculateGrades() {
         progressBar.className = "h-full bg-gradient-to-r from-blue-500 to-indigo-600 rounded-full transition-all duration-500 ease-out";
     }
 
-    updateStatusUI(totalOverallGained, roundedOverall, totalWeightEnteredOverall, failedFinalComponent);
+    updateStatusUI(totalOverallGained, roundedOverall, totalWeightEnteredOverall, failedFinalComponent, attSummary);
     updateStrategyPanel(vizeOverallContribution, vizeEnteredCount);
 }
 
-function updateStatusUI(gainedPoints, roundedOverall, enteredWeight, failedFinalComponent) {
+function updateAttendanceAlertsUI(attSummary) {
+    const failedBanner = document.getElementById('attendance-alert-banner');
+    const failedBannerDetail = document.getElementById('attendance-alert-detail');
+    const criticalBadge = document.getElementById('attendance-critical-badge');
+    const criticalText = document.getElementById('attendance-critical-text');
+
+    if (!attSummary) {
+        if (failedBanner) failedBanner.classList.add('hidden');
+        if (criticalBadge) criticalBadge.classList.add('hidden');
+        return;
+    }
+
+    const formatHrs = (n) => (Number.isInteger(n) ? String(n) : n.toFixed(1).replace(/\.0$/, ''));
+
+    if (attSummary.isFailedAttendance) {
+        if (failedBanner) failedBanner.classList.remove('hidden');
+        if (failedBannerDetail) {
+            failedBannerDetail.innerText = `${attSummary.kurName} devamsızlık sınırı (${formatHrs(attSummary.netAttendanceLoss)} / ${formatHrs(attSummary.maxUnexcused)} saat) aşıldı. Not ortalamanız geçer olsa dahi devamsızlık sınırını aştığınız için kaldınız.`;
+        }
+        if (criticalBadge) criticalBadge.classList.add('hidden');
+    } else if (attSummary.remainingHours <= 3) {
+        if (failedBanner) failedBanner.classList.add('hidden');
+        if (criticalBadge) criticalBadge.classList.remove('hidden');
+        if (criticalText) {
+            const remStr = formatHrs(attSummary.remainingHours);
+            const usedStr = formatHrs(attSummary.netAttendanceLoss);
+            const maxStr = formatHrs(attSummary.maxUnexcused);
+            criticalText.innerText = `Kritik Devamsızlık Uyarısı: Sınıra yalnızca ${remStr} saat kaldı (${usedStr}/${maxStr}s)`;
+        }
+    } else {
+        if (failedBanner) failedBanner.classList.add('hidden');
+        if (criticalBadge) criticalBadge.classList.add('hidden');
+    }
+}
+
+function updateStatusUI(gainedPoints, roundedOverall, enteredWeight, failedFinalComponent, attSummary) {
     const statusCard = document.getElementById('status-card');
     const statusText = document.getElementById('status-text');
     const statusBadge = document.getElementById('status-badge');
+    const statusDzNote = document.getElementById('status-dz-note');
+
+    if (attSummary && attSummary.isFailedAttendance) {
+        const usedStr = Number.isInteger(attSummary.netAttendanceLoss)
+            ? String(attSummary.netAttendanceLoss)
+            : attSummary.netAttendanceLoss.toFixed(1).replace(/\.0$/, '');
+        const maxStr = Number.isInteger(attSummary.maxUnexcused)
+            ? String(attSummary.maxUnexcused)
+            : attSummary.maxUnexcused.toFixed(1).replace(/\.0$/, '');
+
+        statusText.innerText = "KALDI (DZ)";
+        statusText.className = "text-base sm:text-lg font-extrabold text-rose-700 dark:text-rose-400 mt-0.5 sm:mt-1";
+        statusCard.className = "bg-rose-50 dark:bg-rose-950/40 border-2 border-rose-300 dark:border-rose-800/80 rounded-xl p-2.5 sm:p-3.5 flex flex-col justify-center items-center transition-colors duration-300";
+        statusBadge.innerText = `Devamsızlık: ${usedStr}/${maxStr}s`;
+        statusBadge.className = "mt-0.5 text-[10px] sm:text-[11px] px-2 py-0.5 rounded-full bg-rose-200 dark:bg-rose-900/70 text-rose-800 dark:text-rose-200 font-bold truncate max-w-full";
+        if (statusDzNote) {
+            statusDzNote.innerText = "Not ortalamanız geçer olsa dahi devamsızlık sınırını aştığınız için kaldınız";
+            statusDzNote.classList.remove('hidden');
+        }
+        return;
+    }
+
+    if (statusDzNote) {
+        statusDzNote.classList.add('hidden');
+    }
 
     if (failedFinalComponent) {
         statusText.innerText = "KALDI";
@@ -650,34 +713,42 @@ function saveAllInputsToStorage() {
     });
 
     SafeStorage.set(STORAGE_CACHE_KEY, JSON.stringify(data));
+    if (window.SbtuAuth && typeof window.SbtuAuth.markUbysDirty === 'function') {
+        window.SbtuAuth.markUbysDirty();
+    }
 }
 
 function loadAllInputsFromStorage() {
     const raw = SafeStorage.get(STORAGE_CACHE_KEY);
-    if (!raw) return;
+    if (!raw) {
+        [...examStructure.vize, ...examStructure.final].forEach(item => {
+            const input = document.getElementById(`input-${item.id}`);
+            if (input) {
+                input.value = '';
+                applyInputStyle(input);
+            }
+        });
+        const nameInput = document.getElementById('student-name-input');
+        if (nameInput) nameInput.value = '';
+        return;
+    }
 
     try {
         const data = JSON.parse(raw);
-        if (data.vize) {
-            examStructure.vize.forEach(item => {
-                if (data.vize[item.id] !== undefined) {
-                    const el = document.getElementById(`input-${item.id}`);
-                    if (el) { el.value = data.vize[item.id]; applyInputStyle(el); }
-                }
-            });
-        }
-        if (data.final) {
-            examStructure.final.forEach(item => {
-                if (data.final[item.id] !== undefined) {
-                    const el = document.getElementById(`input-${item.id}`);
-                    if (el) { el.value = data.final[item.id]; applyInputStyle(el); }
-                }
-            });
-        }
-        if (data.studentName) {
-            const nameInput = document.getElementById('student-name-input');
-            if (nameInput) nameInput.value = data.studentName;
-        }
+        examStructure.vize.forEach(item => {
+            const el = document.getElementById(`input-${item.id}`);
+            if (!el) return;
+            el.value = (data.vize && data.vize[item.id] !== undefined) ? data.vize[item.id] : '';
+            applyInputStyle(el);
+        });
+        examStructure.final.forEach(item => {
+            const el = document.getElementById(`input-${item.id}`);
+            if (!el) return;
+            el.value = (data.final && data.final[item.id] !== undefined) ? data.final[item.id] : '';
+            applyInputStyle(el);
+        });
+        const nameInput = document.getElementById('student-name-input');
+        if (nameInput) nameInput.value = data.studentName || '';
     } catch (e) {}
 }
 
@@ -698,4 +769,7 @@ function resetGrades() {
 
     SafeStorage.remove(STORAGE_CACHE_KEY);
     calculateGrades();
+    if (window.SbtuAuth && typeof window.SbtuAuth.markUbysDirty === 'function') {
+        window.SbtuAuth.markUbysDirty();
+    }
 }

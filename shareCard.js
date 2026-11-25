@@ -67,7 +67,7 @@ function generateShareCanvas(studentName = '') {
     if (statusText === 'GEÇTİ') {
         statusColor = '#10b981';
         statusBg = 'rgba(16, 185, 129, 0.2)';
-    } else if (statusText === 'KALDI') {
+    } else if (statusText === 'KALDI' || statusText === 'KALDI (DZ)') {
         statusColor = '#f43f5e';
         statusBg = 'rgba(244, 63, 94, 0.2)';
     } else if (statusText === 'DEVAM EDİYOR') {

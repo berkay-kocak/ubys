@@ -83,19 +83,33 @@ function getLocalDateString(date = new Date()) {
 // ====================== DIŞA AKTARMA (EXPORT) ======================
 
 function openExportModal() {
-    const rawGrades = SafeStorage.get(STORAGE_CACHE_KEY);
+    const rawGrades = SafeStorage.get('sbtu_grades_cache');
     let parsedGrades = null;
     if (rawGrades) {
         try { parsedGrades = JSON.parse(rawGrades); } catch (e) {}
     }
+
+    let attendanceData = {};
+    if (typeof multiKurAttendance !== 'undefined') {
+        attendanceData = multiKurAttendance;
+    } else {
+        const rawAtt = SafeStorage.get(ATTENDANCE_ALL_KURS_KEY);
+        if (rawAtt) {
+            try { attendanceData = sanitizeAttendanceState(JSON.parse(rawAtt)); } catch (e) {}
+        }
+    }
+
+    const currentKur = typeof activeKurId !== 'undefined'
+        ? activeKurId
+        : (SafeStorage.get(ACTIVE_KUR_PREF_KEY) || (typeof detectCurrentKurId === 'function' ? detectCurrentKurId() : 'kur1'));
 
     const backupData = {
         app: "SBTU_HAZIRLIK_NOT_SISTEMI",
         version: 1,
         exportDate: new Date().toISOString(),
         grades: parsedGrades || {},
-        attendance: typeof multiKurAttendance !== 'undefined' ? multiKurAttendance : {},
-        activeKur: typeof activeKurId !== 'undefined' ? activeKurId : 'kur1'
+        attendance: attendanceData,
+        activeKur: currentKur
     };
 
     generatedBackupJson = JSON.stringify(backupData, null, 2);
@@ -105,10 +119,17 @@ function openExportModal() {
     const nameEl = document.getElementById('export-preview-name');
     if (nameEl) nameEl.innerText = sName;
     
-    const overallScore = document.getElementById('overall-score')?.innerText || '0';
-    const statusText = document.getElementById('status-text')?.innerText || 'Belirsiz';
+    const overallScoreEl = document.getElementById('overall-score');
+    const statusTextEl = document.getElementById('status-text');
     const gradeEl = document.getElementById('export-preview-grade');
-    if (gradeEl) gradeEl.innerText = `${overallScore} Puan (${statusText})`;
+    if (gradeEl) {
+        if (overallScoreEl && statusTextEl) {
+            gradeEl.innerText = `${overallScoreEl.innerText} Puan (${statusTextEl.innerText})`;
+        } else {
+            const gCount = (parsedGrades?.vize ? Object.keys(parsedGrades.vize).length : 0) + (parsedGrades?.final ? Object.keys(parsedGrades.final).length : 0);
+            gradeEl.innerText = gCount > 0 ? `${gCount} Kayıtlı Sınav Notu` : 'Not Verisi Yok';
+        }
+    }
 
     let gradeCount = 0;
     if (parsedGrades) {
@@ -119,13 +140,11 @@ function openExportModal() {
     if (gradeCountEl) gradeCountEl.innerText = `${gradeCount} Sınav Notu`;
 
     let attCount = 0;
-    if (typeof multiKurAttendance !== 'undefined') {
-        Object.values(multiKurAttendance).forEach(kData => {
-            if (kData && typeof kData === 'object') {
-                attCount += Object.keys(kData).length;
-            }
-        });
-    }
+    Object.values(attendanceData).forEach(kData => {
+        if (kData && typeof kData === 'object') {
+            attCount += Object.keys(kData).length;
+        }
+    });
     const attCountEl = document.getElementById('export-preview-attcount');
     if (attCountEl) attCountEl.innerText = `${attCount} Günlük Yoklama Kaydı`;
 
@@ -253,27 +272,38 @@ function confirmImport() {
     try {
         // Notları geri yükle
         if (pendingImportData.grades) {
-            SafeStorage.set(STORAGE_CACHE_KEY, JSON.stringify(pendingImportData.grades));
+            SafeStorage.set('sbtu_grades_cache', JSON.stringify(pendingImportData.grades));
             if (typeof loadAllInputsFromStorage === 'function') loadAllInputsFromStorage();
-            if (typeof calculateGrades === 'function') calculateGrades();
         }
 
         // Devamsızlık kayıtlarını geri yükle
         if (pendingImportData.attendance && typeof pendingImportData.attendance === 'object') {
-            multiKurAttendance = pendingImportData.attendance;
-            SafeStorage.set(ATTENDANCE_ALL_KURS_KEY, JSON.stringify(multiKurAttendance));
+            const cleanAtt = typeof sanitizeAttendanceState === 'function'
+                ? sanitizeAttendanceState(pendingImportData.attendance)
+                : pendingImportData.attendance;
+            if (typeof multiKurAttendance !== 'undefined') {
+                multiKurAttendance = cleanAtt;
+            }
+            SafeStorage.set(ATTENDANCE_ALL_KURS_KEY, JSON.stringify(cleanAtt));
         }
 
         if (pendingImportData.activeKur && typeof KURS_DATA !== 'undefined' && KURS_DATA[pendingImportData.activeKur]) {
-            activeKurId = pendingImportData.activeKur;
-            SafeStorage.set(ACTIVE_KUR_PREF_KEY, activeKurId);
+            if (typeof activeKurId !== 'undefined') {
+                activeKurId = pendingImportData.activeKur;
+            }
+            SafeStorage.set(ACTIVE_KUR_PREF_KEY, pendingImportData.activeKur);
         }
 
-        // Takvim ve yoklama arayüzlerini yeniden render et
+        // Not ve yoklama arayüzlerini yeniden render et
+        if (typeof calculateGrades === 'function') calculateGrades();
         if (typeof renderKurSelector === 'function') renderKurSelector();
         if (typeof calculateAttendance === 'function') calculateAttendance();
         if (typeof renderCalendar === 'function') renderCalendar();
         if (typeof renderDayEditor === 'function') renderDayEditor();
+
+        if (window.SbtuAuth && typeof window.SbtuAuth.markUbysDirty === 'function') {
+            window.SbtuAuth.markUbysDirty();
+        }
 
         closeImportModal();
         showFeedback(true, "Yedek Geri Yüklendi!", "Tüm notlarınız, strateji verileriniz ve devamsızlık kayıtlarınız başarıyla aktarıldı.");

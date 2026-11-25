@@ -1,15 +1,20 @@
-// SBTÜ PWA Service Worker
-const CACHE_NAME = 'sbtu-hazirlik-v2';
+// SBTÜ Hazırlık & İŞKUR PWA Service Worker
+const CACHE_NAME = 'sbtu-hazirlik-v3';
 const APP_SHELL = [
     './',
     './index.html',
+    './devamsizlik.html',
+    './iskur.html',
     './style.css',
     './app.js',
     './grades.js',
     './attendance.js',
     './shareCard.js',
     './backup.js',
-    './manifest.json'
+    './supabase-auth.js',
+    './manifest.json',
+    './icon-192.png',
+    './icon-512.png'
 ];
 
 self.addEventListener('install', (event) => {
@@ -35,10 +40,22 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
     if (event.request.method !== 'GET') return;
 
+    let requestUrl;
+    try {
+        requestUrl = new URL(event.request.url);
+    } catch (e) {
+        return;
+    }
+
+    // Supabase API ve kimlik doğrulama isteklerini kesinlikle önbelleğe alma
+    if (requestUrl.hostname === 'supabase.co' || requestUrl.hostname.endsWith('.supabase.co')) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+
     event.respondWith(
         fetch(event.request)
             .then((response) => {
-                const requestUrl = new URL(event.request.url);
                 if (requestUrl.origin === self.location.origin && response.ok) {
                     const copy = response.clone();
                     event.waitUntil(
@@ -47,6 +64,12 @@ self.addEventListener('fetch', (event) => {
                 }
                 return response;
             })
-            .catch(() => caches.match(event.request).then((cached) => cached || caches.match('./index.html')))
+            .catch(() => caches.match(event.request, { ignoreSearch: true }).then((cached) => {
+                if (cached) return cached;
+                if (event.request.mode === 'navigate') {
+                    return caches.match('./index.html');
+                }
+                return undefined;
+            }))
     );
 });

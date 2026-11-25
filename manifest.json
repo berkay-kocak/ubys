@@ -1,1 +1,42 @@
-{"name": "SBTÜ Hazırlık Sistemi","short_name": "SBTÜ Hazırlık","id": "/","start_url": "./index.html","display": "standalone","background_color": "#020617","theme_color": "#1e1b4b","orientation": "portrait-primary","lang": "tr-TR","icons": [{"src": "./icon-192.png","sizes": "192x192","type": "image/png","purpose": "any maskable"},{"src": "./icon-512.png","sizes": "512x512","type": "image/png","purpose": "any maskable"}]}
+{
+  "name": "SBTÜ Hazırlık & İŞKUR Sistemi",
+  "short_name": "SBTÜ Hazırlık",
+  "id": "/",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#020617",
+  "theme_color": "#1e1b4b",
+  "orientation": "any",
+  "lang": "tr-TR",
+  "shortcuts": [
+    {
+      "name": "Not Hesaplayıcı",
+      "short_name": "Notlar",
+      "url": "./index.html"
+    },
+    {
+      "name": "Devamsızlık Takibi",
+      "short_name": "Devamsızlık",
+      "url": "./devamsizlik.html"
+    },
+    {
+      "name": "İŞKUR Puantaj",
+      "short_name": "Puantaj",
+      "url": "./iskur.html"
+    }
+  ],
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
