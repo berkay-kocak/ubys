@@ -232,7 +232,7 @@ function calculateAttendance() {
     const remainingHours = Math.max(0, maxUnexcused - netAttendanceLoss);
     const isFailedAttendance = netAttendanceLoss > maxUnexcused;
 
-    // En Kötü Senaryo (Şüpheli Kaçak İmzaların Resmi Devamsızlığa Dönüşmesi Riski)
+    // En Kötü Senaryo (Şüpheli Riskli İmzaların Resmi Devamsızlığa Dönüşmesi Riski)
     const worstCaseLoss = netAttendanceLoss + totalGhostSuspicious;
     const riskRemaining = maxUnexcused - worstCaseLoss;
     const isWorstCaseFailed = worstCaseLoss > maxUnexcused;
@@ -260,7 +260,7 @@ function calculateAttendance() {
     if (unexcusedSubEl) unexcusedSubEl.innerText = `${maxUnexcused} Saatte Kalır`;
     if (barTitleEl) barTitleEl.innerText = `Devamsızlık Tüketimi (${maxUnexcused} Saat Sınırı)`;
 
-    // Kaçak İmza Risk Uyarısı (Kalan Hak Kartının Altı)
+    // Riskli İmza Uyarısı (Kalan Hak Kartının Altı)
     if (limitSubEl) {
         if (totalGhostSuspicious > 0) {
             let riskWarnHtml = `<div class="text-[10px] text-amber-600 dark:text-amber-400 font-bold mt-1 leading-tight">${totalGhostSuspicious}s Şüpheli İmza (En Kötü Senaryo Kalan: ${Math.max(0, riskRemaining).toFixed(1)}s)</div>`;
@@ -545,8 +545,8 @@ function renderDayEditor() {
         let details = [];
         if (unexcusedCount > 0) details.push(`${unexcusedCount} Özürsüz`);
         if (medicalCount > 0) details.push(`${medicalCount} Raporlu`);
-        if (ghostSuspiciousCount > 0) details.push(`${ghostSuspiciousCount} Şüpheli Kaçak`);
-        if (ghostSuccessCount > 0) details.push(`${ghostSuccessCount} Başarılı Kaçak`);
+        if (ghostSuspiciousCount > 0) details.push(`${ghostSuspiciousCount} Şüpheli Riskli İmza`);
+        if (ghostSuccessCount > 0) details.push(`${ghostSuccessCount} Başarılı Riskli İmza`);
         
         const detailStr = details.length > 0 ? ` (${details.join(', ')})` : '';
         badge.innerText = `${totalRecorded} / 5 Saat İşlendi${detailStr}`;
@@ -575,11 +575,11 @@ function renderDayEditor() {
             statusPill = "bg-sky-500 text-white font-bold";
         } else if (status === 'ghost_suspicious') {
             slotStyle = "bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-400/40";
-            statusLabel = "Kaçak (Şüpheli)";
+            statusLabel = "Riskli (Şüpheli)";
             statusPill = "bg-amber-500 text-white font-bold";
         } else if (status === 'ghost_success') {
             slotStyle = "bg-purple-500/20 text-purple-700 dark:text-purple-300 border border-purple-400/40";
-            statusLabel = "Kaçak (Başarılı)";
+            statusLabel = "Riskli (Başarılı)";
             statusPill = "bg-purple-600 text-white font-bold";
         }
 
@@ -723,8 +723,8 @@ function renderAttendanceLog() {
             <div class="flex flex-wrap items-center gap-1 text-[10px] sm:text-[11px]">
                 ${item.unexcused > 0 ? `<span class="px-2 py-0.5 rounded bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 font-bold">${item.unexcused}s Özürsüz</span>` : ''}
                 ${item.medical > 0 ? `<span class="px-2 py-0.5 rounded bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 font-bold">${item.medical}s Raporlu</span>` : ''}
-                ${item.ghostSuspicious > 0 ? `<span class="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold">${item.ghostSuspicious}s Kaçak (?)</span>` : ''}
-                ${item.ghostSuccess > 0 ? `<span class="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold">${item.ghostSuccess}s Kaçak (✓)</span>` : ''}
+                ${item.ghostSuspicious > 0 ? `<span class="px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 font-bold">${item.ghostSuspicious}s Riskli (?)</span>` : ''}
+                ${item.ghostSuccess > 0 ? `<span class="px-2 py-0.5 rounded bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 font-bold">${item.ghostSuccess}s Riskli (✓)</span>` : ''}
                 <button onclick="selectCalendarDay('${item.dateStr}')" class="text-indigo-600 hover:text-indigo-700 font-bold ml-1 text-xs">Düzenle</button>
             </div>
         `;

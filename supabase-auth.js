@@ -691,6 +691,26 @@
                                 </button>
                             </form>
 
+                            <div class="pt-2 border-t border-slate-200/80 dark:border-zinc-800 space-y-2">
+                                <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
+                                    Yerel Veri Yedekleme (Tüm Uygulamalar)
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <button id="profile-export-btn" type="button" class="px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-zinc-200 bg-slate-100 hover:bg-slate-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 border border-slate-200 dark:border-zinc-700 transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                                        <svg class="w-3.5 h-3.5 text-[#0F4C81] dark:text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+                                        </svg>
+                                        <span>Yedek İndir</span>
+                                    </button>
+                                    <button id="profile-import-btn" type="button" class="px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-zinc-200 bg-slate-100 hover:bg-slate-200/80 dark:bg-zinc-800 dark:hover:bg-zinc-700/80 border border-slate-200 dark:border-zinc-700 transition flex items-center justify-center gap-1.5 shadow-sm active:scale-95">
+                                        <svg class="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                                        </svg>
+                                        <span>Yedek İçe Aktar</span>
+                                    </button>
+                                </div>
+                            </div>
+
                             <div class="flex items-center justify-between gap-2 pt-1">
                                 <button id="auth-sync-now-btn" type="button" class="flex-1 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 border border-indigo-200 dark:border-indigo-800/70 transition">
                                     Şimdi Eşitle
@@ -856,6 +876,8 @@
         const profileConfirmPwInput = document.getElementById('profile-confirm-password');
         const profilePwMsg = document.getElementById('profile-pw-msg');
         const profilePwSubmitBtn = document.getElementById('profile-pw-submit-btn');
+        const profileExportBtn = document.getElementById('profile-export-btn');
+        const profileImportBtn = document.getElementById('profile-import-btn');
         const authSyncNowBtn = document.getElementById('auth-sync-now-btn');
         const authLogoutBtn = document.getElementById('auth-logout-btn');
 
@@ -942,6 +964,28 @@
                     if (authMode === 'login') authSubmitBtn.textContent = 'Giriş Yap';
                     else if (authMode === 'register') authSubmitBtn.textContent = 'Hesap Oluştur (Kayıt Ol)';
                     else authSubmitBtn.textContent = 'Şifre Sıfırlama Bağlantısı Gönder';
+                }
+            });
+        }
+
+        if (profileExportBtn) {
+            profileExportBtn.addEventListener('click', () => {
+                closeAuthModal();
+                if (typeof openExportModal === 'function') {
+                    openExportModal();
+                }
+            });
+        }
+
+        if (profileImportBtn) {
+            profileImportBtn.addEventListener('click', () => {
+                const fileInput = document.getElementById('import-file-input');
+                if (fileInput) {
+                    closeAuthModal();
+                    fileInput.click();
+                } else if (typeof openImportModal === 'function') {
+                    closeAuthModal();
+                    openImportModal();
                 }
             });
         }

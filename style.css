@@ -1,6 +1,32 @@
 body {
-    font-family: 'Inter', sans-serif;
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-tap-highlight-color: transparent;
+}
+
+/* Sayısal Veriler İçin Tabular Monospace Tipografi */
+.font-mono-tabular,
+input[type="number"],
+#vize-total-score,
+#final-total-score,
+#overall-score,
+#overall-subtext,
+#vize-subtext,
+#final-subtext,
+#vize-percent-badge,
+#final-percent-badge,
+#att-remaining-hours,
+#att-unexcused-hours,
+#att-medical-hours,
+#att-percent-label,
+#editor-day-badge,
+#home-grade-summary,
+#home-att-summary,
+#home-iskur-summary,
+#puantaj-table td,
+#puantaj-table tfoot td,
+.slot-btn {
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
 }
 
 /* Kaydırma Çubuğu Özelleştirmeleri */
@@ -23,11 +49,11 @@ body {
 }
 
 .dark ::-webkit-scrollbar-thumb {
-    background: #334155;
+    background: #3f3f46;
 }
 
 .dark ::-webkit-scrollbar-thumb:hover {
-    background: #475569;
+    background: #52525b;
 }
 
 /* Tablo Yatay Kaydırma Çubuğu */
@@ -41,7 +67,7 @@ body {
 }
 
 .dark .table-scroll::-webkit-scrollbar-track {
-    background: #1e293b;
+    background: #18181b;
 }
 
 .table-scroll::-webkit-scrollbar-thumb {
@@ -50,7 +76,7 @@ body {
 }
 
 .dark .table-scroll::-webkit-scrollbar-thumb {
-    background: #475569;
+    background: #52525b;
 }
 
 /* Sayı Giriş Oklarını Gizleme */

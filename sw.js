@@ -57,6 +57,22 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
+    // yemek.json: her zaman network-first (GitHub Actions'dan güncellenir)
+    if (requestUrl.pathname.endsWith('/yemek.json') || requestUrl.pathname.endsWith('yemek.json')) {
+        event.respondWith(
+            fetch(event.request, { cache: 'no-store' })
+                .then((res) => {
+                    if (res.ok) {
+                        const copy = res.clone();
+                        event.waitUntil(caches.open(CACHE_NAME).then(c => c.put(event.request, copy)));
+                    }
+                    return res;
+                })
+                .catch(() => caches.match(event.request, { ignoreSearch: true }))
+        );
+        return;
+    }
+
     event.respondWith(
         fetch(event.request)
             .then((response) => {

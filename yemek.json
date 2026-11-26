@@ -1,0 +1,552 @@
+{
+  "updatedAt": "2026-11-26T20:12:43.421Z",
+  "weekTitle": "Kasım 2026 - 5. Hafta",
+  "days": {
+    "2026-11-02": {
+      "dayName": "Pazartesi",
+      "items": [
+        {
+          "name": "YAYLA ÇORBASI",
+          "calories": "98 kal"
+        },
+        {
+          "name": "ETLİ NOHUT",
+          "calories": "317 kal"
+        },
+        {
+          "name": "MEYHANE PİLAVI",
+          "calories": "237 kal"
+        },
+        {
+          "name": "KARIŞIK TURŞU",
+          "calories": "59 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 839
+    },
+    "2026-11-03": {
+      "dayName": "Salı",
+      "items": [
+        {
+          "name": "MERCİMEK ÇORBASI",
+          "calories": "85 kal"
+        },
+        {
+          "name": "KIYMALI ALİ NAZİK",
+          "calories": "389 kal"
+        },
+        {
+          "name": "PATATESLİ BÖREK",
+          "calories": "380 kal"
+        },
+        {
+          "name": "ELMA",
+          "calories": "120 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 1102
+    },
+    "2026-11-04": {
+      "dayName": "Çarşamba",
+      "items": [
+        {
+          "name": "TARHANA ÇORBASI",
+          "calories": "150 kal"
+        },
+        {
+          "name": "TAVUK DÖNER",
+          "calories": "414 kal"
+        },
+        {
+          "name": "PİRİNÇ PİLAVI",
+          "calories": "283 kal"
+        },
+        {
+          "name": "MEVSİM SALATA/AYRAN",
+          "calories": "125 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 1100
+    },
+    "2026-11-05": {
+      "dayName": "Perşembe",
+      "items": [
+        {
+          "name": "DOMATES ÇORBASI",
+          "calories": "68 kal"
+        },
+        {
+          "name": "YEŞİL FASULYE/KARNIYARIK",
+          "calories": "143/191 kal"
+        },
+        {
+          "name": "SOSLU MAKARNA",
+          "calories": "230 kal"
+        },
+        {
+          "name": "CACIK",
+          "calories": "62 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 631
+    },
+    "2026-11-06": {
+      "dayName": "Cuma",
+      "items": [
+        {
+          "name": "MANTAR ÇORBASI",
+          "calories": "132 kal"
+        },
+        {
+          "name": "ÇİFTLİK KEBABI",
+          "calories": "215 kal"
+        },
+        {
+          "name": "BULGUR PİLAVI",
+          "calories": "286 kal"
+        },
+        {
+          "name": "KABAK TATLISI",
+          "calories": "120 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 881
+    },
+    "2026-11-09": {
+      "dayName": "Pazartesi",
+      "items": [
+        {
+          "name": "YARMALI YOĞURT ÇORBASI",
+          "calories": "150 kal"
+        },
+        {
+          "name": "KURU FASULYE",
+          "calories": "146 kal"
+        },
+        {
+          "name": "ŞEHRİYELİ PİRİNÇ PİLAVI",
+          "calories": "283 kal"
+        },
+        {
+          "name": "KARIŞIK TURŞU",
+          "calories": "54 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 761
+    },
+    "2026-11-10": {
+      "dayName": "Salı",
+      "items": [
+        {
+          "name": "TARHANA ÇORBASI",
+          "calories": "150 kal"
+        },
+        {
+          "name": "PATLICAN MUSAKKA/ T. ŞİNİTZEL",
+          "calories": "131/285 kal"
+        },
+        {
+          "name": "PEYNİRLİ MAKARNA",
+          "calories": "286 kal"
+        },
+        {
+          "name": "YOĞURTLU MOR LAHANA SALATASI",
+          "calories": "250 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 945
+    },
+    "2026-11-11": {
+      "dayName": "Çarşamba",
+      "items": [
+        {
+          "name": "MERCİMEK ÇORBASI",
+          "calories": "150 kal"
+        },
+        {
+          "name": "ÇOBAN KAVURMA",
+          "calories": "340 kal"
+        },
+        {
+          "name": "PİRİNÇ PİLAVI",
+          "calories": "283 kal"
+        },
+        {
+          "name": "AYRAN",
+          "calories": "80 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 981
+    },
+    "2026-11-12": {
+      "dayName": "Perşembe",
+      "items": [
+        {
+          "name": "DOMATES ÇORBASI",
+          "calories": "68 kal"
+        },
+        {
+          "name": "BİBER DOLMASI",
+          "calories": "262 kal"
+        },
+        {
+          "name": "PEYNİRLİ BÖREK",
+          "calories": "380 kal"
+        },
+        {
+          "name": "YOĞURT",
+          "calories": "203 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 1041
+    },
+    "2026-11-13": {
+      "dayName": "Cuma",
+      "items": [
+        {
+          "name": "SEBZE ÇORBASI",
+          "calories": "115 kal"
+        },
+        {
+          "name": "FIRIN TAVUK KANAT",
+          "calories": "306 kal"
+        },
+        {
+          "name": "ELMA DİLİM PATATES",
+          "calories": "235 kal"
+        },
+        {
+          "name": "TULUMBA",
+          "calories": "120 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 904
+    },
+    "2026-11-16": {
+      "dayName": "Pazartesi",
+      "items": [
+        {
+          "name": "MERCİMEK ÇORBASI",
+          "calories": "85 kal"
+        },
+        {
+          "name": "TAVUK DÖNER",
+          "calories": "414 kal"
+        },
+        {
+          "name": "PİRİNÇ PİLAVI",
+          "calories": "283 kal"
+        },
+        {
+          "name": "MEVSİM SALATA/AYRAN",
+          "calories": "125 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 1035
+    },
+    "2026-11-17": {
+      "dayName": "Salı",
+      "items": [
+        {
+          "name": "TOYGA ÇORBA",
+          "calories": "112 kal"
+        },
+        {
+          "name": "FIRIN KÖFTE PATATES",
+          "calories": "337 kal"
+        },
+        {
+          "name": "SEBZELİ MAKARNA",
+          "calories": "230 kal"
+        },
+        {
+          "name": "MANDALİNA",
+          "calories": "120 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 927
+    },
+    "2026-11-18": {
+      "dayName": "Çarşamba",
+      "items": [
+        {
+          "name": "DOMATES ÇORBASI",
+          "calories": "68 kal"
+        },
+        {
+          "name": "BALIK+ROKA,LİMON",
+          "calories": "250 kal"
+        },
+        {
+          "name": "ELMA DİLİM PATATES",
+          "calories": "235 kal"
+        },
+        {
+          "name": "UN HELVASI",
+          "calories": "120 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 801
+    },
+    "2026-11-19": {
+      "dayName": "Perşembe",
+      "items": [
+        {
+          "name": "EZOGELİN ÇORBASI",
+          "calories": "136 kal"
+        },
+        {
+          "name": "ORMAN KEBABI",
+          "calories": "215 kal"
+        },
+        {
+          "name": "MEYHANE PİLAVI",
+          "calories": "237 kal"
+        },
+        {
+          "name": "CACIK",
+          "calories": "62 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 778
+    },
+    "2026-11-20": {
+      "dayName": "Cuma",
+      "items": [
+        {
+          "name": "TARHANA ÇORBASI",
+          "calories": "150 kal"
+        },
+        {
+          "name": "ET DÖNER",
+          "calories": "414 kal"
+        },
+        {
+          "name": "PİRİNÇ PİLAVI",
+          "calories": "283 kal"
+        },
+        {
+          "name": "MEVSİM SALATA/AYRAN",
+          "calories": "125 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 1100
+    },
+    "2026-11-23": {
+      "dayName": "Pazartesi",
+      "items": [
+        {
+          "name": "YARMALI YOĞURT ÇORBASI",
+          "calories": "150 kal"
+        },
+        {
+          "name": "NOHUT",
+          "calories": "317 kal"
+        },
+        {
+          "name": "PİRİNÇ PİLAVI",
+          "calories": "283 kal"
+        },
+        {
+          "name": "KORNİŞON TURŞU",
+          "calories": "59 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 937
+    },
+    "2026-11-24": {
+      "dayName": "Salı",
+      "items": [
+        {
+          "name": "DOMATES ÇORBASI",
+          "calories": "68 kal"
+        },
+        {
+          "name": "HAMBURGER",
+          "calories": "281 kal"
+        },
+        {
+          "name": "PATATES KIZARTMASI+KET MAY",
+          "calories": "235 kal"
+        },
+        {
+          "name": "AYRAN",
+          "calories": "80 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 792
+    },
+    "2026-11-25": {
+      "dayName": "Çarşamba",
+      "items": [
+        {
+          "name": "EZOGELİN ÇORBASI",
+          "calories": "136 kal"
+        },
+        {
+          "name": "SEBZELİ TAVUK SOTE",
+          "calories": "415 kal"
+        },
+        {
+          "name": "KÖRİLİ MAKARNA",
+          "calories": "283 kal"
+        },
+        {
+          "name": "HAVUÇ TARATOR",
+          "calories": "200 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 1162
+    },
+    "2026-11-26": {
+      "dayName": "Perşembe",
+      "items": [
+        {
+          "name": "MERCİMEK ÇORBASI",
+          "calories": "85 kal"
+        },
+        {
+          "name": "İZMİR KÖFTE",
+          "calories": "478 kal"
+        },
+        {
+          "name": "PİRİNÇ PİLAVI",
+          "calories": "283 kal"
+        },
+        {
+          "name": "MUZ",
+          "calories": "120 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 1094
+    },
+    "2026-11-27": {
+      "dayName": "Cuma",
+      "items": [
+        {
+          "name": "MANTAR ÇORBASI",
+          "calories": "132 kal"
+        },
+        {
+          "name": "SALÇALI KARIŞIK KIZ/NUGGET",
+          "calories": "336/285 kal"
+        },
+        {
+          "name": "PEYNİRLİ BÖREK",
+          "calories": "380 kal"
+        },
+        {
+          "name": "ÇİKOLATALI ISLAK KEK",
+          "calories": "120 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 1096
+    },
+    "2026-11-30": {
+      "dayName": "Pazartesi",
+      "items": [
+        {
+          "name": "DOMATES ÇORBASI",
+          "calories": "68 kal"
+        },
+        {
+          "name": "YOĞURTLU ETLİ MANTI",
+          "calories": "306 kal"
+        },
+        {
+          "name": "ZYT. HAVUÇ-KARNABAHAR-BROKOLİ",
+          "calories": "78 kal"
+        },
+        {
+          "name": "ÜZÜM HOŞAFI",
+          "calories": "120 kal"
+        },
+        {
+          "name": "ROLL EKMEK",
+          "calories": "128 kal"
+        }
+      ],
+      "totalCalories": 700
+    }
+  }
+}

@@ -1,9 +1,9 @@
 /**
- * SBTÜ Hazırlık Sistemi - Veri Yedekleme ve JSON Transfer Motoru
- * - Tüm sınav notları, devamsızlık kayıtları ve tercihleri .json formatında dışa aktarma
+ * SBTÜ Portal Sistemi - Birleşik Veri Yedekleme ve JSON Transfer Motoru
+ * - Tüm sınav notları, devamsızlık kayıtları, tercihler ve İŞKUR haftalık puantaj verilerini tek .json dosyasında toplar
  * - İçe aktarma öncesi doğrulanabilir detaylı ön izleme modalı
  * - Cihazdaki verileri bozmadan güvenli geri yükleme ve UI senkronizasyonu
- * - Geri bildirim (Feedback) modalı yönetimi
+ * - Tüm sayfalarda (Portal, Not Hesaplayıcı, Devamsızlık Takibi, İŞKUR Puantaj) ve Profil penceresinde ortak çalışır
  */
 
 let pendingImportData = null;
@@ -15,8 +15,8 @@ function validateBackupData(data) {
     const validSlotTypes = new Set(['present', 'unexcused', 'medical', 'ghost_suspicious', 'ghost_success']);
 
     if (!isObject(data)) return ['Yedek kök verisi bir nesne olmalıdır.'];
-    if (data.version !== undefined && data.version !== 1) errors.push('Desteklenmeyen yedek sürümü.');
 
+    // Grades doğrulaması
     if (data.grades !== undefined) {
         if (!isObject(data.grades)) {
             errors.push('Not verisi geçersiz.');
@@ -41,6 +41,7 @@ function validateBackupData(data) {
         }
     }
 
+    // Attendance doğrulaması
     if (data.attendance !== undefined) {
         if (!isObject(data.attendance)) {
             errors.push('Devamsızlık verisi geçersiz.');
@@ -66,8 +67,18 @@ function validateBackupData(data) {
         }
     }
 
-    if (data.activeKur !== undefined && typeof KURS_DATA !== 'undefined' && !KURS_DATA[data.activeKur]) {
-        errors.push(`Geçersiz aktif kur: ${data.activeKur}.`);
+    // İŞKUR puantaj doğrulaması (varsa)
+    if (data.iskur !== undefined) {
+        if (!isObject(data.iskur)) {
+            errors.push('İŞKUR puantaj verisi geçersiz.');
+        } else {
+            if (data.iskur.weeks !== undefined && !isObject(data.iskur.weeks)) {
+                errors.push('İŞKUR haftalık çizelge verisi geçersiz.');
+            }
+            if (data.iskur.manual !== undefined && !isObject(data.iskur.manual)) {
+                errors.push('İŞKUR manuel saat verisi geçersiz.');
+            }
+        }
     }
 
     return errors;
@@ -83,42 +94,63 @@ function getLocalDateString(date = new Date()) {
 // ====================== DIŞA AKTARMA (EXPORT) ======================
 
 function openExportModal() {
-    const rawGrades = SafeStorage.get('sbtu_grades_cache');
+    // 1) Not verisi
     let parsedGrades = null;
+    const rawGrades = (typeof SafeStorage !== 'undefined' ? SafeStorage.get('sbtu_grades_cache') : localStorage.getItem('sbtu_grades_cache'));
     if (rawGrades) {
         try { parsedGrades = JSON.parse(rawGrades); } catch (e) {}
     }
 
+    // 2) Devamsızlık verisi
     let attendanceData = {};
-    if (typeof multiKurAttendance !== 'undefined') {
+    if (typeof multiKurAttendance !== 'undefined' && multiKurAttendance && Object.keys(multiKurAttendance).length > 0) {
         attendanceData = multiKurAttendance;
     } else {
-        const rawAtt = SafeStorage.get(ATTENDANCE_ALL_KURS_KEY);
+        const rawAtt = (typeof SafeStorage !== 'undefined' ? SafeStorage.get('sbtu_attendance_multikur_cache') : localStorage.getItem('sbtu_attendance_multikur_cache'));
         if (rawAtt) {
-            try { attendanceData = sanitizeAttendanceState(JSON.parse(rawAtt)); } catch (e) {}
+            try {
+                attendanceData = typeof sanitizeAttendanceState === 'function' ? sanitizeAttendanceState(JSON.parse(rawAtt)) : JSON.parse(rawAtt);
+            } catch (e) {}
         }
     }
 
     const currentKur = typeof activeKurId !== 'undefined'
         ? activeKurId
-        : (SafeStorage.get(ACTIVE_KUR_PREF_KEY) || (typeof detectCurrentKurId === 'function' ? detectCurrentKurId() : 'kur1'));
+        : ((typeof SafeStorage !== 'undefined' ? SafeStorage.get('sbtu_active_kur_preference') : localStorage.getItem('sbtu_active_kur_preference')) || (typeof detectCurrentKurId === 'function' ? detectCurrentKurId() : 'kur1'));
+
+    // 3) İŞKUR verisi
+    let iskurWeeks = {};
+    let iskurManual = {};
+    let iskurStudent = '';
+    try {
+        const rawW = localStorage.getItem('iskur_genclik_puantaj_v1') || localStorage.getItem('iskur_genclik_puantaj_backup_v1');
+        if (rawW) iskurWeeks = JSON.parse(rawW) || {};
+        const rawM = localStorage.getItem('iskur_genclik_manual_v1');
+        if (rawM) iskurManual = JSON.parse(rawM) || {};
+        iskurStudent = localStorage.getItem('iskur_genclik_student_name_v1') || '';
+    } catch (e) {}
 
     const backupData = {
-        app: "SBTU_HAZIRLIK_NOT_SISTEMI",
-        version: 1,
+        app: "SBTU_PORTAL_SISTEMI",
+        version: 2,
         exportDate: new Date().toISOString(),
         grades: parsedGrades || {},
         attendance: attendanceData,
-        activeKur: currentKur
+        activeKur: currentKur,
+        iskur: {
+            weeks: iskurWeeks,
+            manual: iskurManual,
+            studentName: iskurStudent
+        }
     };
 
     generatedBackupJson = JSON.stringify(backupData, null, 2);
 
     // Modal Ön İzleme Alanlarını Doldur
-    const sName = parsedGrades?.studentName || document.getElementById('student-name-input')?.value || 'İsimsiz';
+    const sName = parsedGrades?.studentName || iskurStudent || document.getElementById('student-name-input')?.value || 'İsimsiz';
     const nameEl = document.getElementById('export-preview-name');
     if (nameEl) nameEl.innerText = sName;
-    
+
     const overallScoreEl = document.getElementById('overall-score');
     const statusTextEl = document.getElementById('status-text');
     const gradeEl = document.getElementById('export-preview-grade');
@@ -148,6 +180,11 @@ function openExportModal() {
     const attCountEl = document.getElementById('export-preview-attcount');
     if (attCountEl) attCountEl.innerText = `${attCount} Günlük Yoklama Kaydı`;
 
+    // İŞKUR özet sayısı
+    const iskurWeeksCount = Object.keys(iskurWeeks).length;
+    const iskurCountEl = document.getElementById('export-preview-iskurcount');
+    if (iskurCountEl) iskurCountEl.innerText = `${iskurWeeksCount} Hafta Puantaj`;
+
     const now = new Date();
     const timeEl = document.getElementById('export-preview-time');
     if (timeEl) timeEl.innerText = now.toLocaleString('tr-TR');
@@ -176,13 +213,15 @@ function downloadExportedFile() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     const todayStr = getLocalDateString();
-    a.download = `sbtu-hazirlik-yedek-${todayStr}.json`;
+    a.download = `sbtu-portal-yedek-${todayStr}.json`;
     a.href = url;
     a.click();
     URL.revokeObjectURL(url);
     closeExportModal();
 
-    showFeedback(true, "Yedek İndirildi", "Yedek dosyanız cihazınıza başarıyla indirildi. İstediğiniz zaman geri yükleyebilirsiniz.");
+    if (typeof showFeedback === 'function') {
+        showFeedback(true, "Yedek İndirildi", "Tüm not, devamsızlık ve İŞKUR puantaj verileriniz tek dosyada başarıyla indirildi.");
+    }
 }
 
 // ====================== İÇE AKTARMA (IMPORT) ======================
@@ -199,40 +238,60 @@ function handleFileSelect(event) {
                 throw new Error("Dosya içeriği geçerli bir JSON değil.");
             }
 
-            if (!parsed.grades && !parsed.attendance) {
-                throw new Error("Yüklenen dosya SBTÜ Hazırlık yedek formatına uygun değil.");
+            // Eski İŞKUR doğrudan yedeği desteği: { weeks: {...}, manual: {...} }
+            let normalized = parsed;
+            if (parsed.weeks && !parsed.grades && !parsed.attendance) {
+                normalized = {
+                    version: 2,
+                    exportDate: parsed.exportDate || new Date().toISOString(),
+                    grades: {},
+                    attendance: {},
+                    iskur: {
+                        weeks: parsed.weeks || {},
+                        manual: parsed.manual || {},
+                        studentName: parsed.studentName || ''
+                    }
+                };
             }
 
-            const validationErrors = validateBackupData(parsed);
+            if (!normalized.grades && !normalized.attendance && !normalized.iskur) {
+                throw new Error("Yüklenen dosya SBTÜ Portal yedek formatına uygun değil.");
+            }
+
+            const validationErrors = validateBackupData(normalized);
             if (validationErrors.length > 0) {
                 throw new Error(`Yedek doğrulanamadı: ${validationErrors.join(' ')}`);
             }
 
-            pendingImportData = parsed;
+            pendingImportData = normalized;
 
             // İçe Aktarma Ön İzleme Alanlarını Doldur
-            const sName = parsed.grades?.studentName || 'Belirtilmedi';
+            const sName = normalized.grades?.studentName || normalized.iskur?.studentName || 'Belirtilmedi';
             const nameEl = document.getElementById('import-preview-name');
             if (nameEl) nameEl.innerText = sName;
 
             let gCount = 0;
-            if (parsed.grades) {
-                if (parsed.grades.vize) gCount += Object.keys(parsed.grades.vize).length;
-                if (parsed.grades.final) gCount += Object.keys(parsed.grades.final).length;
+            if (normalized.grades) {
+                if (normalized.grades.vize) gCount += Object.keys(normalized.grades.vize).length;
+                if (normalized.grades.final) gCount += Object.keys(normalized.grades.final).length;
             }
             const gCountEl = document.getElementById('import-preview-grades');
-            if (gCountEl) gCountEl.innerText = `${gCount} Sınav Notu Mevcut`;
+            if (gCountEl) gCountEl.innerText = `${gCount} Sınav Notu`;
 
             let aCount = 0;
-            if (parsed.attendance && typeof parsed.attendance === 'object') {
-                Object.values(parsed.attendance).forEach(kData => {
+            if (normalized.attendance && typeof normalized.attendance === 'object') {
+                Object.values(normalized.attendance).forEach(kData => {
                     if (kData && typeof kData === 'object') aCount += Object.keys(kData).length;
                 });
             }
             const aCountEl = document.getElementById('import-preview-att');
-            if (aCountEl) aCountEl.innerText = `${aCount} Günlük Kayıt`;
+            if (aCountEl) aCountEl.innerText = `${aCount} Günlük Yoklama`;
 
-            const dateFormatted = parsed.exportDate ? new Date(parsed.exportDate).toLocaleString('tr-TR') : 'Bilinmiyor';
+            const iskurWeeksCount = normalized.iskur?.weeks ? Object.keys(normalized.iskur.weeks).length : 0;
+            const iskurCountEl = document.getElementById('import-preview-iskur');
+            if (iskurCountEl) iskurCountEl.innerText = `${iskurWeeksCount} Hafta Puantaj`;
+
+            const dateFormatted = normalized.exportDate ? new Date(normalized.exportDate).toLocaleString('tr-TR') : 'Bilinmiyor';
             const dateEl = document.getElementById('import-preview-date');
             if (dateEl) dateEl.innerText = dateFormatted;
 
@@ -243,14 +302,18 @@ function handleFileSelect(event) {
                 document.body.style.overflow = 'hidden';
             }
         } catch (err) {
-            showFeedback(false, "Yedek Yüklenemedi", err.message || "Seçilen dosya okunamadı veya formatı bozuk.");
+            if (typeof showFeedback === 'function') {
+                showFeedback(false, "Yedek Yüklenemedi", err.message || "Seçilen dosya okunamadı veya formatı bozuk.");
+            }
         } finally {
             event.target.value = '';
         }
     };
 
     reader.onerror = function() {
-        showFeedback(false, "Dosya Hatası", "Dosya okunurken bir hata oluştu.");
+        if (typeof showFeedback === 'function') {
+            showFeedback(false, "Dosya Hatası", "Dosya okunurken bir hata oluştu.");
+        }
         event.target.value = '';
     };
 
@@ -270,13 +333,13 @@ function confirmImport() {
     if (!pendingImportData) return;
 
     try {
-        // Notları geri yükle
-        if (pendingImportData.grades) {
-            SafeStorage.set('sbtu_grades_cache', JSON.stringify(pendingImportData.grades));
+        // 1) Notları geri yükle
+        if (pendingImportData.grades && typeof pendingImportData.grades === 'object') {
+            localStorage.setItem('sbtu_grades_cache', JSON.stringify(pendingImportData.grades));
             if (typeof loadAllInputsFromStorage === 'function') loadAllInputsFromStorage();
         }
 
-        // Devamsızlık kayıtlarını geri yükle
+        // 2) Devamsızlık kayıtlarını geri yükle
         if (pendingImportData.attendance && typeof pendingImportData.attendance === 'object') {
             const cleanAtt = typeof sanitizeAttendanceState === 'function'
                 ? sanitizeAttendanceState(pendingImportData.attendance)
@@ -284,14 +347,40 @@ function confirmImport() {
             if (typeof multiKurAttendance !== 'undefined') {
                 multiKurAttendance = cleanAtt;
             }
-            SafeStorage.set(ATTENDANCE_ALL_KURS_KEY, JSON.stringify(cleanAtt));
+            localStorage.setItem('sbtu_attendance_multikur_cache', JSON.stringify(cleanAtt));
         }
 
         if (pendingImportData.activeKur && typeof KURS_DATA !== 'undefined' && KURS_DATA[pendingImportData.activeKur]) {
             if (typeof activeKurId !== 'undefined') {
                 activeKurId = pendingImportData.activeKur;
             }
-            SafeStorage.set(ACTIVE_KUR_PREF_KEY, pendingImportData.activeKur);
+            localStorage.setItem('sbtu_active_kur_preference', pendingImportData.activeKur);
+        }
+
+        // 3) İŞKUR puantaj kayıtlarını geri yükle
+        if (pendingImportData.iskur && typeof pendingImportData.iskur === 'object') {
+            const weeks = pendingImportData.iskur.weeks || {};
+            const manual = pendingImportData.iskur.manual || {};
+            const sName = pendingImportData.iskur.studentName || '';
+
+            const serializedW = JSON.stringify(weeks);
+            localStorage.setItem('iskur_genclik_puantaj_v1', serializedW);
+            localStorage.setItem('iskur_genclik_puantaj_backup_v1', serializedW);
+            localStorage.setItem('iskur_genclik_manual_v1', JSON.stringify(manual));
+            if (sName) {
+                localStorage.setItem('iskur_genclik_student_name_v1', sName);
+            }
+
+            // Sayfa İŞKUR sayfası ise verileri anında sayfaya yansıt
+            if (typeof allWeeksData !== 'undefined') {
+                allWeeksData = typeof loadAllData === 'function' ? loadAllData() : weeks;
+            }
+            if (typeof allManualData !== 'undefined') {
+                allManualData = typeof loadAllManualData === 'function' ? loadAllManualData() : manual;
+            }
+            if (typeof renderWeek === 'function') {
+                renderWeek();
+            }
         }
 
         // Not ve yoklama arayüzlerini yeniden render et
@@ -301,14 +390,23 @@ function confirmImport() {
         if (typeof renderCalendar === 'function') renderCalendar();
         if (typeof renderDayEditor === 'function') renderDayEditor();
 
-        if (window.SbtuAuth && typeof window.SbtuAuth.markUbysDirty === 'function') {
-            window.SbtuAuth.markUbysDirty();
+        // Portal özetlerini güncelle
+        if (typeof renderPortalSummaries === 'function') renderPortalSummaries();
+
+        // Bulut senkronizasyon bayraklarını işaretle
+        if (window.SbtuAuth) {
+            if (typeof window.SbtuAuth.markUbysDirty === 'function') window.SbtuAuth.markUbysDirty();
+            if (typeof window.SbtuAuth.markIskurDirty === 'function') window.SbtuAuth.markIskurDirty();
         }
 
         closeImportModal();
-        showFeedback(true, "Yedek Geri Yüklendi!", "Tüm notlarınız, strateji verileriniz ve devamsızlık kayıtlarınız başarıyla aktarıldı.");
+        if (typeof showFeedback === 'function') {
+            showFeedback(true, "Yedek Geri Yüklendi!", "Tüm notlarınız, devamsızlık kayıtlarınız ve İŞKUR puantaj verileriniz başarıyla aktarıldı.");
+        }
     } catch (err) {
         closeImportModal();
-        showFeedback(false, "Aktarım Hatası", "Veriler uygulanırken beklenmeyen bir hata meydana geldi.");
+        if (typeof showFeedback === 'function') {
+            showFeedback(false, "Aktarım Hatası", "Veriler uygulanırken beklenmeyen bir hata meydana geldi.");
+        }
     }
 }

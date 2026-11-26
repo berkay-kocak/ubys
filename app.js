@@ -677,6 +677,169 @@ if ('serviceWorker' in navigator) {
     });
 }
 
+// ====================== GÜNÜN MENÜSÜ (ANA SAYFA) ======================
+
+let dailyMenuState = {
+    data: null,
+    dates: [],
+    currentIndex: -1,
+    initialized: false
+};
+
+/**
+ * yemek.json dosyasını çekip bugünün (veya seçilen günün) menüsünü
+ * #daily-menu-section kartına yazar ve önceki/sonraki gün navigasyonunu yönetir.
+ */
+async function loadDailyMenu() {
+    const listEl     = document.getElementById('menu-items-list');
+    const titleEl    = document.getElementById('menu-day-title');
+    const badgeEl    = document.getElementById('menu-status-badge');
+    const calEl      = document.getElementById('menu-total-cal');
+    const prevBtn    = document.getElementById('menu-prev-btn');
+    const nextBtn    = document.getElementById('menu-next-btn');
+    const todayBtn   = document.getElementById('menu-today-btn');
+
+    if (!listEl) return; // Ana sayfada değilse çık
+
+    const todayStr = new Date().toLocaleDateString('sv-SE'); // "YYYY-MM-DD"
+    const weekdays = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
+    const months   = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
+
+    function escapeHtml(str) {
+        return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+
+    function showEmpty(msg) {
+        listEl.innerHTML = `<div class="flex items-center justify-center py-8 text-xs text-slate-400 dark:text-zinc-500 gap-2">
+            <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"></path></svg>
+            <span>${msg}</span></div>`;
+        if (badgeEl) {
+            badgeEl.textContent = 'Bilgi Yok';
+            badgeEl.className = 'text-[11px] font-bold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-500 dark:text-zinc-400 border border-slate-200 dark:border-zinc-700';
+        }
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+        if (todayBtn) todayBtn.classList.add('hidden');
+    }
+
+    function renderDayByIndex(index) {
+        if (!dailyMenuState.dates || index < 0 || index >= dailyMenuState.dates.length) return;
+        dailyMenuState.currentIndex = index;
+
+        const dateKey = dailyMenuState.dates[index];
+        const dayData = dailyMenuState.data.days[dateKey];
+        if (!dayData) return;
+
+        const isToday = (dateKey === todayStr);
+        const dateObj = new Date(dateKey + 'T12:00:00');
+        const dayNumber = dateObj.getDate();
+        const monthName = months[dateObj.getMonth()];
+        const dayMonth = `${dayNumber} ${monthName}`;
+        const weekday = dayData.dayName || weekdays[dateObj.getDay()];
+
+        // Başlık ve Rozet:
+        // Kullanıcı isteği: "bide bugün yerine 26 kasım bugün falan diye yazabilir bence"
+        if (isToday) {
+            if (titleEl) titleEl.textContent = `Günün Menüsü (${weekday})`;
+            if (badgeEl) {
+                badgeEl.textContent = `🟢 ${dayMonth} • Bugün`;
+                badgeEl.className = 'text-[11px] font-bold px-2.5 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/50';
+            }
+            if (todayBtn) todayBtn.classList.add('hidden');
+        } else {
+            if (titleEl) titleEl.textContent = `${dayMonth} Menüsü (${weekday})`;
+            if (badgeEl) {
+                badgeEl.textContent = `📅 ${dayMonth} • ${weekday}`;
+                badgeEl.className = 'text-[11px] font-bold px-2.5 py-1 rounded-full bg-sky-50 dark:bg-sky-950/40 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/50';
+            }
+            if (todayBtn) todayBtn.classList.remove('hidden');
+        }
+
+        // Toplam Kalori
+        if (calEl) {
+            if (dayData.totalCalories) {
+                calEl.textContent = `~${Math.round(dayData.totalCalories)} kal`;
+                calEl.classList.remove('hidden');
+            } else {
+                calEl.classList.add('hidden');
+            }
+        }
+
+        // Önceki / Sonraki buton durumları
+        if (prevBtn) prevBtn.disabled = (index <= 0);
+        if (nextBtn) nextBtn.disabled = (index >= dailyMenuState.dates.length - 1);
+
+        // Yemek satırları
+        if (Array.isArray(dayData.items) && dayData.items.length > 0) {
+            listEl.innerHTML = dayData.items.map((item, i) => `
+                <div class="flex items-center justify-between gap-3 px-5 py-2.5 ${i % 2 === 0 ? '' : 'bg-slate-50/60 dark:bg-zinc-800/30'}">
+                    <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100 leading-snug">${escapeHtml(item.name)}</span>
+                    ${item.calories ? `<span class="font-mono text-[11px] font-bold text-slate-500 dark:text-zinc-400 shrink-0 whitespace-nowrap">${escapeHtml(item.calories)}</span>` : ''}
+                </div>`).join('');
+        } else {
+            listEl.innerHTML = `<div class="p-5 text-center text-xs text-slate-400">Bu gün için yemek kaydı bulunamadı.</div>`;
+        }
+    }
+
+    // Buton dinleyicilerini bağla (tek seferlik)
+    if (!dailyMenuState.initialized) {
+        if (prevBtn) {
+            prevBtn.addEventListener('click', () => {
+                if (dailyMenuState.currentIndex > 0) {
+                    renderDayByIndex(dailyMenuState.currentIndex - 1);
+                }
+            });
+        }
+        if (nextBtn) {
+            nextBtn.addEventListener('click', () => {
+                if (dailyMenuState.currentIndex < dailyMenuState.dates.length - 1) {
+                    renderDayByIndex(dailyMenuState.currentIndex + 1);
+                }
+            });
+        }
+        if (todayBtn) {
+            todayBtn.addEventListener('click', () => {
+                const todayIdx = dailyMenuState.dates.indexOf(todayStr);
+                if (todayIdx !== -1) {
+                    renderDayByIndex(todayIdx);
+                } else {
+                    const nextIdx = dailyMenuState.dates.findIndex(d => d > todayStr);
+                    renderDayByIndex(nextIdx !== -1 ? nextIdx : dailyMenuState.dates.length - 1);
+                }
+            });
+        }
+        dailyMenuState.initialized = true;
+    }
+
+    try {
+        const res = await fetch('./yemek.json?v=' + Date.now());
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        const data = await res.json();
+
+        if (!data.days || Object.keys(data.days).length === 0) {
+            showEmpty('Yemek listesi şu an mevcut değil');
+            return;
+        }
+
+        dailyMenuState.data = data;
+        dailyMenuState.dates = Object.keys(data.days).sort();
+
+        // Başlangıç tarihi seçimi: Bugün varsa bugün, yoksa yaklaşan ilk gün, o da yoksa son gün
+        let targetIndex = dailyMenuState.dates.indexOf(todayStr);
+        if (targetIndex === -1) {
+            targetIndex = dailyMenuState.dates.findIndex(d => d > todayStr);
+            if (targetIndex === -1) {
+                targetIndex = dailyMenuState.dates.length - 1;
+            }
+        }
+
+        renderDayByIndex(targetIndex);
+    } catch (err) {
+        console.warn('[loadDailyMenu] Yemek verisi alınamadı:', err.message);
+        showEmpty('Yemek listesine ulaşılamadı');
+    }
+}
+
 // ====================== UYGULAMA BAŞLANGIÇ NOKTASI ======================
 
 function initApp() {
@@ -725,6 +888,11 @@ function initApp() {
 
     if (window.SbtuAuth && typeof window.SbtuAuth.init === 'function') {
         window.SbtuAuth.init();
+    }
+
+    // Ana sayfada günün menüsünü yükle
+    if (page === 'home' || page === '') {
+        loadDailyMenu();
     }
 }
 
