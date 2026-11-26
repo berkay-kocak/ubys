@@ -1,0 +1,43 @@
+name: SBTÜ Haftalık Yemek Listesi Güncelleme
+
+on:
+  schedule:
+    # UTC 04:00 = Türkiye 07:00 (Hafta içi + Pazar)
+    - cron: '0 4 * * 0-5'
+    # UTC 08:30 = Türkiye 11:30 (Hafta içi)
+    - cron: '30 8 * * 1-5'
+  workflow_dispatch: # Manuel tetikleme
+
+permissions:
+  contents: write
+
+jobs:
+  update-menu:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Repoyu çek
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Node.js kurulumu
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Yemek listesini güncelle
+        run: node scripts/fetch-menu.js
+
+      - name: Değişiklik var mı kontrol et
+        id: changes
+        run: |
+          git diff --quiet yemek.json && echo "changed=false" >> $GITHUB_OUTPUT || echo "changed=true" >> $GITHUB_OUTPUT
+
+      - name: Commit ve Push
+        if: steps.changes.outputs.changed == 'true'
+        run: |
+          git config --global user.name "SBTÜ Menu Bot"
+          git config --global user.email "menu-bot@sivas.edu.tr"
+          git add yemek.json
+          git commit -m "chore: yemek listesi güncellendi $(date -u +%Y-%m-%d)"
+          git push
