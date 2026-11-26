@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
@@ -6,7 +6,7 @@
     <title>İŞKUR Gençlik - Haftalık Puantaj ve 22.5 Saat Sayacı</title>
     <!-- PWA & Mobil Uygulama Meta Etiketleri -->
     <link rel="manifest" href="../manifest.json">
-    <meta name="theme-color" content="#1e1b4b">
+    <meta name="theme-color" content="#0F4C81">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="application-name" content="SBTÜ Hazırlık">
 
@@ -29,7 +29,7 @@
     <!-- Google Fonts: Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <style>
         /* Yazdırma (A4 Yatay / Landscape & Kesin Beyaz Sayfa) Stilleri */
@@ -173,19 +173,14 @@
         }
     </style>
 </head>
-<body data-page="iskur" class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 min-h-screen pb-12 selection:bg-indigo-500 selection:text-white transition-colors duration-200 antialiased">
+<body data-page="iskur" class="bg-[#F8FAFC] dark:bg-zinc-950 text-slate-900 dark:text-zinc-100 min-h-screen pb-12 selection:bg-[#0F4C81] selection:text-white transition-colors duration-200 antialiased">
 
     <!-- Ortak UBYS Header -->
-    <header class="no-print relative bg-gradient-to-r from-blue-900 via-indigo-900 to-slate-900 text-white shadow-lg mb-4 sm:mb-6">
-        <div class="absolute inset-0 overflow-hidden pointer-events-none">
-            <div class="absolute -top-24 -left-24 w-64 h-64 bg-blue-500/20 rounded-full blur-3xl"></div>
-            <div class="absolute -bottom-24 right-12 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
-        </div>
-
-        <div class="relative max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
+    <header class="no-print bg-[#0F4C81] dark:bg-zinc-900/95 dark:backdrop-blur-md text-white border-b border-white/10 dark:border-zinc-800 mb-4 sm:mb-6">
+<div class="relative max-w-6xl mx-auto px-3 sm:px-6 py-4 sm:py-6">
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                 <div class="min-w-0">
-                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-blue-500/30 text-blue-100 border border-blue-400/30 backdrop-blur-sm mb-1">
+                    <span class="inline-block px-2.5 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold bg-white/10 text-sky-100 border border-white/15 uppercase tracking-wider mb-1">
                         İŞKUR Gençlik Programı
                     </span>
                     <h1 class="text-lg sm:text-2xl md:text-3xl font-extrabold tracking-tight truncate">Haftalık Puantaj Çizelgesi</h1>
@@ -230,8 +225,8 @@
                             </svg>
                             <span>Uygulamalar</span>
                         </button>
-                        <div id="app-switcher-menu" class="hidden absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 text-slate-800 dark:text-slate-100 shadow-2xl border border-slate-200/90 dark:border-slate-700 p-2 z-50 origin-top-right animate-modal">
-                            <div class="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                        <div id="app-switcher-menu" class="hidden absolute right-0 mt-2 w-64 rounded-xl bg-white dark:bg-zinc-900 text-slate-800 dark:text-zinc-100 shadow-2xl border border-slate-200/90 dark:border-zinc-700 p-2 z-50 origin-top-right animate-modal">
+                            <div class="px-2.5 py-1.5 text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-zinc-500">
                                 Uygulamalar
                             </div>
                             <div class="space-y-1 mt-0.5">
@@ -239,28 +234,28 @@
                                     <span class="text-lg leading-none">🏠</span>
                                     <div class="min-w-0 flex-1">
                                         <div class="truncate">Ana Sayfa</div>
-                                        <div class="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate">Portal &amp; Canlı Özet</div>
+                                        <div class="text-[10px] text-slate-400 dark:text-zinc-500 font-normal truncate">Portal &amp; Canlı Özet</div>
                                     </div>
                                 </a>
                                 <a href="../not-hesapla/" data-app-link="grades" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition">
                                     <span class="text-lg leading-none">🧮</span>
                                     <div class="min-w-0 flex-1">
                                         <div class="truncate">Not Hesaplayıcı</div>
-                                        <div class="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate">Vize &amp; Final Strateji</div>
+                                        <div class="text-[10px] text-slate-400 dark:text-zinc-500 font-normal truncate">Vize &amp; Final Strateji</div>
                                     </div>
                                 </a>
                                 <a href="../devamsizlik/" data-app-link="attendance" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition">
                                     <span class="text-lg leading-none">🕒</span>
                                     <div class="min-w-0 flex-1">
                                         <div class="truncate">Devamsızlık Takibi</div>
-                                        <div class="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate">Kur Takvimi &amp; Kota</div>
+                                        <div class="text-[10px] text-slate-400 dark:text-zinc-500 font-normal truncate">Kur Takvimi &amp; Kota</div>
                                     </div>
                                 </a>
                                 <a href="./" data-app-link="iskur" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition">
                                     <span class="text-lg leading-none">📋</span>
                                     <div class="min-w-0 flex-1">
                                         <div class="truncate">İŞKUR Gençlik Puantaj</div>
-                                        <div class="text-[10px] text-slate-400 dark:text-slate-500 font-normal truncate">22.5 Saat &amp; Çizelge</div>
+                                        <div class="text-[10px] text-slate-400 dark:text-zinc-500 font-normal truncate">22.5 Saat &amp; Çizelge</div>
                                     </div>
                                 </a>
                             </div>
@@ -291,38 +286,38 @@
         </div>
 
         <!-- Hafta Kontrol Paneli Kartı (Yazdırmada Gizli) -->
-        <section class="no-print bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-4 sm:p-5 transition-colors">
+        <section class="no-print bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-slate-200/90 dark:border-zinc-800 p-4 sm:p-5 transition-colors">
             <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3.5">
                 <div>
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                             Seçili Hafta
                         </span>
-                        <span id="week-range-badge" class="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-200 bg-slate-100 dark:bg-slate-800 px-3 py-0.5 rounded-full border border-slate-200/80 dark:border-slate-700">
+                        <span id="week-range-badge" class="text-xs sm:text-sm font-bold text-slate-700 dark:text-zinc-200 bg-slate-100 dark:bg-zinc-800 px-3 py-0.5 rounded-full border border-slate-200/80 dark:border-zinc-700">
                             Yükleniyor...
                         </span>
                     </div>
-                    <p class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    <p class="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1">
                         Hücreye tıklayarak <strong>1 Saat</strong> işaretleyin; yarım saat için <strong>½</strong> düğmesine basın veya gün altından <strong>elle saat</strong> girin.
                     </p>
                 </div>
 
                 <!-- Hafta Navigasyonu -->
                 <div class="flex flex-wrap items-center gap-2">
-                    <button id="prev-week-btn" type="button" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold text-xs sm:text-sm transition active:scale-95">
+                    <button id="prev-week-btn" type="button" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 font-semibold text-xs sm:text-sm transition active:scale-95">
                         <span>◀</span>
                         <span>Önceki Hafta</span>
                     </button>
 
                     <div class="relative flex-1 sm:flex-none min-w-[148px]">
-                        <input type="date" id="date-picker" aria-label="Tarih Seçin" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 dark:[color-scheme:dark] font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 cursor-pointer">
+                        <input type="date" id="date-picker" aria-label="Tarih Seçin" class="w-full px-3 py-2 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 dark:[color-scheme:dark] font-semibold text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 cursor-pointer">
                     </div>
 
                     <button id="today-week-btn" type="button" class="flex-1 sm:flex-none inline-flex items-center justify-center px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/70 font-semibold text-xs sm:text-sm transition active:scale-95">
                         Bu Hafta
                     </button>
 
-                    <button id="next-week-btn" type="button" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold text-xs sm:text-sm transition active:scale-95">
+                    <button id="next-week-btn" type="button" class="flex-1 sm:flex-none inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 font-semibold text-xs sm:text-sm transition active:scale-95">
                         <span>Sonraki Hafta</span>
                         <span>▶</span>
                     </button>
@@ -331,7 +326,7 @@
         </section>
 
         <!-- 22.5 Saat İŞKUR Gençlik Sayacı ve Hedef Planlayıcı Butonu (Yazdırmada Gizli) -->
-        <section class="no-print bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-4 sm:p-5 transition-colors">
+        <section class="no-print bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-slate-200/90 dark:border-zinc-800 p-4 sm:p-5 transition-colors">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                 <!-- 22.5 Saat İlerleme Göstergesi -->
                 <div class="flex-1 space-y-2">
@@ -340,26 +335,26 @@
                             <span class="text-xs font-bold uppercase tracking-wider text-indigo-600 dark:text-indigo-400">
                                 İŞKUR Gençlik Haftalık Kota
                             </span>
-                            <span id="quota-badge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700">
+                            <span id="quota-badge" class="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200/70 dark:border-zinc-700">
                                 Kalan: 22.5 Saat
                             </span>
                         </div>
                         <div class="text-right">
                             <span id="weekly-total-hours" class="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white">0</span>
-                            <span class="text-sm sm:text-base font-bold text-slate-500 dark:text-slate-400">/ 22.5 Saat</span>
-                            <span id="weekly-total-hm" class="text-xs font-medium text-slate-500 dark:text-slate-400 ml-1">(0 Saat 0 Dk)</span>
+                            <span class="text-sm sm:text-base font-bold text-slate-500 dark:text-zinc-400">/ 22.5 Saat</span>
+                            <span id="weekly-total-hm" class="text-xs font-medium text-slate-500 dark:text-zinc-400 ml-1">(0 Saat 0 Dk)</span>
                         </div>
                     </div>
 
                     <!-- İlerleme Çubuğu -->
-                    <div class="w-full h-3 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden border border-slate-200/80 dark:border-slate-700 p-0.5">
+                    <div class="w-full h-3 bg-slate-100 dark:bg-zinc-800 rounded-full overflow-hidden border border-slate-200/80 dark:border-zinc-700 p-0.5">
                         <div id="quota-progress-bar" class="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-300" style="width: 0%;"></div>
                     </div>
                 </div>
 
                 <!-- 22.5 Saat Hedef Programı Açma Butonu -->
-                <div class="flex items-center justify-end pt-2 lg:pt-0 border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-slate-800 lg:pl-5">
-                    <button id="open-planner-btn" type="button" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 active:scale-95 text-white font-bold text-xs sm:text-sm shadow-sm transition">
+                <div class="flex items-center justify-end pt-2 lg:pt-0 border-t lg:border-t-0 lg:border-l border-slate-100 dark:border-zinc-800 lg:pl-5">
+                    <button id="open-planner-btn" type="button" class="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-[#0F4C81] hover:bg-[#0c3d68] active:scale-95 text-white font-bold text-xs sm:text-sm shadow-sm transition">
                         <svg class="w-4 h-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
                         </svg>
@@ -370,19 +365,19 @@
         </section>
 
         <!-- 6 Günlük Saat İşaretleme Tablosu -->
-        <main class="surface-card bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 overflow-hidden transition-colors">
+        <main class="surface-card bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-slate-200/90 dark:border-zinc-800 overflow-hidden transition-colors">
             <div class="table-scroll overflow-x-auto">
                 <table id="puantaj-table" class="w-full min-w-[780px] border-collapse text-left">
                     <thead>
-                        <tr class="surface-sub bg-slate-100 dark:bg-slate-800/90 border-b border-slate-200 dark:border-slate-700">
-                            <th class="py-3.5 px-3.5 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-300 w-36 sticky left-0 bg-slate-100 dark:bg-slate-800 z-10 border-r border-slate-200 dark:border-slate-700">
+                        <tr class="surface-sub bg-slate-100 dark:bg-zinc-800/90 border-b border-slate-200 dark:border-zinc-700">
+                            <th class="py-3.5 px-3.5 text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-300 w-36 sticky left-0 bg-slate-100 dark:bg-zinc-800 z-10 border-r border-slate-200 dark:border-zinc-700">
                                 Saat Dilimi
                             </th>
-                            <th id="day-header-0" class="py-3 px-2 text-center border-r border-slate-200 dark:border-slate-700"></th>
-                            <th id="day-header-1" class="py-3 px-2 text-center border-r border-slate-200 dark:border-slate-700"></th>
-                            <th id="day-header-2" class="py-3 px-2 text-center border-r border-slate-200 dark:border-slate-700"></th>
-                            <th id="day-header-3" class="py-3 px-2 text-center border-r border-slate-200 dark:border-slate-700"></th>
-                            <th id="day-header-4" class="py-3 px-2 text-center border-r border-slate-200 dark:border-slate-700"></th>
+                            <th id="day-header-0" class="py-3 px-2 text-center border-r border-slate-200 dark:border-zinc-700"></th>
+                            <th id="day-header-1" class="py-3 px-2 text-center border-r border-slate-200 dark:border-zinc-700"></th>
+                            <th id="day-header-2" class="py-3 px-2 text-center border-r border-slate-200 dark:border-zinc-700"></th>
+                            <th id="day-header-3" class="py-3 px-2 text-center border-r border-slate-200 dark:border-zinc-700"></th>
+                            <th id="day-header-4" class="py-3 px-2 text-center border-r border-slate-200 dark:border-zinc-700"></th>
                             <th id="day-header-5" class="py-3 px-2 text-center"></th>
                         </tr>
                     </thead>
@@ -390,15 +385,15 @@
                         <!-- 10 saatlik dilim satırları JS ile oluşturulacak -->
                     </tbody>
                     <tfoot>
-                        <tr class="surface-sub bg-slate-100 dark:bg-slate-800/90 border-t-2 border-slate-200 dark:border-slate-700 font-bold text-slate-800 dark:text-slate-200">
-                            <td class="py-3 px-3.5 text-xs uppercase tracking-wider text-slate-600 dark:text-slate-400 sticky left-0 bg-slate-100 dark:bg-slate-800 z-10 border-r border-slate-200 dark:border-slate-700">
+                        <tr class="surface-sub bg-slate-100 dark:bg-zinc-800/90 border-t-2 border-slate-200 dark:border-zinc-700 font-bold text-slate-800 dark:text-zinc-200">
+                            <td class="py-3 px-3.5 text-xs uppercase tracking-wider text-slate-600 dark:text-zinc-400 sticky left-0 bg-slate-100 dark:bg-zinc-800 z-10 border-r border-slate-200 dark:border-zinc-700">
                                 Günlük Toplam
                             </td>
-                            <td id="day-total-0" class="py-3 px-2 text-center text-sm border-r border-slate-200 dark:border-slate-700">0 Saat</td>
-                            <td id="day-total-1" class="py-3 px-2 text-center text-sm border-r border-slate-200 dark:border-slate-700">0 Saat</td>
-                            <td id="day-total-2" class="py-3 px-2 text-center text-sm border-r border-slate-200 dark:border-slate-700">0 Saat</td>
-                            <td id="day-total-3" class="py-3 px-2 text-center text-sm border-r border-slate-200 dark:border-slate-700">0 Saat</td>
-                            <td id="day-total-4" class="py-3 px-2 text-center text-sm border-r border-slate-200 dark:border-slate-700">0 Saat</td>
+                            <td id="day-total-0" class="py-3 px-2 text-center text-sm border-r border-slate-200 dark:border-zinc-700">0 Saat</td>
+                            <td id="day-total-1" class="py-3 px-2 text-center text-sm border-r border-slate-200 dark:border-zinc-700">0 Saat</td>
+                            <td id="day-total-2" class="py-3 px-2 text-center text-sm border-r border-slate-200 dark:border-zinc-700">0 Saat</td>
+                            <td id="day-total-3" class="py-3 px-2 text-center text-sm border-r border-slate-200 dark:border-zinc-700">0 Saat</td>
+                            <td id="day-total-4" class="py-3 px-2 text-center text-sm border-r border-slate-200 dark:border-zinc-700">0 Saat</td>
                             <td id="day-total-5" class="py-3 px-2 text-center text-sm">0 Saat</td>
                         </tr>
                     </tfoot>
@@ -418,9 +413,9 @@
         </section>
 
         <!-- Alt Araç Çubuğu: Açıklama ve İşlem Butonları -->
-        <footer class="no-print bg-white dark:bg-slate-900 rounded-2xl shadow-sm border border-slate-200/90 dark:border-slate-800 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors">
+        <footer class="no-print bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-slate-200/90 dark:border-zinc-800 p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 transition-colors">
             <div class="space-y-1">
-                <div class="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-slate-400">
+                <div class="flex flex-wrap items-center gap-3 text-xs text-slate-600 dark:text-zinc-400">
                     <span class="inline-flex items-center gap-1.5">
                         <span class="w-3.5 h-3.5 rounded bg-emerald-600 inline-block"></span>
                         <span><strong>Tıkla:</strong> 1 Saat</span>
@@ -430,7 +425,7 @@
                         <span><strong>½ / Sağ Tık:</strong> 0.5 Saat</span>
                     </span>
                     <span class="inline-flex items-center gap-1.5">
-                        <span class="w-3.5 h-3.5 rounded border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-slate-800 inline-block"></span>
+                        <span class="w-3.5 h-3.5 rounded border border-slate-300 dark:border-slate-600 bg-slate-100 dark:bg-zinc-800 inline-block"></span>
                         <span><strong>Elle (s):</strong> Tabloyu kilitler</span>
                     </span>
                 </div>
@@ -440,17 +435,11 @@
             </div>
 
             <div class="flex flex-wrap items-center gap-2">
-                <button id="copy-summary-btn" type="button" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-semibold text-xs sm:text-sm transition active:scale-95">
+                <button id="copy-summary-btn" type="button" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-zinc-200 border border-slate-200 dark:border-zinc-700 font-semibold text-xs sm:text-sm transition active:scale-95">
                     Özeti Kopyala
                 </button>
                 <button id="clear-week-btn" type="button" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-rose-50 dark:bg-rose-950/60 hover:bg-rose-100 dark:hover:bg-rose-900/70 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800/70 font-semibold text-xs sm:text-sm transition active:scale-95">
                     Haftayı Temizle
-                </button>
-                <button id="export-btn" type="button" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/70 font-semibold text-xs sm:text-sm transition active:scale-95">
-                    Yedek İndir
-                </button>
-                <button id="import-open-btn" type="button" class="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/70 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800/70 font-semibold text-xs sm:text-sm transition active:scale-95">
-                    Yedek Yükle
                 </button>
                 <button id="print-btn" type="button" class="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-xl bg-slate-900 dark:bg-slate-700 hover:bg-slate-800 dark:hover:bg-slate-600 text-white font-semibold text-xs sm:text-sm transition active:scale-95">
                     Yazdır (A4 Yatay)
@@ -458,16 +447,138 @@
             </div>
         </footer>
     </div>
+    <!-- Dışa Aktarma Ön İzleme Modalı -->
+    <div id="export-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-zinc-950/75 backdrop-blur-sm transition-opacity duration-300">
+        <div class="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-slate-200/90 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[92vh] animate-modal">
+            <div class="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-zinc-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-[#0F4C81] dark:text-sky-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    </span>
+                    <h3 class="font-bold text-sm sm:text-base text-slate-800 dark:text-zinc-100">Yedekleme Ön İzlemesi</h3>
+                </div>
+                <button type="button" onclick="closeExportModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Kapat">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-3.5 text-xs">
+                <p class="text-slate-500 dark:text-zinc-400 leading-relaxed text-[11px] sm:text-xs">
+                    Aşağıdaki özet veriler ve tüm uygulama kayıtlarınız şifrelenmemiş standart bir <strong>.json</strong> yedek dosyasında toplanmıştır.
+                </p>
+
+                <div class="p-3.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 space-y-2">
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300">
+                        <span class="font-medium text-slate-500 dark:text-zinc-400">Öğrenci:</span>
+                        <span id="export-preview-name" class="font-bold text-indigo-950 dark:text-indigo-200">Belirtilmedi</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300">
+                        <span class="font-medium text-slate-500 dark:text-zinc-400">Dönem Notu / Durum:</span>
+                        <span id="export-preview-grade" class="font-extrabold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300">
+                        <span class="font-medium text-slate-500 dark:text-zinc-400">Girilmiş Not Sayısı:</span>
+                        <span id="export-preview-gradecount" class="font-bold text-slate-800 dark:text-zinc-200">0 Not</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300">
+                        <span class="font-medium text-slate-500 dark:text-zinc-400">Toplam Devamsızlık Kaydı:</span>
+                        <span id="export-preview-attcount" class="font-bold text-slate-800 dark:text-zinc-200">0 Günlük Kayıt</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300">
+                        <span class="font-medium text-slate-500 dark:text-zinc-400">İŞKUR Puantaj Kaydı:</span>
+                        <span id="export-preview-iskurcount" class="font-bold text-slate-800 dark:text-zinc-200">0 Hafta</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300 pt-1 border-t border-indigo-200/50 dark:border-indigo-900/30 text-[10px]">
+                        <span class="text-slate-400">Yedekleme Zamanı:</span>
+                        <span id="export-preview-time" class="text-indigo-600 dark:text-indigo-400 font-semibold">-</span>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-[11px] font-bold text-slate-600 dark:text-zinc-300 mb-1">Dosya İçeriği (JSON)</span>
+                    <pre id="export-json-preview" class="p-2.5 rounded-xl bg-slate-900 text-indigo-300 text-[10px] font-mono max-h-32 overflow-x-auto overflow-y-auto border border-slate-800 select-all"></pre>
+                </div>
+            </div>
+
+            <div class="p-3.5 sm:p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-900/60 flex items-center justify-end gap-2 shrink-0">
+                <button type="button" onclick="closeExportModal()" class="px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-zinc-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition">
+                    Vazgeç
+                </button>
+                <button type="button" onclick="downloadExportedFile()" class="flex-1 px-4 py-2 bg-[#0F4C81] hover:bg-[#0c3d68] active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span>Yedek Dosyasını İndir (.json)</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- İçe Aktarma Ön İzleme ve Onay Modalı -->
+    <div id="import-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-zinc-950/75 backdrop-blur-sm transition-opacity duration-300">
+        <div class="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-slate-200/90 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[92vh] animate-modal">
+            <div class="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-zinc-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-[#0F4C81] dark:text-sky-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </span>
+                    <h3 class="font-bold text-sm sm:text-base text-slate-800 dark:text-zinc-100">Yedek Yükleme Onayı</h3>
+                </div>
+                <button type="button" onclick="closeImportModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Kapat">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-3.5 text-xs">
+                <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-amber-900 dark:text-amber-300 leading-relaxed text-[11px]">
+                    <strong>Dikkat:</strong> Bu yedek dosyasını içeri aktardığınızda tarayıcınızda kayıtlı mevcut notlar, devamsızlıklar ve İŞKUR kayıtları bu yedekteki verilerle güncellenecektir.
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-800/40 border border-slate-200/80 dark:border-zinc-700/80 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-zinc-400">Öğrenci:</span>
+                        <span id="import-preview-name" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-zinc-400">Not Sayısı:</span>
+                        <span id="import-preview-grades" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-zinc-400">Devamsızlık Kayıtları:</span>
+                        <span id="import-preview-att" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-zinc-400">İŞKUR Puantajı:</span>
+                        <span id="import-preview-iskur" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-zinc-400">Yedek Tarihi:</span>
+                        <span id="import-preview-date" class="font-semibold text-indigo-600 dark:text-indigo-400 text-[10px]">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3.5 sm:p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-900/60 flex items-center justify-end gap-2 shrink-0">
+                <button type="button" onclick="closeImportModal()" class="px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-zinc-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition">
+                    İptal
+                </button>
+                <button type="button" onclick="confirmImport()" class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Onayla ve Verileri Yükle</span>
+                </button>
+            </div>
+        </div>
+    </div>
+    <input type="file" id="import-file-input" accept=".json,application/json" class="hidden" onchange="handleFileSelect(event)">
+
 
     <!-- Bildirim Mesajı (Toast) -->
-    <div id="toast-message" role="status" aria-live="polite" class="no-print fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300 bg-slate-900 dark:bg-slate-800 text-white border border-slate-700 text-xs sm:text-sm font-medium px-4 py-3 rounded-2xl shadow-xl flex items-center gap-2.5 max-w-sm">
+    <div id="toast-message" role="status" aria-live="polite" class="no-print fixed bottom-5 right-5 z-50 hidden transform transition-all duration-300 bg-slate-900 dark:bg-zinc-800 text-white border border-slate-700 text-xs sm:text-sm font-medium px-4 py-3 rounded-xl shadow-xl flex items-center gap-2.5 max-w-sm">
         <span id="toast-icon" data-toast-icon>✅</span>
         <span id="toast-text" data-toast-text>İşlem tamamlandı.</span>
     </div>
 
     <!-- Genel Onay & Bilgi Penceresi (Modal) -->
-    <div id="action-modal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 animate-modal">
+    <div id="action-modal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-zinc-950/75 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200/90 dark:border-zinc-800 animate-modal">
             <div class="flex items-start gap-3">
                 <div id="modal-icon-box" class="p-2.5 bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 rounded-xl border border-indigo-100 dark:border-indigo-900/50 shrink-0">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -475,24 +586,24 @@
                     </svg>
                 </div>
                 <div class="flex-1">
-                    <h3 id="modal-title" class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100">İşlem Onayı</h3>
-                    <p id="modal-message" class="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1 whitespace-pre-line">Bu işlemi onaylıyor musunuz?</p>
+                    <h3 id="modal-title" class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-zinc-100">İşlem Onayı</h3>
+                    <p id="modal-message" class="text-xs sm:text-sm text-slate-500 dark:text-zinc-400 mt-1 whitespace-pre-line">Bu işlemi onaylıyor musunuz?</p>
                 </div>
             </div>
 
             <!-- Yazdırma Öncesi Öğrenci Adı Giriş Alanı -->
-            <div id="modal-student-name-box" class="hidden mt-4 pt-3 border-t border-slate-100 dark:border-slate-800">
-                <label for="modal-student-name-input" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">
+            <div id="modal-student-name-box" class="hidden mt-4 pt-3 border-t border-slate-100 dark:border-zinc-800">
+                <label for="modal-student-name-input" class="block text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-zinc-400 mb-1.5">
                     Öğrenci Ad Soyad (Kâğıdın Altında Görünecek)
                 </label>
-                <input type="text" id="modal-student-name-input" placeholder="Adınız ve Soyadınız..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-800 dark:text-slate-100 text-sm font-semibold focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition">
+                <input type="text" id="modal-student-name-input" placeholder="Adınız ve Soyadınız..." class="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-slate-800 dark:text-zinc-100 text-sm font-semibold focus:bg-white dark:focus:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/30 focus:border-indigo-500 transition">
             </div>
 
             <div class="mt-6 flex justify-end gap-2.5">
-                <button id="modal-cancel-btn" type="button" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                <button id="modal-cancel-btn" type="button" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-zinc-300 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
                     Vazgeç
                 </button>
-                <button id="modal-confirm-btn" type="button" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition">
+                <button id="modal-confirm-btn" type="button" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#0F4C81] hover:bg-[#0c3d68] shadow-sm transition">
                     Onayla
                 </button>
             </div>
@@ -500,8 +611,8 @@
     </div>
 
     <!-- Yedek Yükleme Penceresi -->
-    <div id="upload-modal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 animate-modal">
+    <div id="upload-modal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-zinc-950/75 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-md w-full p-5 sm:p-6 border border-slate-200/90 dark:border-zinc-800 animate-modal">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-3">
                     <div class="p-2.5 bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 rounded-xl border border-indigo-100 dark:border-indigo-900/50 shrink-0">
@@ -510,8 +621,8 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100">Yedek Dosyası Yükle</h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Daha önce indirdiğiniz .json yedek dosyasını seçin</p>
+                        <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-zinc-100">Yedek Dosyası Yükle</h3>
+                        <p class="text-xs text-slate-500 dark:text-zinc-400">Daha önce indirdiğiniz .json yedek dosyasını seçin</p>
                     </div>
                 </div>
                 <button id="upload-close-btn" type="button" aria-label="Kapat" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
@@ -521,24 +632,24 @@
                 </button>
             </div>
 
-            <label id="upload-dropzone" for="import-file-input" class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-300 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-400 rounded-2xl bg-slate-50 dark:bg-slate-800/60 hover:bg-indigo-50/40 dark:hover:bg-slate-800 cursor-pointer transition p-4 text-center">
+            <label id="upload-dropzone" for="import-file-input" class="flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-300 dark:border-zinc-700 hover:border-indigo-500 dark:hover:border-indigo-400 rounded-xl bg-slate-50 dark:bg-zinc-800/60 hover:bg-indigo-50/40 dark:hover:bg-slate-800 cursor-pointer transition p-4 text-center">
                 <svg class="w-10 h-10 text-indigo-600 dark:text-indigo-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
                 </svg>
-                <span id="upload-dropzone-title" class="text-sm font-bold text-slate-800 dark:text-slate-200">
+                <span id="upload-dropzone-title" class="text-sm font-bold text-slate-800 dark:text-zinc-200">
                     Dosya seçmek için tıklayın veya sürükleyip bırakın
                 </span>
-                <span id="upload-dropzone-sub" class="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                <span id="upload-dropzone-sub" class="text-xs text-slate-500 dark:text-zinc-400 mt-1">
                     Yalnızca .json uzantılı yedek dosyaları desteklenir
                 </span>
                 <input type="file" id="import-file-input" accept=".json,application/json" class="hidden">
             </label>
 
             <div class="mt-5 flex justify-end gap-2.5">
-                <button id="upload-cancel-btn" type="button" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
+                <button id="upload-cancel-btn" type="button" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-zinc-300 bg-slate-100 dark:bg-zinc-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition">
                     Vazgeç
                 </button>
-                <button id="upload-confirm-btn" type="button" disabled class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition">
+                <button id="upload-confirm-btn" type="button" disabled class="px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#0F4C81] hover:bg-[#0c3d68] disabled:opacity-40 disabled:cursor-not-allowed shadow-sm transition">
                     Yedeği Yükle
                 </button>
             </div>
@@ -546,8 +657,8 @@
     </div>
 
     <!-- 22.5 Saat Hedef Programı Penceresi -->
-    <div id="planner-modal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/75 backdrop-blur-sm p-4">
-        <div class="bg-white dark:bg-slate-900 rounded-3xl shadow-2xl max-w-lg w-full p-5 sm:p-6 border border-slate-200/90 dark:border-slate-800 max-h-[90vh] overflow-y-auto animate-modal">
+    <div id="planner-modal" class="no-print fixed inset-0 z-50 hidden items-center justify-center bg-zinc-950/75 backdrop-blur-sm p-4">
+        <div class="bg-white dark:bg-zinc-900 rounded-xl shadow-2xl max-w-lg w-full p-5 sm:p-6 border border-slate-200/90 dark:border-zinc-800 max-h-[90vh] overflow-y-auto animate-modal">
             <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center gap-3">
                     <div class="p-2.5 bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 rounded-xl border border-indigo-100 dark:border-indigo-900/50 shrink-0">
@@ -556,8 +667,8 @@
                         </svg>
                     </div>
                     <div>
-                        <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-slate-100">22.5 Saat Hedef Programı</h3>
-                        <p class="text-xs text-slate-500 dark:text-slate-400">08.00–18.00 (günlük maks. 10s) ve 0.5/1s dilimlerle planla</p>
+                        <h3 class="text-base sm:text-lg font-extrabold text-slate-900 dark:text-zinc-100">22.5 Saat Hedef Programı</h3>
+                        <p class="text-xs text-slate-500 dark:text-zinc-400">08.00–18.00 (günlük maks. 10s) ve 0.5/1s dilimlerle planla</p>
                     </div>
                 </div>
                 <button id="planner-close-btn" type="button" aria-label="Kapat" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
@@ -569,11 +680,11 @@
 
             <!-- Mevcut Durum Özeti -->
             <div class="grid grid-cols-2 gap-2.5 mb-4">
-                <div class="bg-slate-50 dark:bg-slate-800/80 rounded-2xl p-3 border border-slate-200/80 dark:border-slate-700">
-                    <div class="text-[11px] font-semibold text-slate-500 dark:text-slate-400">Mevcut Toplam</div>
+                <div class="bg-slate-50 dark:bg-zinc-800/80 rounded-xl p-3 border border-slate-200/80 dark:border-zinc-700">
+                    <div class="text-[11px] font-semibold text-slate-500 dark:text-zinc-400">Mevcut Toplam</div>
                     <div id="planner-current-hours" class="text-lg font-extrabold text-slate-900 dark:text-white mt-0.5">0 Saat</div>
                 </div>
-                <div class="bg-indigo-50/70 dark:bg-indigo-950/40 rounded-2xl p-3 border border-indigo-100 dark:border-indigo-900/50">
+                <div class="bg-indigo-50/70 dark:bg-indigo-950/40 rounded-xl p-3 border border-indigo-100 dark:border-indigo-900/50">
                     <div class="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400">22.5 İçin Kalan</div>
                     <div id="planner-remaining-hours" class="text-lg font-extrabold text-indigo-700 dark:text-indigo-300 mt-0.5">22.5 Saat</div>
                 </div>
@@ -582,7 +693,7 @@
             <!-- Gelebileceğin Günleri Seç -->
             <div class="mb-4">
                 <div class="flex items-center justify-between mb-1.5">
-                    <label class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400">
+                    <label class="text-xs font-bold uppercase tracking-wider text-slate-600 dark:text-zinc-400">
                         Gelebileceğin Günleri Seç
                     </label>
                     <div class="flex items-center gap-2 text-xs">
@@ -595,19 +706,28 @@
             </div>
 
             <!-- Hesaplanan Plan -->
-            <div id="planner-result-box" class="rounded-2xl p-4 bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/80 mb-4"></div>
+            <div id="planner-result-box" class="rounded-xl p-4 bg-indigo-50/80 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800/80 mb-4"></div>
 
             <div class="flex justify-end">
-                <button id="planner-done-btn" type="button" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition">
+                <button id="planner-done-btn" type="button" class="px-5 py-2.5 rounded-xl text-sm font-bold text-white bg-[#0F4C81] hover:bg-[#0c3d68] shadow-sm transition">
                     Kapat
                 </button>
             </div>
         </div>
     </div>
 
+    
+    <!-- Alt Bilgi -->
+    <footer class="max-w-6xl no-print mx-auto px-3 sm:px-4 pt-6 pb-4 text-center">
+        <p class="text-[11px] font-medium text-slate-400 dark:text-zinc-500 border-t border-slate-200/80 dark:border-zinc-800/80 pt-4">
+            SBTÜ Öğrenci Ekosistemi • Açık Kaynak Proje
+        </p>
+    </footer>
+
     <!-- Ortak Çekirdek & Supabase Auth Scriptleri -->
     <script src="../supabase-auth.js"></script>
     <script src="../app.js"></script>
+    <script src="../backup.js"></script>
 
     <!-- İŞKUR Puantaj Sayfa Mantığı -->
     <script>
@@ -851,7 +971,7 @@
                     confirmBtn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-rose-600 hover:bg-rose-700 shadow-sm transition";
                     iconBox.className = "p-2.5 bg-rose-50 dark:bg-rose-950/70 text-rose-600 dark:text-rose-400 rounded-xl border border-rose-100 dark:border-rose-900/50 shrink-0";
                 } else {
-                    confirmBtn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 shadow-sm transition";
+                    confirmBtn.className = "px-4 py-2 rounded-xl text-xs sm:text-sm font-bold text-white bg-[#0F4C81] hover:bg-[#0c3d68] shadow-sm transition";
                     iconBox.className = "p-2.5 bg-indigo-50 dark:bg-indigo-950/70 text-indigo-600 dark:text-indigo-300 rounded-xl border border-indigo-100 dark:border-indigo-900/50 shrink-0";
                 }
 
@@ -909,12 +1029,12 @@
                     const manualVal = manualArr[d];
                     const hasManual = manualVal !== null && manualVal !== "";
 
-                    th.className = `py-2.5 px-2 text-center border-r border-slate-200 dark:border-slate-700 last:border-r-0 ${isToday ? "bg-indigo-50/90 dark:bg-indigo-950/60" : ""}`;
+                    th.className = `py-2.5 px-2 text-center border-r border-slate-200 dark:border-zinc-700 last:border-r-0 ${isToday ? "bg-indigo-50/90 dark:bg-indigo-950/60" : ""}`;
                     th.innerHTML = `
-                        <div class="text-xs font-extrabold uppercase tracking-wide ${isToday ? "text-indigo-700 dark:text-indigo-300" : "text-slate-800 dark:text-slate-200"}">
+                        <div class="text-xs font-extrabold uppercase tracking-wide ${isToday ? "text-indigo-700 dark:text-indigo-300" : "text-slate-800 dark:text-zinc-200"}">
                             ${DAY_NAMES[d]}
                         </div>
-                        <div class="text-[11px] font-medium ${isToday ? "text-indigo-600 dark:text-indigo-400 font-semibold" : "text-slate-500 dark:text-slate-400"} mt-0.5">
+                        <div class="text-[11px] font-medium ${isToday ? "text-indigo-600 dark:text-indigo-400 font-semibold" : "text-slate-500 dark:text-zinc-400"} mt-0.5">
                             ${formatShortDate(dayDate)}${isToday ? ' <span class="no-print">• Bugün</span>' : ""}
                         </div>
                         <div class="no-print mt-1.5 flex items-center justify-center gap-1">
@@ -927,7 +1047,7 @@
                                 value="${hasManual ? manualVal : ""}"
                                 placeholder="Elle (s)"
                                 title="Bu gün için doğrudan saat girin (0-10 saat). Girildiğinde tablo kilitlenir."
-                                class="manual-day-input w-16 px-1.5 py-0.5 text-center text-[11px] font-bold rounded-lg border ${hasManual ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-800 dark:text-indigo-200" : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200"} focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
+                                class="manual-day-input w-16 px-1.5 py-0.5 text-center text-[11px] font-bold rounded-lg border ${hasManual ? "border-indigo-500 bg-indigo-50 dark:bg-indigo-950/80 text-indigo-800 dark:text-indigo-200" : "border-slate-200 dark:border-zinc-700 bg-white dark:bg-zinc-900 text-slate-700 dark:text-zinc-200"} focus:outline-none focus:ring-2 focus:ring-indigo-500/30"
                             >
                             ${hasManual ? `<button type="button" data-clear-manual="${d}" title="Elle girişi kaldır ve tabloyu aç" class="w-5 h-5 inline-flex items-center justify-center rounded-md bg-rose-100 dark:bg-rose-950/80 text-rose-700 dark:text-rose-300 hover:bg-rose-200 text-xs font-bold leading-none">×</button>` : ""}
                         </div>
@@ -942,7 +1062,7 @@
                     tr.className = "hover:bg-slate-50/80 dark:hover:bg-slate-800/40 transition-colors";
 
                     const timeTd = document.createElement("td");
-                    timeTd.className = "py-2 px-3.5 font-semibold text-xs sm:text-sm text-slate-700 dark:text-slate-300 whitespace-nowrap sticky left-0 bg-white dark:bg-slate-900 z-10 border-r border-slate-200 dark:border-slate-800";
+                    timeTd.className = "py-2 px-3.5 font-semibold text-xs sm:text-sm text-slate-700 dark:text-zinc-300 whitespace-nowrap sticky left-0 bg-white dark:bg-zinc-900 z-10 border-r border-slate-200 dark:border-zinc-800";
                     timeTd.textContent = slotLabel;
                     tr.appendChild(timeTd);
 
@@ -953,7 +1073,7 @@
                         const isLocked = manualArr[dIdx] !== null && manualArr[dIdx] !== "";
 
                         const td = document.createElement("td");
-                        td.className = `p-1.5 text-center border-r border-slate-100 dark:border-slate-800 last:border-r-0 ${isToday ? "bg-indigo-50/40 dark:bg-indigo-950/20" : ""}`;
+                        td.className = `p-1.5 text-center border-r border-slate-100 dark:border-zinc-800 last:border-r-0 ${isToday ? "bg-indigo-50/40 dark:bg-indigo-950/20" : ""}`;
 
                         const btn = document.createElement("button");
                         btn.type = "button";
@@ -980,13 +1100,13 @@
                     btn.classList.add(
                         "slot-btn-locked",
                         "bg-slate-100/80",
-                        "dark:bg-slate-800/40",
+                        "dark:bg-zinc-800/40",
                         "text-slate-400",
                         "dark:text-slate-600",
                         "border",
                         "border-dashed",
                         "border-slate-300",
-                        "dark:border-slate-700/70",
+                        "dark:border-zinc-700/70",
                         "cursor-not-allowed"
                     );
                     btn.innerHTML = sIdx === 4
@@ -1025,18 +1145,18 @@
                     btn.classList.add(
                         "slot-btn-empty",
                         "bg-slate-50",
-                        "dark:bg-slate-800/80",
+                        "dark:bg-zinc-800/80",
                         "hover:bg-slate-100",
                         "dark:hover:bg-slate-800",
                         "text-slate-400",
-                        "dark:text-slate-500",
+                        "dark:text-zinc-500",
                         "border",
                         "border-slate-200",
-                        "dark:border-slate-700"
+                        "dark:border-zinc-700"
                     );
                     btn.innerHTML = `
                         <span class="group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">+</span>
-                        <span data-half-trigger="true" title="Yarım saat (0.5) işaretle" class="no-print opacity-60 sm:opacity-0 group-hover:opacity-100 absolute right-1.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-amber-500 hover:text-white text-slate-600 dark:text-slate-300 text-[10px] font-bold flex items-center justify-center transition-all">½</span>
+                        <span data-half-trigger="true" title="Yarım saat (0.5) işaretle" class="no-print opacity-60 sm:opacity-0 group-hover:opacity-100 absolute right-1.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-md bg-slate-200 dark:bg-slate-700 hover:bg-amber-500 hover:text-white text-slate-600 dark:text-zinc-300 text-[10px] font-bold flex items-center justify-center transition-all">½</span>
                     `;
                 }
             }
@@ -1055,7 +1175,7 @@
                     dayTotalCell.textContent = hasManual
                         ? `${formatHoursNumber(dayHours)} Saat (Manuel)`
                         : `${formatHoursNumber(dayHours)} Saat`;
-                    dayTotalCell.className = `py-3 px-2 text-center text-xs sm:text-sm border-r border-slate-200 dark:border-slate-700 last:border-r-0 ${dayHours > 0 ? "text-indigo-700 dark:text-indigo-400 font-extrabold" : "text-slate-500 dark:text-slate-500 font-semibold"}`;
+                    dayTotalCell.className = `py-3 px-2 text-center text-xs sm:text-sm border-r border-slate-200 dark:border-zinc-700 last:border-r-0 ${dayHours > 0 ? "text-indigo-700 dark:text-indigo-400 font-extrabold" : "text-slate-500 dark:text-zinc-500 font-semibold"}`;
                 }
 
                 const formattedWeekly = formatHoursNumber(weeklyTotal);
@@ -1071,7 +1191,7 @@
                 const diff = TARGET_HOURS - weeklyTotal;
                 if (diff > 0) {
                     progressBar.className = "h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-600 transition-all duration-300";
-                    quotaBadge.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/70 dark:border-slate-700";
+                    quotaBadge.className = "text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 border border-slate-200/70 dark:border-zinc-700";
                     quotaBadge.textContent = `Kalan: ${formatHoursNumber(diff)} Saat`;
                 } else if (diff === 0) {
                     progressBar.className = "h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300";
@@ -1147,7 +1267,7 @@
                     btn.dataset.planDay = String(d);
                     btn.className = isChecked
                         ? "flex items-center justify-between px-3 py-2.5 rounded-xl border-2 border-indigo-600 bg-indigo-50 dark:bg-indigo-950/70 text-indigo-900 dark:text-indigo-200 text-left transition"
-                        : "flex items-center justify-between px-3 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 text-left transition";
+                        : "flex items-center justify-between px-3 py-2.5 rounded-xl border border-slate-200 dark:border-zinc-700 bg-slate-50 dark:bg-zinc-800 text-slate-700 dark:text-zinc-300 hover:bg-slate-100 dark:hover:bg-slate-700 text-left transition";
 
                     btn.innerHTML = `
                         <div>
@@ -1166,7 +1286,7 @@
                         <div class="text-sm font-bold text-emerald-700 dark:text-emerald-300">
                             🎉 Tebrikler! Bu hafta 22.5 saat hedefine zaten ulaştınız.
                         </div>
-                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                        <p class="text-xs text-slate-600 dark:text-zinc-400 mt-1">
                             Ekstra gün planlamanıza gerek kalmadı.
                         </p>
                     `;
@@ -1189,7 +1309,7 @@
                         <div class="text-sm font-bold text-rose-700 dark:text-rose-300">
                             ⚠️ Seçtiğiniz günler 22.5 saati tamamlamaya yetmiyor!
                         </div>
-                        <p class="text-xs text-slate-600 dark:text-slate-400 mt-1">
+                        <p class="text-xs text-slate-600 dark:text-zinc-400 mt-1">
                             08.00–18.00 (günlük maks. 10 saat) kuralına göre seçtiğiniz günlerde en fazla <strong>${formatHoursNumber(dist.totalCapHours)} saat</strong> daha çalışabilirsiniz. Kalan <strong>${formatHoursNumber(remaining)} saat</strong> için başka günler de ekleyin.
                         </p>
                     `;
@@ -1208,14 +1328,14 @@
                     const newTotal = item.existing + addHours;
                     const dayDate = addDays(currentMonday, item.dayIdx);
                     return `
-                        <div class="flex items-center justify-between py-1.5 px-2.5 rounded-xl bg-white/85 dark:bg-slate-900/80 border border-indigo-200/70 dark:border-indigo-800/50 text-xs">
+                        <div class="flex items-center justify-between py-1.5 px-2.5 rounded-xl bg-white/85 dark:bg-zinc-900/80 border border-indigo-200/70 dark:border-indigo-800/50 text-xs">
                             <div>
-                                <span class="font-bold text-slate-800 dark:text-slate-100">${DAY_NAMES[item.dayIdx]}</span>
-                                <span class="text-slate-500 dark:text-slate-400 ml-1">(${formatShortDate(dayDate)})</span>
+                                <span class="font-bold text-slate-800 dark:text-zinc-100">${DAY_NAMES[item.dayIdx]}</span>
+                                <span class="text-slate-500 dark:text-zinc-400 ml-1">(${formatShortDate(dayDate)})</span>
                             </div>
                             <div class="text-right">
                                 <span class="font-extrabold text-indigo-700 dark:text-indigo-300">+${formatHoursNumber(addHours)} Saat</span>
-                                <span class="text-[11px] text-slate-500 dark:text-slate-400 ml-1">(Gün toplamı: ${formatHoursNumber(newTotal)}s)</span>
+                                <span class="text-[11px] text-slate-500 dark:text-zinc-400 ml-1">(Gün toplamı: ${formatHoursNumber(newTotal)}s)</span>
                             </div>
                         </div>
                     `;
@@ -1487,7 +1607,11 @@
                 });
             });
 
-            document.getElementById("export-btn").addEventListener("click", () => {
+            document.getElementById("export-btn")?.addEventListener("click", () => {
+                if (typeof openExportModal === "function") {
+                    openExportModal();
+                    return;
+                }
                 const recordedCount = Object.keys(allWeeksData).length;
                 openActionModal({
                     title: "Yedek Dosyası İndir",
@@ -1577,7 +1701,12 @@
                 reader.readAsText(file);
             }
 
-            document.getElementById("import-open-btn").addEventListener("click", () => {
+            document.getElementById("import-open-btn")?.addEventListener("click", () => {
+                const fileInput = document.getElementById("import-file-input");
+                if (typeof openImportModal === "function" && fileInput) {
+                    fileInput.click();
+                    return;
+                }
                 resetUploadModal();
                 uploadModalEl.classList.remove("hidden");
                 uploadModalEl.classList.add("flex");
