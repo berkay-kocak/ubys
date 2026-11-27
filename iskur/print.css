@@ -1,0 +1,141 @@
+
+        /* Yazdırma (A4 Yatay / Landscape & Kesin Beyaz Sayfa) Stilleri */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 7mm;
+            }
+
+            html, body {
+                width: 100% !important;
+                height: auto !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .print-only {
+                display: block !important;
+            }
+
+            .print-only-flex {
+                display: flex !important;
+            }
+
+            #app-container {
+                max-width: 100% !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+
+            .surface-card,
+            .surface-sub,
+            .surface-cell {
+                background: #ffffff !important;
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+                box-shadow: none !important;
+                border-color: #cbd5e1 !important;
+            }
+
+            #print-header {
+                display: flex !important;
+                padding: 6px 10px !important;
+                margin-bottom: 6px !important;
+                border: 1px solid #94a3b8 !important;
+                border-radius: 8px !important;
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+            }
+
+            .table-scroll {
+                overflow: visible !important;
+            }
+
+            #puantaj-table {
+                min-width: 100% !important;
+                width: 100% !important;
+                table-layout: fixed !important;
+                border-collapse: collapse !important;
+            }
+
+            #puantaj-table th,
+            #puantaj-table td {
+                padding: 2px 3px !important;
+                border: 1px solid #94a3b8 !important;
+                color: #0f172a !important;
+                background-color: #ffffff !important;
+            }
+
+            #puantaj-table thead th {
+                background-color: #f1f5f9 !important;
+                font-size: 10px !important;
+                padding: 4px 3px !important;
+            }
+
+            #puantaj-table tbody td:first-child {
+                width: 96px !important;
+                font-size: 10px !important;
+                background-color: #f8fafc !important;
+            }
+
+            .slot-btn {
+                min-height: 21px !important;
+                height: 21px !important;
+                padding: 1px 4px !important;
+                border-radius: 4px !important;
+                font-size: 9.5px !important;
+                box-shadow: none !important;
+            }
+
+            .slot-btn-full {
+                background-color: #dcfce7 !important;
+                border: 1px solid #22c55e !important;
+                color: #14532d !important;
+            }
+
+            .slot-btn-half {
+                background-color: #fef3c7 !important;
+                border: 1px solid #f59e0b !important;
+                color: #78350f !important;
+            }
+
+            .slot-btn-empty {
+                background-color: #ffffff !important;
+                border: 1px dashed #cbd5e1 !important;
+                color: #94a3b8 !important;
+            }
+
+            .slot-btn-locked {
+                background-color: #f8fafc !important;
+                border: 1px dashed #cbd5e1 !important;
+                color: #64748b !important;
+            }
+
+            #puantaj-table tfoot td {
+                background-color: #f1f5f9 !important;
+                font-size: 10px !important;
+                padding: 4px 3px !important;
+            }
+
+            #print-student-footer {
+                display: flex !important;
+                margin-top: 8px !important;
+                padding: 6px 10px !important;
+                border: 1px solid #94a3b8 !important;
+                border-radius: 6px !important;
+                background-color: #ffffff !important;
+                color: #0f172a !important;
+                font-size: 11px !important;
+            }
+        }
+    
