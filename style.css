@@ -1,10 +1,22 @@
-body {
-    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+body,
+input,
+button,
+select,
+textarea {
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Sayısal Veriler İçin Tabular Monospace Tipografi */
+/* Başlıklar ve Kart Başlıkları: Bricolage Grotesque */
+h1, h2, h3, h4,
+.font-heading,
+#menu-day-title {
+    font-family: 'Bricolage Grotesque', 'Manrope', sans-serif;
+}
+
+/* Sayısal Veriler İçin Tabular Tipografi (Manrope) */
 .font-mono-tabular,
+.tabular-nums,
 input[type="number"],
 #vize-total-score,
 #final-total-score,
@@ -17,15 +29,23 @@ input[type="number"],
 #att-remaining-hours,
 #att-unexcused-hours,
 #att-medical-hours,
+#att-medical-quota,
 #att-percent-label,
 #editor-day-badge,
 #home-grade-summary,
 #home-att-summary,
 #home-iskur-summary,
+#menu-total-cal,
+#quota-badge,
+#weekly-total-hours,
+#weekly-total-hm,
+#planner-current-hours,
+#planner-remaining-hours,
+#print-total-hours-text,
 #puantaj-table td,
 #puantaj-table tfoot td,
 .slot-btn {
-    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
     font-variant-numeric: tabular-nums;
 }
 

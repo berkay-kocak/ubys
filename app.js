@@ -774,7 +774,7 @@ async function loadDailyMenu() {
             listEl.innerHTML = dayData.items.map((item, i) => `
                 <div class="flex items-center justify-between gap-3 px-5 py-2.5 ${i % 2 === 0 ? '' : 'bg-slate-50/60 dark:bg-zinc-800/30'}">
                     <span class="text-xs sm:text-sm font-semibold text-slate-800 dark:text-zinc-100 leading-snug">${escapeHtml(item.name)}</span>
-                    ${item.calories ? `<span class="font-mono text-[11px] font-bold text-slate-500 dark:text-zinc-400 shrink-0 whitespace-nowrap">${escapeHtml(item.calories)}</span>` : ''}
+                    ${item.calories ? `<span class="tabular-nums text-[11px] font-bold text-slate-500 dark:text-zinc-400 shrink-0 whitespace-nowrap">${escapeHtml(item.calories)}</span>` : ''}
                 </div>`).join('');
         } else {
             listEl.innerHTML = `<div class="p-5 text-center text-xs text-slate-400">Bu gün için yemek kaydı bulunamadı.</div>`;

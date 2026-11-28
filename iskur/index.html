@@ -21,15 +21,23 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
-            darkMode: 'class'
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Manrope', '-apple-system', 'BlinkMacSystemFont', 'sans-serif'],
+                        heading: ['"Bricolage Grotesque"', 'Manrope', 'sans-serif'],
+                    }
+                }
+            }
         };
     </script>
     <!-- Supabase JS SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Google Fonts: Inter -->
+    <!-- Google Fonts: Bricolage Grotesque & Manrope -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Manrope:wght@400;500;600;700&display=swap&subset=latin-ext" rel="stylesheet">
     <link rel="stylesheet" href="../style.css">
     <link rel="stylesheet" href="./print.css">
 </head>
@@ -356,7 +364,7 @@
 
                 <div>
                     <span class="block text-[11px] font-bold text-slate-600 dark:text-zinc-300 mb-1">Dosya İçeriği (JSON)</span>
-                    <pre id="export-json-preview" class="p-2.5 rounded-xl bg-slate-900 text-indigo-300 text-[10px] font-mono max-h-32 overflow-x-auto overflow-y-auto border border-slate-800 select-all"></pre>
+                    <pre id="export-json-preview" class="p-2.5 rounded-xl bg-slate-900 text-indigo-300 text-[10px] font-sans tabular-nums max-h-32 overflow-x-auto overflow-y-auto border border-slate-800 select-all"></pre>
                 </div>
             </div>
 
