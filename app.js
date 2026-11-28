@@ -701,7 +701,7 @@ async function loadDailyMenu() {
 
     if (!listEl) return; // Ana sayfada değilse çık
 
-    const todayStr = new Date().toLocaleDateString('sv-SE'); // "YYYY-MM-DD"
+    const todayStr = getLocalDateString(); // "YYYY-MM-DD"
     const weekdays = ['Pazar','Pazartesi','Salı','Çarşamba','Perşembe','Cuma','Cumartesi'];
     const months   = ['Ocak','Şubat','Mart','Nisan','Mayıs','Haziran','Temmuz','Ağustos','Eylül','Ekim','Kasım','Aralık'];
 
@@ -840,11 +840,172 @@ async function loadDailyMenu() {
     }
 }
 
+// ====================== ORTAK YARDIMCILAR & MODALLAR ======================
+
+function getLocalDateString(date = new Date()) {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
+
+function initSharedModals() {
+    if (!document.getElementById('export-modal')) {
+        document.body.insertAdjacentHTML('beforeend', `
+    <!-- Dışa Aktarma Ön İzleme Modalı -->
+    <div id="export-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-zinc-950/75 backdrop-blur-sm transition-opacity duration-300">
+        <div class="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-slate-200/90 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[92vh] animate-modal">
+            <div class="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-zinc-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-[#0F4C81] dark:text-sky-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    </span>
+                    <h3 class="font-bold text-sm sm:text-base text-slate-800 dark:text-zinc-100">Yedekleme Ön İzlemesi</h3>
+                </div>
+                <button type="button" onclick="closeExportModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Kapat">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-3.5 text-xs">
+                <p class="text-slate-500 dark:text-zinc-400 leading-relaxed text-[11px] sm:text-xs">
+                    Aşağıdaki özet veriler ve tüm uygulama kayıtlarınız şifrelenmemiş standart bir <strong>.json</strong> yedek dosyasında toplanmıştır.
+                </p>
+
+                <div class="p-3.5 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/30 border border-indigo-100 dark:border-indigo-900/40 space-y-2">
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300">
+                        <span class="font-medium text-slate-500 dark:text-zinc-400">Öğrenci:</span>
+                        <span id="export-preview-name" class="font-bold text-indigo-950 dark:text-indigo-200">Belirtilmedi</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300">
+                        <span class="font-medium text-slate-500 dark:text-zinc-400">Dönem Notu / Durum:</span>
+                        <span id="export-preview-grade" class="font-extrabold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300">
+                        <span class="font-medium text-slate-500 dark:text-zinc-400">Girilmiş Not Sayısı:</span>
+                        <span id="export-preview-gradecount" class="font-bold text-slate-800 dark:text-zinc-200">0 Not</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300">
+                        <span class="font-medium text-slate-500 dark:text-zinc-400">Toplam Devamsızlık Kaydı:</span>
+                        <span id="export-preview-attcount" class="font-bold text-slate-800 dark:text-zinc-200">0 Günlük Kayıt</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300">
+                        <span class="font-medium text-slate-500 dark:text-zinc-400">İŞKUR Puantaj Kaydı:</span>
+                        <span id="export-preview-iskurcount" class="font-bold text-slate-800 dark:text-zinc-200">0 Hafta</span>
+                    </div>
+                    <div class="flex justify-between items-center text-slate-700 dark:text-zinc-300 pt-1 border-t border-indigo-200/50 dark:border-indigo-900/30 text-[10px]">
+                        <span class="text-slate-400">Yedekleme Zamanı:</span>
+                        <span id="export-preview-time" class="text-indigo-600 dark:text-indigo-400 font-semibold">-</span>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="block text-[11px] font-bold text-slate-600 dark:text-zinc-300 mb-1">Dosya İçeriği (JSON)</span>
+                    <pre id="export-json-preview" class="p-2.5 rounded-xl bg-slate-900 text-indigo-300 text-[10px] font-sans tabular-nums max-h-32 overflow-x-auto overflow-y-auto border border-slate-800 select-all"></pre>
+                </div>
+            </div>
+
+            <div class="p-3.5 sm:p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-900/60 flex items-center justify-end gap-2 shrink-0">
+                <button type="button" onclick="closeExportModal()" class="px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-zinc-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition">
+                    Vazgeç
+                </button>
+                <button type="button" onclick="downloadExportedFile()" class="flex-1 px-4 py-2 bg-[#0F4C81] hover:bg-[#0c3d68] active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span>Yedek Dosyasını İndir (.json)</span>
+                </button>
+            </div>
+        </div>
+    </div>`);
+    }
+
+    if (!document.getElementById('import-modal')) {
+        document.body.insertAdjacentHTML('beforeend', `
+    <!-- İçe Aktarma Ön İzleme ve Onay Modalı -->
+    <div id="import-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-zinc-950/75 backdrop-blur-sm transition-opacity duration-300">
+        <div class="relative w-full max-w-sm sm:max-w-md bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-slate-200/90 dark:border-zinc-800 overflow-hidden flex flex-col max-h-[92vh] animate-modal">
+            <div class="flex items-center justify-between px-4 sm:px-5 py-3.5 border-b border-slate-100 dark:border-zinc-800 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-[#0F4C81] dark:text-sky-400">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </span>
+                    <h3 class="font-bold text-sm sm:text-base text-slate-800 dark:text-zinc-100">Yedek Yükleme Onayı</h3>
+                </div>
+                <button type="button" onclick="closeImportModal()" class="p-1.5 rounded-xl text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition" aria-label="Kapat">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <div class="p-4 sm:p-5 overflow-y-auto space-y-3.5 text-xs">
+                <div class="p-3 rounded-xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-900/50 text-amber-900 dark:text-amber-300 leading-relaxed text-[11px]">
+                    <strong>Dikkat:</strong> Bu yedek dosyasını içeri aktardığınızda tarayıcınızda kayıtlı mevcut notlar, devamsızlıklar ve İŞKUR kayıtları bu yedekteki verilerle güncellenecektir.
+                </div>
+
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-zinc-800/40 border border-slate-200/80 dark:border-zinc-700/80 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-zinc-400">Öğrenci:</span>
+                        <span id="import-preview-name" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-zinc-400">Not Sayısı:</span>
+                        <span id="import-preview-grades" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-zinc-400">Devamsızlık Kayıtları:</span>
+                        <span id="import-preview-att" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-zinc-400">İŞKUR Puantajı:</span>
+                        <span id="import-preview-iskur" class="font-bold text-slate-900 dark:text-white">-</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-slate-500 dark:text-zinc-400">Yedek Tarihi:</span>
+                        <span id="import-preview-date" class="font-semibold text-indigo-600 dark:text-indigo-400 text-[10px]">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="p-3.5 sm:p-4 border-t border-slate-100 dark:border-zinc-800 bg-slate-50/60 dark:bg-zinc-900/60 flex items-center justify-end gap-2 shrink-0">
+                <button type="button" onclick="closeImportModal()" class="px-3.5 py-2 text-xs font-semibold rounded-xl text-slate-600 dark:text-zinc-400 hover:bg-slate-200/60 dark:hover:bg-slate-800 transition">
+                    İptal
+                </button>
+                <button type="button" onclick="confirmImport()" class="flex-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Onayla ve Verileri Yükle</span>
+                </button>
+            </div>
+        </div>
+    </div>`);
+    }
+
+    if (!document.getElementById('import-file-input')) {
+        document.body.insertAdjacentHTML('beforeend', `
+    <input type="file" id="import-file-input" accept=".json,application/json" class="hidden" onchange="handleFileSelect(event)">`);
+    }
+
+    if (!document.getElementById('status-feedback-modal')) {
+        document.body.insertAdjacentHTML('beforeend', `
+    <!-- İşlem Sonuç Modalı -->
+    <div id="status-feedback-modal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-3 sm:p-4 bg-zinc-950/75 backdrop-blur-sm transition-opacity duration-300">
+        <div class="relative w-full max-w-xs sm:max-w-sm bg-white dark:bg-zinc-900 rounded-xl shadow-2xl border border-slate-200/90 dark:border-zinc-800 p-5 text-center space-y-3.5 animate-modal">
+            <div id="feedback-icon-container" class="w-12 h-12 mx-auto rounded-full flex items-center justify-center bg-emerald-100 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400"></div>
+            <div>
+                <h3 id="feedback-title" class="font-extrabold text-base text-slate-900 dark:text-zinc-100">İşlem Tamamlandı</h3>
+                <p id="feedback-desc" class="text-xs text-slate-500 dark:text-zinc-400 mt-1 leading-relaxed">Verileriniz başarıyla yüklendi.</p>
+            </div>
+            <button type="button" onclick="closeFeedbackModal()" class="w-full py-2 bg-[#0F4C81] hover:bg-[#0c3d68] text-white font-bold text-xs rounded-xl shadow transition active:scale-95">
+                Tamam
+            </button>
+        </div>
+    </div>`);
+    }
+}
+
 // ====================== UYGULAMA BAŞLANGIÇ NOKTASI ======================
 
 function initApp() {
     initTheme();
     initAppSwitcher();
+    initSharedModals();
 
     const page = getCurrentPageKey();
 

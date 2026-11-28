@@ -3,18 +3,18 @@ input,
 button,
 select,
 textarea {
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
 
-/* Başlıklar ve Kart Başlıkları: Bricolage Grotesque */
+/* Başlıklar, Kart ve Bölüm Başlıkları: Bricolage Grotesque */
 h1, h2, h3, h4,
 .font-heading,
 #menu-day-title {
-    font-family: 'Bricolage Grotesque', 'Manrope', sans-serif;
+    font-family: 'Bricolage Grotesque', 'Golos Text', sans-serif;
 }
 
-/* Sayısal Veriler İçin Tabular Tipografi (Manrope) */
+/* Sayısal Veriler İçin Tabular Tipografi (Golos Text) */
 .font-mono-tabular,
 .tabular-nums,
 input[type="number"],
@@ -45,8 +45,14 @@ input[type="number"],
 #puantaj-table td,
 #puantaj-table tfoot td,
 .slot-btn {
-    font-family: 'Manrope', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
     font-variant-numeric: tabular-nums;
+}
+
+/* Yemekhane kalori etiketlerinde 'kal' biriminin alt satıra düşmesini engelle */
+#menu-total-cal,
+#menu-items-list span.tabular-nums {
+    white-space: nowrap;
 }
 
 /* Kaydırma Çubuğu Özelleştirmeleri */
