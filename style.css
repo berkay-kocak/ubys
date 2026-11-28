@@ -3,7 +3,7 @@ input,
 button,
 select,
 textarea {
-    font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
     -webkit-tap-highlight-color: transparent;
 }
 
@@ -11,10 +11,10 @@ textarea {
 h1, h2, h3, h4,
 .font-heading,
 #menu-day-title {
-    font-family: 'Bricolage Grotesque', 'Golos Text', sans-serif;
+    font-family: 'Bricolage Grotesque', 'Onest', sans-serif;
 }
 
-/* Sayısal Veriler İçin Tabular Tipografi (Golos Text) */
+/* Sayısal Veriler İçin Tabular Tipografi (Onest) */
 .font-mono-tabular,
 .tabular-nums,
 input[type="number"],
@@ -45,7 +45,7 @@ input[type="number"],
 #puantaj-table td,
 #puantaj-table tfoot td,
 .slot-btn {
-    font-family: 'Golos Text', -apple-system, BlinkMacSystemFont, sans-serif;
+    font-family: 'Onest', -apple-system, BlinkMacSystemFont, sans-serif;
     font-variant-numeric: tabular-nums;
 }
 
